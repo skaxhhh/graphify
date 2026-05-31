@@ -1,0 +1,53 @@
+CREATE TABLE openai_settings (
+    id                         BIGINT PRIMARY KEY DEFAULT 1,
+    endpoint_url               VARCHAR(512)  NOT NULL DEFAULT '',
+    api_key_encrypted          TEXT,
+    deployment_name            VARCHAR(128)  NOT NULL DEFAULT 'gpt-4o',
+    api_version                VARCHAR(32)   NOT NULL DEFAULT '2024-02-15',
+    model                      VARCHAR(64)   NOT NULL DEFAULT 'gpt-4o',
+    temperature                NUMERIC(4, 2) NOT NULL DEFAULT 0.30,
+    max_tokens                 INT           NOT NULL DEFAULT 4096,
+    top_p                      NUMERIC(4, 2) NOT NULL DEFAULT 1.00,
+    embedding_model            VARCHAR(64)   NOT NULL DEFAULT 'text-embedding-3-large',
+    embedding_deployment       VARCHAR(128)  NOT NULL DEFAULT 'text-embedding-3-large',
+    fallback_endpoint_url      VARCHAR(512),
+    fallback_api_key_encrypted TEXT,
+    fallback_deployment_name   VARCHAR(128),
+    tokens_used                BIGINT        NOT NULL DEFAULT 0,
+    rate_limit_remaining       INT,
+    last_status                VARCHAR(32),
+    last_checked_at            TIMESTAMPTZ,
+    created_at                 TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    updated_at                 TIMESTAMPTZ   NOT NULL DEFAULT NOW(),
+    CONSTRAINT openai_settings_singleton CHECK (id = 1)
+);
+
+INSERT INTO openai_settings (
+    id,
+    endpoint_url,
+    deployment_name,
+    api_version,
+    model,
+    temperature,
+    max_tokens,
+    top_p,
+    embedding_model,
+    embedding_deployment,
+    tokens_used,
+    rate_limit_remaining,
+    last_status
+) VALUES (
+    1,
+    '',
+    'gpt-4o',
+    '2024-02-15',
+    'gpt-4o',
+    0.30,
+    4096,
+    1.00,
+    'text-embedding-3-large',
+    'text-embedding-3-large',
+    0,
+    100000,
+    'NOT_CONFIGURED'
+);

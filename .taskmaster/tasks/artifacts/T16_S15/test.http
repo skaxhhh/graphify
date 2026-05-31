@@ -1,0 +1,51 @@
+### Admin login (seed: admin@graphify.dev / admin1234)
+POST http://localhost:8081/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@graphify.dev",
+  "password": "admin1234"
+}
+
+> {%
+  client.global.set("adminToken", response.body.data.accessToken);
+%}
+
+### GET prompts — 성공
+GET http://localhost:8081/api/v1/admin/prompts?type=RELATION_ANALYSIS
+Authorization: Bearer {{adminToken}}
+
+### GET prompts — 실패 (type 오류)
+GET http://localhost:8081/api/v1/admin/prompts?type=INVALID
+Authorization: Bearer {{adminToken}}
+
+### POST save — 성공
+POST http://localhost:8081/api/v1/admin/prompts
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "type": "RELATION_ANALYSIS",
+  "systemPrompt": "당신은 기업 관계 분석 전문 AI입니다.",
+  "taskTemplate": "관계 그래프 관점에서 핵심 연결을 요약하세요.",
+  "changeNote": "API 테스트 저장"
+}
+
+### POST test — 성공 (companyId=1 가정)
+POST http://localhost:8081/api/v1/admin/prompts/1/test
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "companyId": 1,
+  "sampleInput": "반도체 공급망 중심으로 분석"
+}
+
+### POST rollback — 성공 (targetVersionId는 GET 응답 versions[1].id 사용)
+POST http://localhost:8081/api/v1/admin/prompts/1/rollback
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "targetVersionId": 1
+}

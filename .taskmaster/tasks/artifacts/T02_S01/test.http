@@ -1,0 +1,9 @@
+### GET trending companies
+GET http://localhost:8081/api/v1/home/trending-companies?limit=8
+
+###
+
+### GET market news
+GET http://localhost:8081/api/v1/home/market-news?limit=12
+
+###

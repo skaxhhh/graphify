@@ -1,0 +1,59 @@
+### Admin login
+POST http://localhost:8081/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@graphify.dev",
+  "password": "admin1234"
+}
+
+> {%
+  client.global.set("adminToken", response.body.data.accessToken);
+%}
+
+### GET config
+GET http://localhost:8081/api/v1/admin/openai/config
+Authorization: Bearer {{adminToken}}
+
+### PUT config — 성공
+PUT http://localhost:8081/api/v1/admin/openai/config
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "endpointUrl": "https://your-resource.openai.azure.com",
+  "apiKey": "test-key-placeholder",
+  "deploymentName": "gpt-4o",
+  "apiVersion": "2024-02-15",
+  "model": "gpt-4o",
+  "temperature": 0.3,
+  "maxTokens": 4096,
+  "topP": 1,
+  "embeddingModel": "text-embedding-3-large",
+  "embeddingDeployment": "text-embedding-3-large"
+}
+
+### PUT config — 실패 (http endpoint)
+PUT http://localhost:8081/api/v1/admin/openai/config
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "endpointUrl": "http://invalid.local",
+  "deploymentName": "gpt-4o",
+  "apiVersion": "2024-02-15",
+  "model": "gpt-4o",
+  "temperature": 0.3,
+  "maxTokens": 4096,
+  "topP": 1,
+  "embeddingModel": "text-embedding-3-large",
+  "embeddingDeployment": "text-embedding-3-large"
+}
+
+### GET status
+GET http://localhost:8081/api/v1/admin/openai/status
+Authorization: Bearer {{adminToken}}
+
+### GET status refresh
+GET http://localhost:8081/api/v1/admin/openai/status?refresh=true
+Authorization: Bearer {{adminToken}}

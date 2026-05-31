@@ -1,0 +1,53 @@
+---
+description: graphify 프로젝트 핵심 컨텍스트 — 작업 전·중 항상 참조
+alwaysApply: true
+---
+
+# 프로젝트 컨텍스트
+
+- **서비스**: graphify / AI Agent·MCP 기반 기업 관계 시각화·투자 인사이트 웹 서비스
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Spring Boot 3.x + Java 21 + Gradle
+- **DB**: PostgreSQL 16
+- **인증**: JWT (Access 15분 / Refresh 7일) + OAuth(소셜) — 상세는 [SCREEN_FLOW.md](mdc:.taskmaster/docs/SCREEN_FLOW.md)
+- **상태관리**: Zustand(전역) + TanStack Query(서버 캐시·요청)
+- **환경**: `dev` / `staging` / `prod` — 설정은 `.env.{환경}` 및 서버 프로파일로만 주입
+
+# 기획·UI 단일 출처
+
+- **PRD**: [prd.txt](mdc:.taskmaster/docs/prd.txt)
+- **화면 흐름**: [SCREEN_FLOW.md](mdc:.taskmaster/docs/SCREEN_FLOW.md)
+- **UI 명세**: [.taskmaster/docs/ui_specs/](mdc:.taskmaster/docs/ui_specs/) — 화면별 `UI_SPEC_S##_*.md`
+- **디자인 토큰**: [design_system.md](mdc:design_system.md) — 색·타이포·테두리; 코드 반영은 `frontend/tailwind.config.js` (`warm-border` 등)
+- **태스크·산출물**: [.taskmaster/tasks/tasks.json](mdc:.taskmaster/tasks/tasks.json), `artifacts/T##_*/` API·DB·개발 가이드
+
+# 공통 응답 포맷 (전체 API 통일)
+
+성공:
+
+```json
+{ "success": true, "data": {}, "meta": {} }
+```
+
+실패:
+
+```json
+{ "success": false, "error": { "code": "ERR_001", "message": "..." } }
+```
+
+- **메타**: 페이지네이션 시 `meta.page`, `meta.size`, `meta.total` 등 확장 가능
+- **코드**: `ERR_*` 도메인별 접두 규칙을 문서(OpenAPI)와 맞출 것
+
+# 절대 금지
+
+- TypeScript `any` 타입 사용
+- `console.log` 커밋 (임시 로그는 제거 후 커밋; 필요 시 구조화 로거·레벨)
+- 코드 내 하드코딩 URL / API 키 / 비밀번호
+- 직접 DOM 조작( `document.querySelector` 등 일괄 금지) — React·Radix 등 선언적 API 또는 허용된 ref 패턴만
+- 레이어 스킵 — 예: Controller → Repository 직접 호출; 트랜잭션·도메인 규칙은 Service(또는 UseCase) 계층에서 처리
+
+# 구현 시 권장
+
+- 화면별 작업은 Taskmaster 메타의 **구현 화면(S##)** 과 해당 **UI_SPEC**을 먼저 열고 레이아웃·상태·인터랙션 순으로 맞출 것
+- Spring: 검증은 Bean Validation, 보안 설정은 중앙 집중, DTO는 API 경계에 명시
+- DB: 마이그레이션(Flyway/Liquibase) 없이 스키마만 수동 변경하지 말 것

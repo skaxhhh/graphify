@@ -1,0 +1,45 @@
+{
+  "fear_and_greed": {
+    "score": 58.57,
+    "rating": "greed",
+    "timestamp": "2026-05-26T15:30:00.000Z"
+  },
+  "market_momentum_sp500": {
+    "score": 62.1,
+    "rating": "greed",
+    "data": []
+  },
+  "stock_price_strength": {
+    "score": 55.0,
+    "rating": "neutral",
+    "data": []
+  },
+  "stock_price_breadth": {
+    "score": 50.0,
+    "rating": "neutral",
+    "data": []
+  },
+  "put_call_options": {
+    "score": 48.0,
+    "rating": "neutral",
+    "data": []
+  },
+  "market_volatility_vix": {
+    "score": 52.0,
+    "rating": "neutral",
+    "data": [{ "x": 1, "y": 16.78 }]
+  },
+  "market_volatility_vix_50": {
+    "data": [{ "x": 1, "y": 18.2 }]
+  },
+  "junk_bond_demand": {
+    "score": 60.0,
+    "rating": "greed",
+    "data": []
+  },
+  "safe_haven_demand": {
+    "score": 58.0,
+    "rating": "greed",
+    "data": []
+  }
+}

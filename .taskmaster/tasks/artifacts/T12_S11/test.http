@@ -1,0 +1,54 @@
+@baseUrl = http://localhost:8081
+@token = {{login.response.body.data.accessToken}}
+
+### 로그인
+# @name login
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@graphify.dev",
+  "password": "password123"
+}
+
+###
+
+### GET /watchlist/me — 성공
+GET {{baseUrl}}/api/v1/watchlist/me
+Authorization: Bearer {{token}}
+
+###
+
+### GET /watchlist/me — 실패 (미인증)
+GET {{baseUrl}}/api/v1/watchlist/me
+
+###
+
+### POST /watchlist/me — 성공
+POST {{baseUrl}}/api/v1/watchlist/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "companyId": 6
+}
+
+###
+
+### DELETE /watchlist/me/{companyId} — 성공
+DELETE {{baseUrl}}/api/v1/watchlist/me/6
+Authorization: Bearer {{token}}
+
+###
+
+### GET /companies/compare — 성공
+GET {{baseUrl}}/api/v1/companies/compare?ids=1,2,3&basis=INVESTMENT
+Authorization: Bearer {{token}}
+
+###
+
+### GET /companies/compare — 실패 (4개 초과)
+GET {{baseUrl}}/api/v1/companies/compare?ids=1,2,3,4&basis=INVESTMENT
+Authorization: Bearer {{token}}
+
+###

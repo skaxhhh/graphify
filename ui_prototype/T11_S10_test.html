@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S10 분석 이력 상세 — 상태 테스트</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f7f5f0; color: #2d2d2d; }
+    .panel { border: 1px solid #e8e4dc; background: #faf8f4; border-radius: 12px; }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+  <div class="mx-auto max-w-[1400px] space-y-4">
+    <div class="flex flex-wrap gap-2">
+      <button type="button" data-state="loading" class="rounded-lg bg-charcoal px-4 py-2 text-sm text-white">loading</button>
+      <button type="button" data-state="empty" class="rounded-lg border px-4 py-2 text-sm">empty</button>
+      <button type="button" data-state="error" class="rounded-lg border px-4 py-2 text-sm">error</button>
+      <button type="button" data-state="populated" class="rounded-lg border px-4 py-2 text-sm">populated</button>
+    </div>
+    <div id="view" class="min-h-[480px]"></div>
+  </div>
+  <script>
+    const mock = {
+      company: { name: "삼성전자" },
+      analyzedAt: "2026-05-18T09:00:00Z",
+      status: "COMPLETED",
+      summaryLine: "HBM 공급망·AI GPU 고객 관계 인사이트 2건",
+      timeline: [
+        { label: "분석 시작", t: "2026-05-18T07:00:00Z" },
+        { label: "관계망 구성", t: "2026-05-18T08:00:00Z" },
+        { label: "분석 완료", t: "2026-05-18T09:00:00Z" }
+      ],
+      diffSummary: { text: "분석 시점 대비 공급망·투자 관계에서 핵심 파트너 노드 비중이 유지되었습니다.", generatedAt: "2026-05-18T09:05:00Z" }
+    };
+
+    const view = document.getElementById("view");
+
+    function render(state) {
+      if (state === "loading") {
+        view.innerHTML = `<div class="space-y-4"><div class="h-10 w-64 animate-pulse rounded bg-gray-200"></div><div class="h-12 animate-pulse rounded panel"></div><div class="h-80 animate-pulse rounded panel"></div></div>`;
+        return;
+      }
+      if (state === "empty") {
+        view.innerHTML = `<div class="panel p-8 text-center text-gray-500"><p class="font-medium">표시할 분석 데이터가 없습니다</p><p class="mt-2 text-sm">${mock.summaryLine}</p><a href="#" class="mt-4 inline-block text-sm underline">분석 이력 목록으로</a></div>`;
+        return;
+      }
+      if (state === "error") {
+        view.innerHTML = `<div class="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800">분석 이력을 불러오지 못했습니다. <button class="ml-2 underline">재시도</button></div>`;
+        return;
+      }
+      view.innerHTML = `
+        <div class="flex flex-wrap justify-between gap-4">
+          <div><h1 class="text-2xl font-semibold">${mock.company.name}</h1><p class="text-sm text-gray-500">분석 일시 ${new Date(mock.analyzedAt).toLocaleString("ko-KR")}</p></div>
+          <label class="text-sm">현재와 비교 <input type="checkbox" /></label>
+        </div>
+        <div class="panel mt-4 h-12 flex items-center px-4 text-xs text-gray-500">TimelineSlider · ${mock.timeline.map(e => e.label).join(" → ")}</div>
+        <div class="panel mt-4 min-h-[420px] flex items-center justify-center text-gray-500">GraphSnapshotView (read-only)</div>
+        <div class="panel mt-4 p-4 text-sm">${mock.diffSummary.text}</div>`;
+    }
+
+    document.querySelectorAll("[data-state]").forEach((btn) => {
+      btn.addEventListener("click", () => render(btn.dataset.state));
+    });
+    render("populated");
+  </script>
+</body>
+</html>

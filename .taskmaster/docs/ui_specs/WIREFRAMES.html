@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>graphify — Screen Wireframes (S01–S17)</title>
+  <style>
+    :root {
+      --bg: #f5f3ef;
+      --surface: #fff;
+      --border: #c8c2b8;
+      --border-dashed: #a39e94;
+      --text: #2b2b2b;
+      --muted: #6b6560;
+      --accent: #3d4f5f;
+      --sidebar: #ebe6dd;
+      --header-h: 40px;
+      --subheader-h: 32px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "SF Pro Text", "Apple SD Gothic Neo", system-ui, sans-serif;
+      font-size: 12px;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.4;
+    }
+    .doc-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--text);
+      color: #f5f3ef;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+    .doc-header h1 { margin: 0; font-size: 16px; font-weight: 600; }
+    .doc-header p { margin: 0; font-size: 11px; opacity: 0.8; }
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .nav a {
+      color: #f5f3ef;
+      text-decoration: none;
+      padding: 4px 8px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 4px;
+      font-size: 11px;
+    }
+    .nav a:hover { background: rgba(255,255,255,0.12); }
+    .nav a.admin { border-color: #d4a574; color: #ffd9a8; }
+    .container { max-width: 1280px; margin: 0 auto; padding: 24px 16px 80px; }
+    .screen {
+      margin-bottom: 48px;
+      scroll-margin-top: 72px;
+    }
+    .screen-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 16px;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--text);
+    }
+    .screen-meta h2 { margin: 0; font-size: 18px; font-weight: 600; }
+    .badge {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--sidebar);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .badge.guest { background: #e8f0f8; border-color: #9cb4cc; }
+    .badge.user { background: #e8f4ea; border-color: #8fb996; }
+    .badge.admin { background: #f8ece0; border-color: #c9a06a; }
+    .wf {
+      background: var(--surface);
+      border: 2px solid var(--text);
+      border-radius: 8px;
+      overflow: hidden;
+      min-height: 200px;
+    }
+    .wf-row { display: flex; min-height: 0; }
+    .wf-col { display: flex; flex-direction: column; min-width: 0; }
+    .wf-header {
+      height: var(--header-h);
+      background: var(--sidebar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .wf-subheader {
+      height: var(--subheader-h);
+      background: #f0ebe3;
+      border-bottom: 1px dashed var(--border-dashed);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .wf-footer {
+      height: 28px;
+      background: #f0ebe3;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .wf-sidebar {
+      width: 140px;
+      flex-shrink: 0;
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .wf-sidebar.w-narrow { width: 48px; }
+    .wf-sidebar .nav-item {
+      padding: 6px 8px;
+      border: 1px dashed var(--border-dashed);
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .wf-sidebar .nav-item.active {
+      background: var(--accent);
+      color: #fff;
+      border-style: solid;
+      border-color: var(--accent);
+    }
+    .wf-main {
+      flex: 1;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+    .wf-main.centered {
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+    }
+    .wf-box {
+      border: 1px dashed var(--border-dashed);
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #faf9f7;
+      position: relative;
+    }
+    .wf-box.solid { border-style: solid; border-color: var(--border); }
+    .wf-box.primary { background: var(--accent); color: #fff; border-color: var(--accent); text-align: center; }
+    .wf-box.muted { background: #f0ebe3; color: var(--muted); font-size: 10px; }
+    .wf-box .label {
+      position: absolute;
+      top: -7px;
+      left: 8px;
+      background: var(--surface);
+      padding: 0 4px;
+      font-size: 9px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .wf-box.has-label { margin-top: 6px; }
+    .wf-grid { display: grid; gap: 8px; }
+    .wf-grid.g2 { grid-template-columns: 1fr 1fr; }
+    .wf-grid.g3 { grid-template-columns: repeat(3, 1fr); }
+    .wf-grid.g4 { grid-template-columns: repeat(4, 1fr); }
+    .wf-grid.g-hero { grid-template-columns: 1fr 120px; }
+    .wf-grid.g-main-side { grid-template-columns: 1fr 100px; }
+    .wf-grid.g-graph { grid-template-columns: 100px 1fr 110px; min-height: 220px; }
+    .wf-stack { display: flex; flex-direction: column; gap: 6px; }
+    .wf-inline { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .wf-spacer { flex: 1; }
+    .wf-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 10px;
+      background: #fff;
+    }
+    .wf-chart {
+      min-height: 64px;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      padding-top: 8px;
+    }
+    .wf-chart span {
+      flex: 1;
+      background: var(--accent);
+      opacity: 0.35;
+      border-radius: 2px 2px 0 0;
+      min-height: 12px;
+    }
+    .wf-table .row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 0.6fr 0.6fr 0.5fr;
+      gap: 4px;
+      padding: 4px 0;
+      border-bottom: 1px dotted var(--border);
+      font-size: 10px;
+    }
+    .wf-table .row.head { font-weight: 600; color: var(--muted); }
+    .wf-card-narrow { max-width: 280px; width: 100%; }
+    .wf-card-md { max-width: 360px; width: 100%; }
+    .wf-card-lg { max-width: 480px; width: 100%; }
+    .wf-textarea { min-height: 48px; }
+    .wf-dock {
+      border-top: 2px solid var(--border);
+      padding: 8px;
+      background: #f0ebe3;
+      margin: 0 -12px -12px;
+    }
+    .wf-overlay-note {
+      font-size: 10px;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 4px;
+    }
+    .legend {
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .legend code { font-size: 10px; background: #ebe6dd; padding: 1px 4px; border-radius: 3px; }
+    @media (max-width: 700px) {
+      .wf-grid.g3, .wf-grid.g4 { grid-template-columns: 1fr 1fr; }
+      .wf-grid.g-graph { grid-template-columns: 1fr; }
+      .wf-sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="doc-header">
+    <div>
+      <h1>graphify Screen Wireframes</h1>
+      <p>출처: <code>UI_SPEC_S01</code>–<code>S17</code> · Guest / User / Admin 레이아웃</p>
+    </div>
+    <nav class="nav" aria-label="화면 목록">
+      <a href="#s01">S01</a><a href="#s02">S02</a><a href="#s03">S03</a><a href="#s04">S04</a><a href="#s05">S05</a>
+      <a href="#s06">S06</a><a href="#s07">S07</a><a href="#s08">S08</a><a href="#s09">S09</a><a href="#s10">S10</a>
+      <a href="#s11">S11</a><a href="#s12">S12</a>
+      <a href="#s13" class="admin">S13</a><a href="#s14" class="admin">S14</a><a href="#s15" class="admin">S15</a>
+      <a href="#s16" class="admin">S16</a><a href="#s17" class="admin">S17</a>
+    </nav>
+  </header>
+
+  <div class="container">
+
+    <!-- S01 -->
+    <article class="screen" id="s01">
+      <div class="screen-meta">
+        <h2>S01 — 홈 / 랜딩</h2>
+        <span class="badge guest">Guest Layout</span>
+        <span class="badge">max-w 1200 · 검색 720</span>
+      </div>
+      <div class="wf">
+        <div class="wf-header">
+          <span class="wf-pill">Logo</span><span class="wf-spacer"></span><span class="wf-pill">로그인</span>
+        </div>
+        <div class="wf-main" style="min-height:300px;align-items:center;text-align:center;">
+          <div class="wf-box has-label" style="width:100%;max-width:560px;border:none;background:transparent;">
+            <span class="label">HeroSection</span>
+            <strong style="font-size:20px;">Display Hero</strong><br/>
+            <span style="color:var(--muted)">Body Large — 가치 제안</span>
+          </div>
+          <div class="wf-box has-label solid" style="width:100%;max-width:420px;">
+            <span class="label">GlobalSearchBar [hero]</span>
+            검색어 입력 · 자동완성 ▼
+          </div>
+          <div class="wf-inline muted" style="justify-content:center;">RecentSearchChips (로그인 시)</div>
+          <div class="wf-grid g3" style="width:100%;max-width:560px;margin-top:8px;">
+            <div class="wf-box muted">FeatureCard</div>
+            <div class="wf-box muted">FeatureCard</div>
+            <div class="wf-box muted">FeatureCard</div>
+          </div>
+        </div>
+        <div class="wf-footer">MarketingFooter</div>
+      </div>
+      <p class="legend">컴포넌트: <code>AppHeaderGuest</code> · <code>HeroSection</code> · <code>GlobalSearchBar</code> · <code>RecentSearchChips</code></p>
+    </article>
+
+    <!-- S02 -->
+    <article class="screen" id="s02">
+      <div class="screen-meta">
+        <h2>S02 — 로그인</h2>
+        <span class="badge guest">Guest Layout</span>
+        <span class="badge">카드 max-w 440</span>
+      </div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Logo</span></div>
+        <div class="wf-main centered">
+          <div class="wf-card-md wf-stack">
+            <div class="wf-box has-label solid"><span class="label">LoginCard</span><strong>로그인</strong></div>
+            <div class="wf-box primary">SocialProviderButton ×3</div>
+            <div class="wf-box muted">Divider "또는"</div>
+            <div class="wf-box">Email · Password · PrimaryButton</div>
+            <div class="wf-box muted" style="text-align:center;">비밀번호 찾기 → S04</div>
+          </div>
+        </div>
+        <div class="wf-footer">MarketingFooter</div>
+      </div>
+    </article>
+
+    <!-- S03 -->
+    <article class="screen" id="s03">
+      <div class="screen-meta">
+        <h2>S03 — 약관 동의</h2>
+        <span class="badge guest">Guest · 최초 가입</span>
+      </div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Logo only</span></div>
+        <div class="wf-main centered">
+          <div class="wf-card-md wf-stack">
+            <div class="wf-box muted">ConsentIntro</div>
+            <div class="wf-box">MasterConsentCheckbox</div>
+            <div class="wf-box has-label" style="max-height:80px;overflow:hidden;">
+              <span class="label">TermsItemList</span>체크박스 + 본문 보기 (스크롤 max-h 40vh)
+            </div>
+            <div class="wf-box primary">동의하고 시작하기</div>
+            <div class="wf-box">GhostButton 뒤로 → S02</div>
+          </div>
+        </div>
+        <div class="wf-footer">MarketingFooter</div>
+      </div>
+    </article>
+
+    <!-- S04 S05 -->
+    <article class="screen" id="s04">
+      <div class="screen-meta"><h2>S04 — 비밀번호 재설정 요청</h2><span class="badge guest">Guest</span></div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Logo</span></div>
+        <div class="wf-main centered">
+          <div class="wf-card-md wf-stack">
+            <strong>비밀번호 재설정</strong>
+            <div class="wf-box muted">HelperText</div>
+            <div class="wf-box">TextField email</div>
+            <div class="wf-box primary">재설정 메일 보내기</div>
+            <div class="wf-box">로그인으로 → S02</div>
+          </div>
+        </div>
+        <div class="wf-footer">MarketingFooter</div>
+      </div>
+    </article>
+
+    <article class="screen" id="s05">
+      <div class="screen-meta"><h2>S05 — 새 비밀번호 설정</h2><span class="badge guest">token 쿼리</span></div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Logo</span></div>
+        <div class="wf-main centered">
+          <div class="wf-card-md wf-stack">
+            <strong>새 비밀번호 설정</strong>
+            <div class="wf-box">PasswordField ×2</div>
+            <div class="wf-box muted">PasswordStrengthMeter</div>
+            <div class="wf-box primary">비밀번호 변경</div>
+          </div>
+        </div>
+        <div class="wf-footer">MarketingFooter</div>
+      </div>
+    </article>
+
+    <!-- S06 -->
+    <article class="screen" id="s06">
+      <div class="screen-meta">
+        <h2>S06 — 검색 결과</h2>
+        <span class="badge guest">Guest / User Header</span>
+        <span class="badge">max-w 1200</span>
+      </div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Logo</span><span class="wf-pill" style="flex:1;">GlobalSearchBar inline</span><span class="wf-pill">🔔 Avatar</span></div>
+        <div class="wf-main">
+          <div class="wf-box solid">GlobalSearchBar (q from URL)</div>
+          <div class="wf-inline">
+            <span class="wf-box muted">ResultCount</span><span class="wf-spacer"></span>
+            <span class="wf-pill">SortSelect</span><span class="wf-pill">FilterPopover</span>
+          </div>
+          <div class="wf-stack">
+            <div class="wf-box">CompanyResultRow ×N</div>
+            <div class="wf-box">CompanyResultRow</div>
+            <div class="wf-box">CompanyResultRow</div>
+          </div>
+          <div class="wf-box muted" style="text-align:center;">Pagination</div>
+        </div>
+        <div class="wf-footer">Footer</div>
+      </div>
+    </article>
+
+    <!-- S07 -->
+    <article class="screen" id="s07">
+      <div class="screen-meta">
+        <h2>S07 — 기업 상세</h2>
+        <span class="badge user">User / Guest</span>
+        <span class="badge">2열 lg: 1fr + 360px</span>
+      </div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Logo</span><span class="wf-pill" style="flex:1;">Search</span><span class="wf-pill">Avatar</span></div>
+        <div class="wf-main">
+          <div class="wf-box has-label solid wf-grid g-hero">
+            <span class="label">CompanyHeroCard</span>
+            <div><strong>기업명</strong> · Badge · DataFreshness</div>
+            <div class="wf-stack" style="align-items:flex-end;">
+              <div class="wf-box primary" style="padding:4px;">관계 그래프</div>
+              <div class="wf-box">분석 이력 · WatchToggle</div>
+            </div>
+          </div>
+          <div class="wf-grid g-main-side">
+            <div class="wf-col wf-stack">
+              <div class="wf-box">CompanyInfoSection</div>
+              <div class="wf-grid g2">
+                <div class="wf-box muted">InsightCard</div><div class="wf-box muted">InsightCard</div>
+                <div class="wf-box muted">InsightCard</div><div class="wf-box muted">InsightCard</div>
+              </div>
+              <div class="wf-box">SignalList</div>
+            </div>
+            <div class="wf-box has-label"><span class="label">Sidebar 360px</span>DataProvenance · Disclaimer</div>
+          </div>
+        </div>
+        <div class="wf-footer">UserFooterSlim</div>
+      </div>
+      <p class="wf-overlay-note">오버레이: OV02 근거 · OV06 신뢰도 · OV07 Agent 토스트</p>
+    </article>
+
+    <!-- S08 -->
+    <article class="screen" id="s08">
+      <div class="screen-meta">
+        <h2>S08 — 관계 그래프</h2>
+        <span class="badge user">3열 · &lt;1280 BottomSheet</span>
+      </div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">Header</span></div>
+        <div class="wf-subheader">← S07 · Depth 1-3 · 필터요약 · 초기화 · 출처</div>
+        <div class="wf-row" style="min-height:240px;">
+          <div class="wf-sidebar" style="width:90px;">
+            <div class="nav-item">RelationFilter</div>
+            <div class="nav-item">DepthControl</div>
+            <div class="nav-item">DimMode</div>
+          </div>
+          <div class="wf-main" style="justify-content:center;align-items:center;">
+            <div class="wf-box has-label" style="width:90%;height:160px;border-style:solid;">
+              <span class="label">GraphView</span>
+              <span style="color:var(--muted);">노드 · 엣지 · ZoomControls</span>
+            </div>
+          </div>
+          <div class="wf-sidebar" style="width:100px;">
+            <div class="nav-item">InsightCardStack</div>
+            <div class="nav-item muted">Provenance</div>
+          </div>
+        </div>
+      </div>
+      <p class="wf-overlay-note">모바일: Filter FAB · Insights FAB · OV01 NodePopover</p>
+    </article>
+
+    <!-- S09 S10 -->
+    <article class="screen" id="s09">
+      <div class="screen-meta"><h2>S09 — 분석 이력 목록</h2><span class="badge user">로그인 전용 · max-w 960</span></div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">AppHeaderUser</span></div>
+        <div class="wf-main">
+          <div class="wf-inline">
+            <strong>분석 이력</strong><span class="wf-spacer"></span>
+            <span class="wf-pill">Search</span><span class="wf-pill">DateRange</span><span class="wf-pill">Export</span>
+          </div>
+          <div class="wf-box has-label solid wf-table">
+            <span class="label">HistoryTable (md+)</span>
+            <div class="row head"><span>기업</span><span>일시</span><span>상태</span><span>요약</span><span>액션</span></div>
+            <div class="row"><span>삼성전자</span><span>05/19</span><span>완료</span><span>…</span><span>→</span></div>
+            <div class="row"><span>SK하이닉스</span><span>05/18</span><span>실패</span><span>…</span><span>→</span></div>
+          </div>
+          <div class="wf-box muted" style="text-align:center;">Pagination</div>
+        </div>
+        <div class="wf-footer">UserFooterSlim</div>
+      </div>
+    </article>
+
+    <article class="screen" id="s10">
+      <div class="screen-meta"><h2>S10 — 분석 이력 상세</h2><span class="badge user">max-w 1400 · Compare</span></div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">AppHeaderUser</span></div>
+        <div class="wf-main">
+          <div class="wf-inline"><strong>기업명</strong><span class="wf-pill muted">분석 일시</span><span class="wf-spacer"></span><span class="wf-pill">CompareToggle</span></div>
+          <div class="wf-box has-label"><span class="label">TimelineSlider</span>●────●────●────● 이벤트 마커</div>
+          <div class="wf-grid g2">
+            <div class="wf-box" style="min-height:100px;">PastGraphPanel</div>
+            <div class="wf-box" style="min-height:100px;">CurrentGraphPanel</div>
+          </div>
+          <div class="wf-inline">
+            <span class="wf-pill">Insights</span><span class="wf-pill">Signals</span><span class="wf-pill">DiffSummary</span>
+          </div>
+        </div>
+        <div class="wf-footer">UserFooterSlim</div>
+      </div>
+    </article>
+
+    <!-- S11 S12 -->
+    <article class="screen" id="s11">
+      <div class="screen-meta"><h2>S11 — 관심 기업 / 비교</h2><span class="badge user">max-w 1200</span></div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">AppHeaderUser</span></div>
+        <div class="wf-main">
+          <strong>관심 기업</strong> <span class="wf-pill muted">최대 3개 비교</span>
+          <div class="wf-grid g3">
+            <div class="wf-box">WatchlistCard ☐</div>
+            <div class="wf-box">WatchlistCard ☑</div>
+            <div class="wf-box">WatchlistCard ☐</div>
+          </div>
+          <div class="wf-dock">CompareDock: 칩 ×2 · Primary 비교 · Ghost 해제</div>
+          <div class="wf-box has-label">
+            <span class="label">ComparePanel</span>
+            <div class="wf-inline"><span class="wf-pill">투자</span><span class="wf-pill">공급망</span><span class="wf-pill">협력</span></div>
+            <div class="wf-grid g3" style="margin-top:6px;">
+              <div class="wf-box muted">Column A</div><div class="wf-box muted">Column B</div><div class="wf-box muted">Column C</div>
+            </div>
+          </div>
+        </div>
+        <div class="wf-footer">UserFooterSlim</div>
+      </div>
+    </article>
+
+    <article class="screen" id="s12">
+      <div class="screen-meta"><h2>S12 — 마이페이지</h2><span class="badge user">max-w 720</span></div>
+      <div class="wf">
+        <div class="wf-header"><span class="wf-pill">AppHeaderUser</span></div>
+        <div class="wf-main" style="max-width:400px;margin:0 auto;">
+          <div class="wf-box solid wf-inline">Avatar · displayName · email</div>
+          <div class="wf-box has-label"><span class="label">PasswordChangeForm</span>current · new · confirm · 저장</div>
+          <div class="wf-box has-label wf-textarea"><span class="label">PromptEditor (Premium)</span>textarea min-h 160px</div>
+          <div class="wf-box">로그아웃 · 회원탈퇴</div>
+        </div>
+        <div class="wf-footer">UserFooterSlim</div>
+      </div>
+    </article>
+
+    <!-- Admin shell helper -->
+    <!-- S13 -->
+    <article class="screen" id="s13">
+      <div class="screen-meta">
+        <h2>S13 — 관리자 대시보드</h2>
+        <span class="badge admin">Admin Layout</span>
+        <span class="badge">Sidebar 256 · KPI 4</span>
+      </div>
+      <div class="wf">
+        <div class="wf-row">
+          <div class="wf-sidebar">
+            <span class="wf-pill" style="margin-bottom:6px;">graphify</span>
+            <div class="nav-item active">대시보드</div>
+            <div class="nav-item">MCP 도구</div>
+            <div class="nav-item">프롬프트</div>
+            <div class="nav-item">OpenAI</div>
+            <div class="nav-item">Vector DB</div>
+            <span class="wf-spacer"></span>
+            <div class="nav-item muted">사용자 서비스로</div>
+          </div>
+          <div class="wf-col" style="flex:1;">
+            <div class="wf-header"><span>Admin</span><span class="wf-spacer"></span><span class="wf-pill">SwitchToUser</span><span class="wf-pill">Avatar</span></div>
+            <div class="wf-main">
+              <div class="wf-grid g4">
+                <div class="wf-box">KPI 실행수</div><div class="wf-box">KPI 시간</div>
+                <div class="wf-box">KPI 토큰</div><div class="wf-box">KPI 오류율</div>
+              </div>
+              <div class="wf-grid g2">
+                <div class="wf-box has-label"><span class="label">AgentRunsChart</span><div class="wf-chart"><span style="height:50%"></span><span style="height:80%"></span><span style="height:40%"></span></div></div>
+                <div class="wf-box has-label"><span class="label">TokenChart</span><div class="wf-chart"><span style="height:60%"></span><span style="height:90%"></span><span style="height:55%"></span></div></div>
+              </div>
+              <div class="wf-grid g2">
+                <div class="wf-box">AnomalyAlertList</div>
+                <div class="wf-box wf-table"><div class="row head"><span>사용자</span><span>토큰</span><span>요청</span><span>오류</span><span></span></div><div class="row"><span>demo</span><span>192k</span><span>12</span><span>0</span><span></span></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- S14 -->
+    <article class="screen" id="s14">
+      <div class="screen-meta"><h2>S14 — MCP 도구 관리</h2><span class="badge admin">OV03 모달</span></div>
+      <div class="wf">
+        <div class="wf-row">
+          <div class="wf-sidebar w-narrow"><div class="nav-item active">MCP</div></div>
+          <div class="wf-col" style="flex:1;">
+            <div class="wf-header">AdminTopBar</div>
+            <div class="wf-main">
+              <div class="wf-inline"><strong>MCP 도구</strong><span class="wf-spacer"></span><div class="wf-box primary" style="padding:4px 12px;">신규 등록</div></div>
+              <div class="wf-inline"><span class="wf-pill">Search</span><span class="wf-pill">StatusFilter</span></div>
+              <div class="wf-box wf-table">
+                <div class="row head"><span>이름</span><span>설명</span><span>상태</span><span>마지막호출</span><span>액션</span></div>
+                <div class="row"><span>corp-search</span><span>…</span><span>●</span><span>1h</span><span>Edit</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- S15 -->
+    <article class="screen" id="s15">
+      <div class="screen-meta"><h2>S15 — Agent 프롬프트</h2><span class="badge admin">OV04 테스트 패널</span></div>
+      <div class="wf">
+        <div class="wf-row">
+          <div class="wf-sidebar w-narrow"><div class="nav-item active">프롬프트</div></div>
+          <div class="wf-col" style="flex:1;">
+            <div class="wf-header">AdminTopBar</div>
+            <div class="wf-subheader">관계 분석 | 리스크 탐지 | 인사이트 요약</div>
+            <div class="wf-row" style="min-height:200px;">
+              <div class="wf-main">
+                <div class="wf-box wf-textarea">SystemPromptEditor</div>
+                <div class="wf-box wf-textarea">TaskTemplateEditor</div>
+                <div class="wf-inline"><span class="wf-pill primary" style="background:var(--accent);color:#fff;">저장</span><span class="wf-pill">테스트 실행</span></div>
+              </div>
+              <div class="wf-sidebar" style="width:110px;border-left:1px solid var(--border);border-right:none;">
+                <div class="nav-item">v3 · 롤백</div>
+                <div class="nav-item muted">v2</div>
+                <div class="nav-item muted">v1</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- S16 -->
+    <article class="screen" id="s16">
+      <div class="screen-meta"><h2>S16 — OpenAI 설정</h2><span class="badge admin">max-w 960</span></div>
+      <div class="wf">
+        <div class="wf-row">
+          <div class="wf-sidebar w-narrow"><div class="nav-item active">OpenAI</div></div>
+          <div class="wf-col" style="flex:1;">
+            <div class="wf-header">AdminTopBar</div>
+            <div class="wf-main" style="max-width:480px;">
+              <div class="wf-box">ConnectionFormCard — endpoint · apiKey · deployment</div>
+              <div class="wf-box">ModelParams — temperature slider · maxTokens</div>
+              <div class="wf-box">EmbeddingConfigCard</div>
+              <div class="wf-box">FallbackConfigCard</div>
+              <div class="wf-inline"><span class="wf-pill primary" style="background:var(--accent);color:#fff;">저장</span><span class="wf-pill">취소</span></div>
+              <div class="wf-box muted">OpenAIStatusStrip — 연결상태 · 토큰 · RateLimit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- S17 -->
+    <article class="screen" id="s17">
+      <div class="screen-meta"><h2>S17 — Vector DB 관리</h2><span class="badge admin">max-w 1400</span></div>
+      <div class="wf">
+        <div class="wf-row">
+          <div class="wf-sidebar w-narrow"><div class="nav-item active">Vector DB</div></div>
+          <div class="wf-col" style="flex:1;">
+            <div class="wf-header">AdminTopBar</div>
+            <div class="wf-main">
+              <div class="wf-grid g4">
+                <div class="wf-box">총 벡터</div><div class="wf-box">유형별</div>
+                <div class="wf-box">인덱스</div><div class="wf-box">최근 작업</div>
+              </div>
+              <div class="wf-grid g2">
+                <div class="wf-box has-label"><span class="label">ReindexPanel</span>전체/선택 · MultiSelect · 실행</div>
+                <div class="wf-box has-label"><span class="label">PerformancePanel</span>MiniCharts latency/sim/qps</div>
+              </div>
+              <div class="wf-box has-label"><span class="label">CleanupPanel</span>만료 규칙 · Preview · Danger 삭제</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+  <div style="background:#f7f4ed;padding:24px;display:flex;gap:16px;">
+    <div style="width:120px;height:80px;border:1px solid #eceae4;background:#f7f4ed">A</div>
+    <div style="width:120px;height:80px;border:1px solid #ddd6cb;background:#f7f4ed">B</div>
+    <div style="width:120px;height:80px;border:1px solid #cfc6b8;background:#f7f4ed">C</div>
+    <div style="width:120px;height:80px;border:1px solid #b8aea0;background:#f7f4ed">D</div>
+  </div>
+  <script>
+    document.querySelectorAll('.nav a').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  </script>
+</body>
+</html>

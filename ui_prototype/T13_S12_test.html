@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S12 마이페이지 — 상태 테스트</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f7f5f0] p-6">
+  <div class="mx-auto max-w-[720px] space-y-4">
+    <div class="flex gap-2">
+      <button data-state="loading" class="rounded bg-gray-800 px-3 py-1 text-sm text-white">loading</button>
+      <button data-state="empty" class="rounded border px-3 py-1 text-sm">empty</button>
+      <button data-state="error" class="rounded border px-3 py-1 text-sm">error</button>
+      <button data-state="populated" class="rounded border px-3 py-1 text-sm">populated</button>
+    </div>
+    <div id="view"></div>
+  </div>
+  <script>
+    const user = { displayName: "데모 사용자", email: "demo@graphify.dev", isPremium: true };
+    const view = document.getElementById("view");
+    function render(s) {
+      if (s === "loading") { view.innerHTML = '<div class="space-y-4"><div class="h-24 animate-pulse rounded-xl bg-gray-200"></div><div class="h-64 animate-pulse rounded-xl bg-gray-200"></div></div>'; return; }
+      if (s === "empty") { view.innerHTML = '<div class="rounded-xl border p-12 text-center text-gray-500">프로필 없음</div>'; return; }
+      if (s === "error") { view.innerHTML = '<div class="rounded border border-red-200 bg-red-50 p-4 text-red-800">로드 실패</div>'; return; }
+      view.innerHTML = `<div class="space-y-6"><div class="rounded-xl border bg-[#faf8f4] p-6 flex gap-4"><div class="h-14 w-14 rounded-full bg-gray-200"></div><div><h1 class="text-xl font-semibold">${user.displayName}</h1><p class="text-sm text-gray-500">${user.email}</p></div></div><div class="rounded-xl border bg-[#faf8f4] p-6"><h2 class="font-semibold">비밀번호 변경</h2></div><div class="rounded-xl border bg-[#faf8f4] p-6"><h2 class="font-semibold">커스텀 프롬프트 (Premium)</h2></div></div>`;
+    }
+    document.querySelectorAll("[data-state]").forEach(b => b.onclick = () => render(b.dataset.state));
+    render("populated");
+  </script>
+</body>
+</html>

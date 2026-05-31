@@ -1,0 +1,16 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "graphify (local)",
+      "Group": "graphify",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "graphify",
+      "Username": "graphify",
+      "PassFile": "/pgadmin4/pgpass",
+      "SavePassword": true,
+      "SSLMode": "prefer",
+      "Comment": "graphify dev — docker compose postgres 서비스"
+    }
+  }
+}

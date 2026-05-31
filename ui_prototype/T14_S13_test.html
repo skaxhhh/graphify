@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>T14 S13 관리자 대시보드 — 4상태</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f7f4ef; color: #2b2b2b; margin: 0; padding: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card { background: #fff; border: 1px solid #e8e2d8; border-radius: 12px; padding: 16px; min-height: 160px; }
+    h2 { margin: 0 0 8px; font-size: 16px; }
+    .muted { color: #7a756c; font-size: 13px; }
+    .kpi { font-size: 28px; font-weight: 600; margin-top: 8px; }
+    .bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; margin-top: 12px; }
+    .bar { flex: 1; background: #2b2b2b99; border-radius: 4px 4px 0 0; min-height: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    th, td { border-bottom: 1px solid #e8e2d8; padding: 6px 4px; text-align: left; }
+    .alert { background: #fff8e6; border: 1px solid #f0d78c; border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 13px; }
+    .skeleton { background: linear-gradient(90deg, #ece7de 25%, #f5f1ea 50%, #ece7de 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 8px; height: 72px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+  <h1>S13 관리자 대시보드 — UI 상태 프로토타입 (T14)</h1>
+  <p class="muted">loading / empty / error / populated 네 가지 상태를 카드로 표현합니다.</p>
+  <div class="grid" style="margin-top: 20px;">
+    <section class="card">
+      <h2>loading</h2>
+      <div class="skeleton"></div>
+      <div class="skeleton" style="margin-top:8px;height:120px;"></div>
+    </section>
+    <section class="card">
+      <h2>empty</h2>
+      <p class="muted">집계된 Agent 실행 메트릭이 없습니다.</p>
+    </section>
+    <section class="card">
+      <h2>error</h2>
+      <p style="color:#9b2c2c;">대시보드 데이터를 불러오지 못했습니다.</p>
+      <button type="button">다시 시도</button>
+    </section>
+    <section class="card">
+      <h2>populated</h2>
+      <p class="muted">실행 수</p>
+      <p class="kpi">620</p>
+      <div class="bars">
+        <div class="bar" style="height:40%"></div>
+        <div class="bar" style="height:70%"></div>
+        <div class="bar" style="height:55%"></div>
+        <div class="bar" style="height:90%"></div>
+      </div>
+      <div class="alert">WARN · 오류율이 24시간 평균 대비 상승</div>
+      <table>
+        <thead><tr><th>사용자</th><th>토큰</th></tr></thead>
+        <tbody><tr><td>데모</td><td>192,000</td></tr></tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>

@@ -1,0 +1,67 @@
+### Admin login
+POST http://localhost:8081/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@graphify.dev",
+  "password": "admin1234"
+}
+
+> {%
+  client.global.set("adminToken", response.body.data.accessToken);
+%}
+
+### GET stats
+GET http://localhost:8081/api/v1/admin/vectordb/stats
+Authorization: Bearer {{adminToken}}
+
+### POST reindex — 성공 (전체)
+POST http://localhost:8081/api/v1/admin/vectordb/reindex
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "scope": "ALL"
+}
+
+> {%
+  client.global.set("jobId", response.body.data.jobId);
+%}
+
+### GET job (폴링)
+GET http://localhost:8081/api/v1/admin/vectordb/jobs/{{jobId}}
+Authorization: Bearer {{adminToken}}
+
+### POST reindex — 실패 (선택 + 빈 targetIds)
+POST http://localhost:8081/api/v1/admin/vectordb/reindex
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "scope": "SELECTED",
+  "targetIds": []
+}
+
+### GET cleanup preview
+GET http://localhost:8081/api/v1/admin/vectordb/cleanup/preview?olderThanDays=90&types=COMPANY,INSIGHT
+Authorization: Bearer {{adminToken}}
+
+### DELETE cleanup — 성공
+DELETE http://localhost:8081/api/v1/admin/vectordb/cleanup
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "olderThanDays": 90,
+  "types": ["COMPANY", "INSIGHT"]
+}
+
+### DELETE cleanup — 실패 (types 비움)
+DELETE http://localhost:8081/api/v1/admin/vectordb/cleanup
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "olderThanDays": 90,
+  "types": []
+}

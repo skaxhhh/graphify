@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S01 Home Landing Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* UI 명세 기반 디자인 토큰 설정 */
+        :root {
+            --cream: #F9F8F3;
+            --light-cream: #ECEAE4;
+            --charcoal: #1A1A1A;
+            --muted-gray: #717171;
+            --ring-blue: #3B82F6;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--cream);
+            color: var(--charcoal);
+        }
+        .bg-cream { background-color: var(--cream); }
+        .border-light-cream { border-color: var(--light-cream); }
+        .text-charcoal { color: var(--charcoal); }
+        .bg-charcoal { background-color: var(--charcoal); }
+        .text-muted-gray { color: var(--muted-gray); }
+        
+        /* Skeleton 애니메이션 */
+        .skeleton {
+            background: linear-gradient(90deg, #eceae4 25%, #f4f2ed 50%, #eceae4 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body x-data="appState()">
+
+    <header class="h-16 sticky top-0 z-50 bg-cream border-b border-light-cream px-4 md:px-8 flex items-center justify-between">
+        <div class="flex items-center gap-2 cursor-pointer" @click="resetToHome()">
+            <div class="w-8 h-8 bg-charcoal rounded-md"></div>
+            <span class="font-bold text-xl tracking-tight">LOGO</span>
+        </div>
+        <button class="px-5 py-2 bg-charcoal text-white rounded-full text-sm font-medium hover:opacity-90 transition-all">
+            로그인
+        </button>
+    </header>
+
+    <div class="fixed bottom-4 right-4 z-[100] flex gap-2 p-2 bg-white/80 backdrop-blur rounded-lg border border-light-cream shadow-lg">
+        <button @click="state = 'loading'" class="px-2 py-1 text-xs border rounded hover:bg-gray-100" :class="state === 'loading' && 'bg-black text-white'">Loading</button>
+        <button @click="state = 'idle'" class="px-2 py-1 text-xs border rounded hover:bg-gray-100" :class="state === 'idle' && 'bg-black text-white'">Idle</button>
+        <button @click="isLoggedIn = !isLoggedIn" class="px-2 py-1 text-xs border rounded hover:bg-gray-100" :class="isLoggedIn && 'bg-blue-100 border-blue-500'">Login: <span x-text="isLoggedIn ? 'ON' : 'OFF'"></span></button>
+    </div>
+
+    <main class="min-h-[calc(100vh-4rem-200px)] flex flex-col items-center">
+        
+        <template x-if="state === 'loading'">
+            <div class="w-full max-w-[1200px] px-4 py-24 md:py-32 flex flex-col items-center space-y-8">
+                <div class="h-16 w-3/4 skeleton rounded-lg"></div>
+                <div class="h-6 w-1/2 skeleton rounded-md"></div>
+                <div class="h-14 w-full max-w-[720px] skeleton rounded-xl mt-8"></div>
+            </div>
+        </template>
+
+        <template x-if="state === 'idle'">
+            <div class="w-full flex flex-col items-center">
+                <section class="max-w-[1200px] w-full px-4 py-24 md:py-32 text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold text-charcoal mb-6 tracking-tight leading-tight">
+                        세상의 모든 기업 데이터를<br>한 눈에 연결하세요
+                    </h1>
+                    <p class="text-lg md:text-xl text-muted-gray max-w-2xl mx-auto">
+                        복잡한 기업 정보와 시장 분석을 가장 직관적인 인터페이스로 경험하는 방법
+                    </p>
+
+                    <div class="w-full max-w-[720px] mx-auto mt-12 relative">
+                        <div class="relative flex items-center group">
+                            <input 
+                                type="text" 
+                                x-model="searchQuery"
+                                @input="handleAutocomplete"
+                                @focus="isSearchFocused = true"
+                                @blur="setTimeout(() => isSearchFocused = false, 200)"
+                                placeholder="기업명, 티커, 산업군을 검색하세요"
+                                class="w-full h-14 pl-6 pr-16 rounded-2xl border border-light-cream bg-white text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm group-hover:shadow-md"
+                            >
+                            <button class="absolute right-3 p-2 bg-charcoal text-white rounded-xl">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </button>
+                        </div>
+
+                        <div x-show="isSearchFocused && searchQuery.length >= 2" 
+                             x-transition 
+                             class="absolute top-full left-0 w-full mt-2 bg-white border border-light-cream rounded-2xl shadow-xl z-10 overflow-hidden text-left">
+                            
+                            <div x-show="acStatus === 'loading'" class="p-4 space-y-3">
+                                <div class="h-4 w-1/3 skeleton rounded"></div>
+                                <div class="h-4 w-1/2 skeleton rounded"></div>
+                            </div>
+
+                            <div x-show="acStatus === 'empty'" class="p-8 text-center">
+                                <p class="text-muted-gray mb-2">검색 결과가 없습니다.</p>
+                                <button class="text-blue-500 font-medium">" 전체 검색 결과 보기 "</button>
+                            </div>
+
+                            <div x-show="acStatus === 'error'" class="p-4 flex justify-between items-center bg-red-50">
+                                <span class="text-red-500 text-sm">데이터를 불러오지 못했습니다.</span>
+                                <button @click="handleAutocomplete" class="text-xs underline">재시도</button>
+                            </div>
+
+                            <div x-show="acStatus === 'populated'">
+                                <template x-for="item in mockResults" :key="item.id">
+                                    <div class="px-6 py-4 hover:bg-gray-50 cursor-pointer flex justify-between border-b border-light-cream last:border-none">
+                                        <div>
+                                            <span class="font-semibold" x-text="item.name"></span>
+                                            <span class="ml-2 text-sm text-muted-gray" x-text="item.ticker"></span>
+                                        </div>
+                                        <span class="text-xs bg-gray-100 px-2 py-1 rounded" x-text="item.matchType"></span>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <div x-show="isLoggedIn" class="mt-6 flex flex-wrap gap-2 justify-center">
+                            <span class="text-sm text-muted-gray w-full mb-1">최근 검색</span>
+                            <template x-for="chip in recentSearches" :key="chip.id">
+                                <div class="flex items-center gap-2 px-4 py-1.5 bg-white border border-light-cream rounded-full text-sm hover:border-gray-400 transition-colors cursor-pointer group">
+                                    <span x-text="chip.label"></span>
+                                    <button @click.stop="removeChip(chip.id)" class="text-gray-400 hover:text-red-500">×</button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="max-w-[1200px] w-full px-4 pb-32 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="p-8 bg-white rounded-3xl border border-light-cream">
+                        <div class="w-12 h-12 bg-cream rounded-2xl mb-6 flex items-center justify-center">📊</div>
+                        <h3 class="text-xl font-bold mb-3">실시간 시장 분석</h3>
+                        <p class="text-muted-gray leading-relaxed">최신 API 연동을 통해 전 세계 시장의 흐름을 1초 단위로 추적하고 리포트를 생성합니다.</p>
+                    </div>
+                    <div class="p-8 bg-white rounded-3xl border border-light-cream">
+                        <div class="w-12 h-12 bg-cream rounded-2xl mb-6 flex items-center justify-center">🔍</div>
+                        <h3 class="text-xl font-bold mb-3">정교한 필터링</h3>
+                        <p class="text-muted-gray leading-relaxed">기업 규모, 재무 건전성, 업종별 세부 지표를 조합하여 원하는 대상만 정확히 추출하세요.</p>
+                    </div>
+                    <div class="p-8 bg-white rounded-3xl border border-light-cream">
+                        <div class="w-12 h-12 bg-cream rounded-2xl mb-6 flex items-center justify-center">🛡️</div>
+                        <h3 class="text-xl font-bold mb-3">검증된 데이터</h3>
+                        <p class="text-muted-gray leading-relaxed">여러 출처의 데이터를 교차 검증하여 신뢰할 수 있는 수치만을 제공합니다.</p>
+                    </div>
+                </section>
+            </div>
+        </template>
+    </main>
+
+    <footer class="w-full border-t border-light-cream bg-cream py-12 px-4 md:px-8">
+        <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-start gap-8">
+            <div class="space-y-4">
+                <div class="font-bold text-lg">LOGO</div>
+                <p class="text-sm text-muted-gray max-w-xs">기업 데이터 분석의 새로운 표준, 우리는 데이터의 가치를 연결합니다.</p>
+            </div>
+            <div class="flex gap-12 text-sm">
+                <div class="space-y-3">
+                    <div class="font-semibold">서비스</div>
+                    <div class="text-muted-gray cursor-pointer">이용약관</div>
+                    <div class="text-muted-gray cursor-pointer font-bold">개인정보처리방침</div>
+                </div>
+                <div class="space-y-3">
+                    <div class="font-semibold">고객지원</div>
+                    <div class="text-muted-gray cursor-pointer">문의하기</div>
+                    <div class="text-muted-gray cursor-pointer">도움말</div>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-[1200px] mx-auto mt-12 pt-8 border-t border-light-cream text-xs text-muted-gray">
+            © 2024 Platform Inc. All rights reserved. 본 정보는 투자 참고용이며 오류에 대해 책임을 지지 않습니다.
+        </div>
+    </footer>
+
+    <script>
+        function appState() {
+            return {
+                state: 'idle', // 'loading', 'idle'
+                isLoggedIn: false,
+                searchQuery: '',
+                isSearchFocused: false,
+                acStatus: 'populated', // 'loading', 'empty', 'error', 'populated'
+                mockResults: [],
+                recentSearches: [
+                    { id: 1, label: '삼성전자' },
+                    { id: 2, label: 'NVIDIA' },
+                    { id: 3, label: '애플' }
+                ],
+                
+                handleAutocomplete() {
+                    if (this.searchQuery.length < 2) return;
+                    
+                    this.acStatus = 'loading';
+                    
+                    // Debounce Mock (250ms)
+                    setTimeout(() => {
+                        if (this.searchQuery.includes('error')) {
+                            this.acStatus = 'error';
+                        } else if (this.searchQuery === 'none') {
+                            this.acStatus = 'empty';
+                        } else {
+                            this.acStatus = 'populated';
+                            this.mockResults = [
+                                { id: 101, name: this.searchQuery + ' Tech', ticker: 'TCK', matchType: 'Company' },
+                                { id: 102, name: this.searchQuery + ' Holdings', ticker: 'HDG', matchType: 'Company' },
+                                { id: 103, name: 'Global ' + this.searchQuery, ticker: 'GLB', matchType: 'Industry' }
+                            ];
+                        }
+                    }, 250);
+                },
+
+                removeChip(id) {
+                    this.recentSearches = this.recentSearches.filter(c => c.id !== id);
+                },
+
+                resetToHome() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    this.searchQuery = '';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>S11 관심 기업 — 상태 테스트</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#f7f5f0] p-6 text-[#2d2d2d]">
+  <div class="mx-auto max-w-[1200px] space-y-4">
+    <div class="flex gap-2">
+      <button data-state="loading" class="rounded bg-gray-800 px-3 py-1 text-sm text-white">loading</button>
+      <button data-state="empty" class="rounded border px-3 py-1 text-sm">empty</button>
+      <button data-state="error" class="rounded border px-3 py-1 text-sm">error</button>
+      <button data-state="populated" class="rounded border px-3 py-1 text-sm">populated</button>
+    </div>
+    <div id="view"></div>
+  </div>
+  <script>
+    const items = [
+      { companyId: 1, name: "삼성전자", industry: "반도체" },
+      { companyId: 2, name: "SK하이닉스", industry: "반도체" },
+      { companyId: 5, name: "NAVER", industry: "인터넷" }
+    ];
+    const view = document.getElementById("view");
+    function render(state) {
+      if (state === "loading") {
+        view.innerHTML = '<div class="grid grid-cols-3 gap-4">' + Array(6).fill('<div class="h-48 animate-pulse rounded-xl bg-gray-200"></div>').join("") + '</div>';
+        return;
+      }
+      if (state === "empty") {
+        view.innerHTML = '<div class="rounded-xl border p-12 text-center text-gray-500"><p>등록된 관심 기업이 없습니다</p><a href="#" class="mt-4 inline-block text-sm underline">기업 검색</a></div>';
+        return;
+      }
+      if (state === "error") {
+        view.innerHTML = '<div class="rounded border border-red-200 bg-red-50 p-4 text-red-800">목록 로드 실패 <button class="underline">재시도</button></div>';
+        return;
+      }
+      view.innerHTML = '<div class="grid grid-cols-1 md:grid-cols-3 gap-4">' + items.map(i =>
+        `<div class="rounded-xl border bg-[#faf8f4] p-4"><label><input type="checkbox" /> 비교</label><h3 class="mt-2 font-semibold">${i.name}</h3><p class="text-xs text-gray-500">${i.industry}</p></div>`
+      ).join("") + '</div><div class="sticky bottom-0 mt-4 border-t bg-[#faf8f4] p-4 text-sm">CompareDock · 2개 선택 · 비교 보기</div>';
+    }
+    document.querySelectorAll("[data-state]").forEach(b => b.addEventListener("click", () => render(b.dataset.state)));
+    render("populated");
+  </script>
+</body>
+</html>

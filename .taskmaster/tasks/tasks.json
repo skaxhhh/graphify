@@ -1,0 +1,3102 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "1",
+        "title": "graphify 모노레포 부트스트랩 (React + Spring Boot + PostgreSQL)",
+        "description": "graphify — 공통 (부트스트랩/인프라) (P0)",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: 공통 (부트스트랩/인프라)\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `SCREEN_FLOW.md` §3 + PRD §3 (공통 인프라)\n\n## 산출물 (자동 생성)\n- `artifacts/T01_BOOT/API_SPEC.md`\n- `artifacts/T01_BOOT/DB_SCHEMA.md`\n- `artifacts/T01_BOOT/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "React 앱 라우팅/레이아웃 셸",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] React 앱 라우팅/레이아웃 셸",
+            "updatedAt": "2026-05-18T07:51:47.576Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Spring Boot 멀티모듈 또는 단일 API",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] Spring Boot 멀티모듈 또는 단일 API",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T07:51:47.590Z"
+          },
+          {
+            "id": 3,
+            "title": "PostgreSQL Docker compose + 연결 설정",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] PostgreSQL Docker compose + 연결 설정",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T07:51:47.593Z"
+          },
+          {
+            "id": 4,
+            "title": "공통 CORS·보안 헤더",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] 공통 CORS·보안 헤더",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T07:51:47.596Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "공통 (부트스트랩/인프라)",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T01_BOOT"
+        },
+        "updatedAt": "2026-05-18T07:51:47.596Z"
+      },
+      {
+        "id": "2",
+        "title": "S01 홈/랜딩 — 검색·히어로·Guest 레이아웃",
+        "description": "graphify — S01 (P0)",
+        "status": "done",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S01\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S01_Home.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T02_S01/API_SPEC.md`\n- `artifacts/T02_S01/DB_SCHEMA.md`\n- `artifacts/T02_S01/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [x] UI_SPEC 레이아웃 구조 준수\n- [x] 4가지 상태(loading / empty / error / populated) 구현\n- [x] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [x] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: HomePage (S01)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: HomePage (S01)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest (로고 클릭 → S01, 로그인 → S02)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: [SHARED] AppHeaderGuest (로고 클릭 → S01, 로그인 → S02)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: HeroSection (서비스 한 줄 정의 + 서브카피, 타이포: Display Hero / Body Large)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: HeroSection (서비스 한 줄 정의 + 서브카피, 타이포: Display Hero / Body Large)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: GlobalSearchBar [SHARED] (props: variant=\"hero\", minQueryLength=2, onSubmit→S06)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: GlobalSearchBar [SHARED] (props: variant=\"hero\", minQueryLength=2, onSubmit→S06)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: SearchInput (placeholder: Muted Gray, border Light Cream, focus Ring Blue)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: SearchInput (placeholder: Muted Gray, border Light Cream, focus Ring Blue)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: SearchSubmitButton (Primary Dark 스타일)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: SearchSubmitButton (Primary Dark 스타일)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: AutocompleteDropdown (조건부: 입력 ≥2자 & 포커스, 키보드 탐색)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: AutocompleteDropdown (조건부: 입력 ≥2자 & 포커스, 키보드 탐색)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: RecentSearchSection (조건부: 로그인 + 로컬/서버 이력 존재)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: RecentSearchSection (조건부: 로그인 + 로컬/서버 이력 존재)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: RecentSearchChips [SHARED] (항목 클릭 → S07 또는 검색 재실행)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: RecentSearchChips [SHARED] (항목 클릭 → S07 또는 검색 재실행)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: FeatureHighlightCards (선택: PRD 가치 3포인트)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: FeatureHighlightCards (선택: PRD 가치 3포인트)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: [SHARED] MarketingFooter",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: [SHARED] MarketingFooter",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:01:19.177Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S01",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T02_S01"
+        },
+        "updatedAt": "2026-05-18T08:01:19.177Z"
+      },
+      {
+        "id": "3",
+        "title": "S02 로그인 — 소셜·이메일 인증",
+        "description": "graphify — S02 (P0)",
+        "status": "done",
+        "dependencies": [
+          "1"
+        ],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S02\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S02_Login.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T03_S02/API_SPEC.md`\n- `artifacts/T03_S02/DB_SCHEMA.md`\n- `artifacts/T03_S02/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [x] UI_SPEC 레이아웃 구조 준수\n- [x] 4가지 상태(loading / empty / error / populated) 구현\n- [x] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [x] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: LoginPage (S02)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: LoginPage (S02)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest (로고만 또는 \"뒤로\" — 정책에 맞춤)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: [SHARED] AppHeaderGuest (로고만 또는 \"뒤로\" — 정책에 맞춤)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: LoginCard",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: LoginCard",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: LoginTitle (타이포: Sub-heading 축소)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: LoginTitle (타이포: Sub-heading 축소)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: SocialLoginStack [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: SocialLoginStack [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: SocialProviderButton (Google → OAuth start)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: SocialProviderButton (Google → OAuth start)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: SocialProviderButton (Naver)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: SocialProviderButton (Naver)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: SocialProviderButton (Kakao)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: SocialProviderButton (Kakao)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: DividerWithLabel (또는 \"또는\" Muted Gray Caption)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: DividerWithLabel (또는 \"또는\" Muted Gray Caption)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: EmailLoginForm (조건부: 기능 플래그 on)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: EmailLoginForm (조건부: 기능 플래그 on)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: TextField [SHARED] (email)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: TextField [SHARED] (email)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: TextField [SHARED] (password, type=password)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: TextField [SHARED] (password, type=password)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: InlineError (조건부: 인증 실패 메시지)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: InlineError (조건부: 인증 실패 메시지)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: PrimaryButton [SHARED] (submit → POST /auth/login)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: PrimaryButton [SHARED] (submit → POST /auth/login)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: FooterLinks",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: FooterLinks",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: Link (비밀번호 찾기 → S04)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: Link (비밀번호 찾기 → S04)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: [SHARED] MarketingFooter",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[x] UI 컴포넌트: [SHARED] MarketingFooter",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:22:44.260Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S02",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T03_S02"
+        },
+        "updatedAt": "2026-05-18T08:22:44.260Z"
+      },
+      {
+        "id": "4",
+        "title": "S03 약관 동의",
+        "description": "graphify — S03 (P0)",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S03\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S03_TermsConsent.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T04_S03/API_SPEC.md`\n- `artifacts/T04_S03/DB_SCHEMA.md`\n- `artifacts/T04_S03/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [x] UI_SPEC 레이아웃 구조 준수\n- [x] 4가지 상태(loading / empty / error / populated) 구현\n- [x] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [x] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: TermsConsentPage (S03)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TermsConsentPage (S03)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderGuest",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: TermsConsentCard",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TermsConsentCard",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: ConsentIntro (Body, Muted Gray)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ConsentIntro (Body, Muted Gray)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: MasterConsentCheckbox [SHARED] (전체 동의 토글 → 자식 동기화)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: MasterConsentCheckbox [SHARED] (전체 동의 토글 → 자식 동기화)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: TermsItemList",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TermsItemList",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: TermsItem (반복)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TermsItem (반복)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: Checkbox [SHARED] (필수 여부 props: required)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Checkbox [SHARED] (필수 여부 props: required)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: TextButton \"본문 보기\" → TermsDetailModal [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextButton \"본문 보기\" → TermsDetailModal [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: ConsentErrorBanner (조건부: 미동의 제출 시)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ConsentErrorBanner (조건부: 미동의 제출 시)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: PrimaryButton [SHARED] (동의 완료 → POST /auth/consent → S01)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton [SHARED] (동의 완료 → POST /auth/consent → S01)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: GhostButton (뒤로 → S02, 세션 정리 정책과 연동)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GhostButton (뒤로 → S02, 세션 정리 정책과 연동)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: TermsDetailModal [SHARED] (조건부: 약관 본문)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TermsDetailModal [SHARED] (조건부: 약관 본문)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: ScrollableTermsBody (GET /terms/latest HTML 또는 markdown)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ScrollableTermsBody (GET /terms/latest HTML 또는 markdown)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: [SHARED] MarketingFooter",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] MarketingFooter",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T08:38:41.488Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S03",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T04_S03"
+        },
+        "updatedAt": "2026-05-18T08:38:41.488Z"
+      },
+      {
+        "id": "5",
+        "title": "S04 비밀번호 재설정 요청",
+        "description": "graphify — S04 (P1)",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S04\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S04_PasswordResetRequest.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T05_S04/API_SPEC.md`\n- `artifacts/T05_S04/DB_SCHEMA.md`\n- `artifacts/T05_S04/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: PasswordResetRequestPage (S04)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PasswordResetRequestPage (S04)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.763Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderGuest",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.777Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.782Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: ResetRequestCard",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ResetRequestCard",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.786Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: PageTitle",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PageTitle",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.791Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: HelperText (Muted Gray, Caption~Body)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: HelperText (Muted Gray, Caption~Body)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.797Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: TextField [SHARED] (props: type=email, autoComplete=email)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField [SHARED] (props: type=email, autoComplete=email)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.801Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: FieldError (조건부: 형식 오류)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: FieldError (조건부: 형식 오류)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.810Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: PrimaryButton [SHARED] (submit)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton [SHARED] (submit)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.815Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: SuccessNotice (조건부: 발송 완료 — Body, border Light Cream bg Cream)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SuccessNotice (조건부: 발송 완료 — Body, border Light Cream bg Cream)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.822Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: LinkButton → S02",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: LinkButton → S02",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.826Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: [SHARED] MarketingFooter",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] MarketingFooter",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.830Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S04",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T05_S04"
+        },
+        "updatedAt": "2026-05-18T11:59:25.830Z"
+      },
+      {
+        "id": "6",
+        "title": "S05 비밀번호 재설정 확인",
+        "description": "graphify — S05 (P1)",
+        "status": "done",
+        "dependencies": [
+          "5"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S05\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S05_PasswordResetConfirm.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T06_S05/API_SPEC.md`\n- `artifacts/T06_S05/DB_SCHEMA.md`\n- `artifacts/T06_S05/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: PasswordResetConfirmPage (S05)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PasswordResetConfirmPage (S05)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.834Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderGuest",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.838Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.846Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: ResetConfirmCard",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ResetConfirmCard",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.851Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: TokenValidator (마운트 시 토큰 검증 — 로딩/만료 UI 분기)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TokenValidator (마운트 시 토큰 검증 — 로딩/만료 UI 분기)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.854Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: PageTitle",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PageTitle",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.858Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: NewPasswordField [SHARED] (props: showStrength)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: NewPasswordField [SHARED] (props: showStrength)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.862Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: ConfirmPasswordField [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ConfirmPasswordField [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.866Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: InlineErrors (조건부: 불일치, 정책 미달)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: InlineErrors (조건부: 불일치, 정책 미달)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.870Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: PrimaryButton [SHARED] → POST confirm",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton [SHARED] → POST confirm",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.875Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: LinkToS04 (조건부: 토큰 만료/무효)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: LinkToS04 (조건부: 토큰 만료/무효)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.885Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: SuccessState (조건부: 완료 후 2초 타이머 → S02)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SuccessState (조건부: 완료 후 2초 타이머 → S02)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.892Z"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: [SHARED] MarketingFooter",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] MarketingFooter",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S05",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T06_S05"
+        },
+        "updatedAt": "2026-05-18T11:59:25.892Z"
+      },
+      {
+        "id": "7",
+        "title": "S06 검색 결과 목록 — 정렬·필터·하이브리드 검색",
+        "description": "graphify — S06 (P0)",
+        "status": "done",
+        "dependencies": [
+          "1",
+          "2"
+        ],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S06\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S06_SearchResult.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T07_S06/API_SPEC.md`\n- `artifacts/T07_S06/DB_SCHEMA.md`\n- `artifacts/T07_S06/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: SearchResultPage (S06)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SearchResultPage (S06)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.897Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest | AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderGuest | AppHeaderUser",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.901Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.905Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: GlobalSearchBar [SHARED] (controlled `q`, submit 유지 S06)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GlobalSearchBar [SHARED] (controlled `q`, submit 유지 S06)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.909Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: SearchToolbar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SearchToolbar",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.916Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: ResultCount (Caption)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ResultCount (Caption)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.920Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: SortSelect [SHARED] (options: name, industry, updatedAt)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SortSelect [SHARED] (options: name, industry, updatedAt)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.924Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: FilterPopover [SHARED] (업종/시장/데이터상태)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: FilterPopover [SHARED] (업종/시장/데이터상태)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.928Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: SemanticSuggestionsBanner (조건부: Vector 유사 기업 안내)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SemanticSuggestionsBanner (조건부: Vector 유사 기업 안내)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.933Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: CompanyResultList",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyResultList",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.938Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: CompanyResultRow [SHARED] (클릭 → S07, 키보드 Enter)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyResultRow [SHARED] (클릭 → S07, 키보드 Enter)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.943Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: Pagination [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Pagination [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.948Z"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: EmptyState [SHARED] (조건부: 0건)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EmptyState [SHARED] (조건부: 0건)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.951Z"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: [SHARED] MarketingFooter | UserFooterSlim",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] MarketingFooter | UserFooterSlim",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T11:59:25.956Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S06",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T07_S06"
+        },
+        "updatedAt": "2026-05-18T11:59:25.956Z"
+      },
+      {
+        "id": "8",
+        "title": "S07 기업 상세 — 인사이트 카드·신호·OV02/06",
+        "description": "graphify — S07 (P0)",
+        "status": "done",
+        "dependencies": [
+          "7"
+        ],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S07\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S07_CompanyDetail.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T08_S07/API_SPEC.md`\n- `artifacts/T08_S07/DB_SCHEMA.md`\n- `artifacts/T08_S07/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: CompanyDetailPage (S07)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyDetailPage (S07)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.296Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest | AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderGuest | AppHeaderUser",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.309Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.312Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: CompanyHeroCard",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyHeroCard",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.316Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: CompanyTitleBlock (name, ticker)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyTitleBlock (name, ticker)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.322Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: IndustryBadge [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: IndustryBadge [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.326Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: DataFreshnessBadges [SHARED] (PRD §5, §8 — 최신성·커버리지)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DataFreshnessBadges [SHARED] (PRD §5, §8 — 최신성·커버리지)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.329Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: HeroActions",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: HeroActions",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.332Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: PrimaryButton → S08 (graph)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton → S08 (graph)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.337Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: GhostButton → S09 (조건부: 로그인)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GhostButton → S09 (조건부: 로그인)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.341Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: WatchToggle [SHARED] (로그인: PUT watchlist, 비로그인: 로그인 유도 토스트)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: WatchToggle [SHARED] (로그인: PUT watchlist, 비로그인: 로그인 유도 토스트)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.344Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: CompanyInfoSection (사업·재무)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyInfoSection (사업·재무)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.347Z"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: InsightCardGrid",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: InsightCardGrid",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.351Z"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: InsightCard [SHARED] (props: type, title, summary, confidence, onDetail→OV02, onReliability→OV06)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: InsightCard [SHARED] (props: type, title, summary, confidence, onDetail→OV02, onReliability→OV06)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.354Z"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: SignalList [SHARED] (신호 유형 라벨, 근거 노드 id)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SignalList [SHARED] (신호 유형 라벨, 근거 노드 id)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.357Z"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: SidebarColumn",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SidebarColumn",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.361Z"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: DataProvenanceCard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DataProvenanceCard [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.364Z"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: DisclaimerCompact [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DisclaimerCompact [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.369Z"
+          },
+          {
+            "id": 19,
+            "title": "UI 컴포넌트: OV02 InsightEvidenceModal [SHARED] (포털)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: OV02 InsightEvidenceModal [SHARED] (포털)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.372Z"
+          },
+          {
+            "id": 20,
+            "title": "UI 컴포넌트: OV06 ReliabilityCriteriaModal [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: OV06 ReliabilityCriteriaModal [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-18T12:17:39.375Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S07",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T08_S07"
+        },
+        "updatedAt": "2026-05-18T12:17:39.375Z"
+      },
+      {
+        "id": "9",
+        "title": "S08 관계 그래프 시각화 — 필터·깊이·SSE·OV01/08",
+        "description": "graphify — S08 (P0)",
+        "status": "done",
+        "dependencies": [
+          "8"
+        ],
+        "priority": "high",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S08\n- **우선순위 등급**: P0 (Taskmaster priority=`high`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S08_GraphVisualization.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T09_S08/API_SPEC.md`\n- `artifacts/T09_S08/DB_SCHEMA.md`\n- `artifacts/T09_S08/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: GraphVisualizationPage (S08)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphVisualizationPage (S08)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.450Z"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderGuest | AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderGuest | AppHeaderUser",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.465Z"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: GraphSubheader",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphSubheader",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.468Z"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: BackButton → S07 (히스토리 복원)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: BackButton → S07 (히스토리 복원)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.470Z"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: DepthStepper [SHARED] (1~3, PRD §7.1)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DepthStepper [SHARED] (1~3, PRD §7.1)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.473Z"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: ResetViewButton (초기화 — PRD §7.3)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ResetViewButton (초기화 — PRD §7.3)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.475Z"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: DataSourceIconButton → Provenance popover",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DataSourceIconButton → Provenance popover",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.478Z"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: GraphShell",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphShell",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.480Z"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: GraphLeftPanel [SHARED] (lg+)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphLeftPanel [SHARED] (lg+)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.483Z"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: RelationTypeFilter [SHARED] (다중 선택 + 전체, debounce 대상)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RelationTypeFilter [SHARED] (다중 선택 + 전체, debounce 대상)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.486Z"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: NonSelectedDimModeToggle (숨김/흐림)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: NonSelectedDimModeToggle (숨김/흐림)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.489Z"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: SessionFilterPersistenceNote (Caption, Muted)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SessionFilterPersistenceNote (Caption, Muted)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.491Z"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: GraphCanvas",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphCanvas",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.495Z"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: GraphView [SHARED] (React Flow/D3 — 노드/엣지, 휠 줌, 드래그 팬)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphView [SHARED] (React Flow/D3 — 노드/엣지, 휠 줌, 드래그 팬)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.497Z"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: GraphTooltipLayer [SHARED] (호버 툴팁 PRD §2.3)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphTooltipLayer [SHARED] (호버 툴팁 PRD §2.3)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.500Z"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: ZoomControls [SHARED] (+/−, fit view)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ZoomControls [SHARED] (+/−, fit view)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.502Z"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: Minimap [SHARED] (조건부: 기능 on)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Minimap [SHARED] (조건부: 기능 on)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.506Z"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: GraphRightPanel [SHARED] (lg+)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphRightPanel [SHARED] (lg+)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.509Z"
+          },
+          {
+            "id": 19,
+            "title": "UI 컴포넌트: InsightCardStack (S07과 동일 카드 축약版)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: InsightCardStack (S07과 동일 카드 축약版)",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.511Z"
+          },
+          {
+            "id": 20,
+            "title": "UI 컴포넌트: ProvenanceFooter [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "done",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ProvenanceFooter [SHARED]",
+            "parentId": "undefined",
+            "updatedAt": "2026-05-19T00:27:16.513Z"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S08",
+          "priorityTier": "P0",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T09_S08"
+        },
+        "updatedAt": "2026-05-19T00:27:16.513Z"
+      },
+      {
+        "id": "10",
+        "title": "S09 분석 이력 목록",
+        "description": "graphify — S09 (P1)",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S09\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S09_AnalysisHistoryList.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T10_S09/API_SPEC.md`\n- `artifacts/T10_S09/DB_SCHEMA.md`\n- `artifacts/T10_S09/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AnalysisHistoryListPage (S09)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AnalysisHistoryListPage (S09)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderUser",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: PageHeader",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PageHeader",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: PageTitle",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PageTitle",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: HistorySearchBar [SHARED] (local filter 또는 query param)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: HistorySearchBar [SHARED] (local filter 또는 query param)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: DateRangeFilter [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DateRangeFilter [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: ExportMenu [SHARED] (조건부: Premium — CSV/PDF)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ExportMenu [SHARED] (조건부: Premium — CSV/PDF)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: HistoryTableDesktop [SHARED] (md+)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: HistoryTableDesktop [SHARED] (md+)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: Row → navigate S10(sessionId)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Row → navigate S10(sessionId)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: HistoryCardListMobile (<md)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: HistoryCardListMobile (<md)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: Pagination [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Pagination [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: [SHARED] UserFooterSlim",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] UserFooterSlim",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S09",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T10_S09"
+        },
+        "updatedAt": "2026-05-19T00:29:30.892Z"
+      },
+      {
+        "id": "11",
+        "title": "S10 분석 이력 상세·시계열 비교",
+        "description": "graphify — S10 (P1)",
+        "status": "done",
+        "dependencies": [
+          "10",
+          "8"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S10\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S10_AnalysisHistoryDetail.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T11_S10/API_SPEC.md`\n- `artifacts/T11_S10/DB_SCHEMA.md`\n- `artifacts/T11_S10/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AnalysisHistoryDetailPage (S10)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AnalysisHistoryDetailPage (S10)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderUser",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: SessionMetaBar (companyName, analyzedAt, status badge)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SessionMetaBar (companyName, analyzedAt, status badge)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: CompareToggle [SHARED] (boolean — 레이아웃 전환)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompareToggle [SHARED] (boolean — 레이아웃 전환)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: TimelineSlider [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TimelineSlider [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: SliderTrack",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SliderTrack",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: EventMarkers [SHARED] (클릭 → EventDetailInline)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EventMarkers [SHARED] (클릭 → EventDetailInline)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: EventDetailInline (조건부: 마커 선택 시)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EventDetailInline (조건부: 마커 선택 시)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: GraphCompareLayout",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphCompareLayout",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: GraphSnapshotView [SHARED] (past, readOnly)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphSnapshotView [SHARED] (past, readOnly)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: GraphLiveView [SHARED] (조건부: compare on — 현재 graph)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GraphLiveView [SHARED] (조건부: compare on — 현재 graph)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: HistoryDetailTabs",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: HistoryDetailTabs",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: InsightsSnapshotList (과거 카드 읽기 전용)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: InsightsSnapshotList (과거 카드 읽기 전용)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: SignalsSnapshotList",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SignalsSnapshotList",
+            "parentId": "undefined"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: DiffSummaryPanel (AI 트렌드 텍스트 PRD §13.2)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DiffSummaryPanel (AI 트렌드 텍스트 PRD §13.2)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: [SHARED] UserFooterSlim",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] UserFooterSlim",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S10",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T11_S10"
+        },
+        "updatedAt": "2026-05-19T00:54:25.180Z"
+      },
+      {
+        "id": "12",
+        "title": "S11 관심 기업 목록·비교 (최대 3)",
+        "description": "graphify — S11 (P1)",
+        "status": "done",
+        "dependencies": [
+          "3",
+          "8"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S11\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S11_Watchlist.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T12_S11/API_SPEC.md`\n- `artifacts/T12_S11/DB_SCHEMA.md`\n- `artifacts/T12_S11/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: WatchlistPage (S11)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: WatchlistPage (S11)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderUser",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: PageTitleBlock",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PageTitleBlock",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: WatchlistGrid",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: WatchlistGrid",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: WatchlistCard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: WatchlistCard [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: CompareCheckbox (max 3, 초과 시 토스트)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompareCheckbox (max 3, 초과 시 토스트)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: CompanySummary",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanySummary",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: RemoveWatchButton → DELETE API",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RemoveWatchButton → DELETE API",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: LinkToDetail → S07",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: LinkToDetail → S07",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: CompareDock [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompareDock [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: ComparePanel [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ComparePanel [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: BasisTabs [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: BasisTabs [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: InsightCompareColumn [SHARED] × 선택 수",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: InsightCompareColumn [SHARED] × 선택 수",
+            "parentId": "undefined"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: [SHARED] UserFooterSlim",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] UserFooterSlim",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S11",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T12_S11"
+        },
+        "updatedAt": "2026-05-19T01:44:15.846Z"
+      },
+      {
+        "id": "13",
+        "title": "S12 마이페이지 — 비밀번호·프롬프트·OV05",
+        "description": "graphify — S12 (P1)",
+        "status": "done",
+        "dependencies": [
+          "3"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S12\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S12_MyPage.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T13_S12/API_SPEC.md`\n- `artifacts/T13_S12/DB_SCHEMA.md`\n- `artifacts/T13_S12/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: MyPage (S12)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: MyPage (S12)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: [SHARED] AppHeaderUser",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] AppHeaderUser",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: ProfileSummaryCard",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ProfileSummaryCard",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: Avatar [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Avatar [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: UserTextBlock (GET /users/me)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: UserTextBlock (GET /users/me)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: PasswordChangeForm [SHARED] (조건부: `authProvider===email`)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PasswordChangeForm [SHARED] (조건부: `authProvider===email`)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: TextField currentPassword",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField currentPassword",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: TextField newPassword",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField newPassword",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: TextField confirmPassword",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField confirmPassword",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: PolicyHints (Caption)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PolicyHints (Caption)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: PrimaryButton → PUT password",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton → PUT password",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: PremiumPromptSection (조건부: Premium)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PremiumPromptSection (조건부: Premium)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: PromptEditor [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PromptEditor [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: PrimaryButton → PUT prompt",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton → PUT prompt",
+            "parentId": "undefined"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: AccountActions",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AccountActions",
+            "parentId": "undefined"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: GhostButton \"로그아웃\" → OV05",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GhostButton \"로그아웃\" → OV05",
+            "parentId": "undefined"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: TextLink \"회원 탈퇴\" → (별도 플로우)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextLink \"회원 탈퇴\" → (별도 플로우)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 19,
+            "title": "UI 컴포넌트: OV05 LogoutConfirmDialog [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: OV05 LogoutConfirmDialog [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 20,
+            "title": "UI 컴포넌트: [SHARED] UserFooterSlim",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: [SHARED] UserFooterSlim",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S12",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T13_S12"
+        },
+        "updatedAt": "2026-05-19T01:57:15.176Z"
+      },
+      {
+        "id": "14",
+        "title": "S13 관리자 대시보드 — Agent 실행·토큰·알림",
+        "description": "graphify — S13 (P1)",
+        "status": "done",
+        "dependencies": [
+          "1",
+          "3"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S13\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S13_AdminDashboard.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T14_S13/API_SPEC.md`\n- `artifacts/T14_S13/DB_SCHEMA.md`\n- `artifacts/T14_S13/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AdminDashboardPage (S13)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminDashboardPage (S13)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: AdminSidebar [SHARED] (nav items)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminSidebar [SHARED] (nav items)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: AdminTopBar [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminTopBar [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: KpiCardGrid [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: KpiCardGrid [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: KpiCard ×4 (실행 수, 평균 시간, 토큰, 오류율)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: KpiCard ×4 (실행 수, 평균 시간, 토큰, 오류율)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: TrendChartsRow [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TrendChartsRow [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: AgentRunsChart (period selector)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AgentRunsChart (period selector)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: TokenUsageChart",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TokenUsageChart",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: AnomalyAlertList [SHARED] (이상 감지)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AnomalyAlertList [SHARED] (이상 감지)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: UserUsageTable [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: UserUsageTable [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: Row drill-down → session detail drawer (옵션)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Row drill-down → session detail drawer (옵션)",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S13",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T14_S13"
+        },
+        "updatedAt": "2026-05-19T02:11:03.016Z"
+      },
+      {
+        "id": "15",
+        "title": "S14 MCP 도구 관리 — OV03",
+        "description": "graphify — S14 (P1)",
+        "status": "done",
+        "dependencies": [
+          "14"
+        ],
+        "priority": "medium",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S14\n- **우선순위 등급**: P1 (Taskmaster priority=`medium`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S14_AdminMcpTools.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T15_S14/API_SPEC.md`\n- `artifacts/T15_S14/DB_SCHEMA.md`\n- `artifacts/T15_S14/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AdminMcpToolsPage (S14)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminMcpToolsPage (S14)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: AdminSidebar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminSidebar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: AdminTopBar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminTopBar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: PageHeader + PrimaryButton (신규 → OV03 create mode)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PageHeader + PrimaryButton (신규 → OV03 create mode)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: ToolsToolbar [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ToolsToolbar [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: McpToolsTable [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: McpToolsTable [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: RowActions (Ping, Edit→OV03, Delete confirm)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RowActions (Ping, Edit→OV03, Delete confirm)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: EmptyState (0건)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EmptyState (0건)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: OV03 McpToolFormModal [SHARED] (create/edit)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: OV03 McpToolFormModal [SHARED] (create/edit)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: FormFields (name, endpointUrl, authType, description, schema JSON)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: FormFields (name, endpointUrl, authType, description, schema JSON)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: RolePermissionMultiSelect [SHARED] (User/Admin/Premium)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RolePermissionMultiSelect [SHARED] (User/Admin/Premium)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: FooterActions (Save, Test connection optional)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: FooterActions (Save, Test connection optional)",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S14",
+          "priorityTier": "P1",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T15_S14"
+        }
+      },
+      {
+        "id": "16",
+        "title": "S15 Agent 프롬프트 관리 — 버전·OV04",
+        "description": "graphify — S15 (P2)",
+        "status": "pending",
+        "dependencies": [
+          "14"
+        ],
+        "priority": "low",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S15\n- **우선순위 등급**: P2 (Taskmaster priority=`low`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S15_AdminPrompts.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T16_S15/API_SPEC.md`\n- `artifacts/T16_S15/DB_SCHEMA.md`\n- `artifacts/T16_S15/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AdminPromptsPage (S15)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminPromptsPage (S15)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: AdminSidebar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminSidebar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: AdminTopBar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminTopBar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: TaskTypeTabs [SHARED] (query: `type=`)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TaskTypeTabs [SHARED] (query: `type=`)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: PromptEditorLayout",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PromptEditorLayout",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: SystemPromptEditor [SHARED] (large textarea, monospace 옵션)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SystemPromptEditor [SHARED] (large textarea, monospace 옵션)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: TaskTemplateEditor [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TaskTemplateEditor [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: EditorActionBar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EditorActionBar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: PrimaryButton → POST save (버전 자동)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton → POST save (버전 자동)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: GhostButton → open OV04 test",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GhostButton → open OV04 test",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: VersionHistoryPanel [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: VersionHistoryPanel [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: VersionListItem (timestamp, author, summary)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: VersionListItem (timestamp, author, summary)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: RollbackButton → confirm → POST rollback",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RollbackButton → confirm → POST rollback",
+            "parentId": "undefined"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: OV04 PromptTestPanel [SHARED] (slide from right `w-full max-w-[480px]`)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: OV04 PromptTestPanel [SHARED] (slide from right `w-full max-w-[480px]`)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: CompanyIdPicker [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CompanyIdPicker [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: RunTestButton → POST test",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RunTestButton → POST test",
+            "parentId": "undefined"
+          },
+          {
+            "id": 19,
+            "title": "UI 컴포넌트: TestOutputViewer (streaming 선택)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TestOutputViewer (streaming 선택)",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S15",
+          "priorityTier": "P2",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T16_S15"
+        }
+      },
+      {
+        "id": "17",
+        "title": "S16 Azure OpenAI 연결 설정",
+        "description": "graphify — S16 (P2)",
+        "status": "pending",
+        "dependencies": [
+          "14"
+        ],
+        "priority": "low",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S16\n- **우선순위 등급**: P2 (Taskmaster priority=`low`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S16_AdminOpenAIConfig.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T17_S16/API_SPEC.md`\n- `artifacts/T17_S16/DB_SCHEMA.md`\n- `artifacts/T17_S16/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AdminOpenAIConfigPage (S16)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminOpenAIConfigPage (S16)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: AdminSidebar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminSidebar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: AdminTopBar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminTopBar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: ConnectionFormCard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ConnectionFormCard [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: TextField endpointUrl",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField endpointUrl",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: SecretField apiKey (mask, rotate hint)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: SecretField apiKey (mask, rotate hint)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: TextField deploymentName",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField deploymentName",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: TextField apiVersion",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: TextField apiVersion",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: ModelParamsCard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ModelParamsCard [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: Select model",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Select model",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: Slider temperature",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: Slider temperature",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: NumberField maxTokens",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: NumberField maxTokens",
+            "parentId": "undefined"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: NumberField topP",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: NumberField topP",
+            "parentId": "undefined"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: EmbeddingConfigCard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EmbeddingConfigCard [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: FallbackConfigCard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: FallbackConfigCard [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: FormFooter",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: FormFooter",
+            "parentId": "undefined"
+          },
+          {
+            "id": 19,
+            "title": "UI 컴포넌트: PrimaryButton → PUT config",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton → PUT config",
+            "parentId": "undefined"
+          },
+          {
+            "id": 20,
+            "title": "UI 컴포넌트: GhostButton \"취소\" → reload from server",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: GhostButton \"취소\" → reload from server",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S16",
+          "priorityTier": "P2",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T17_S16"
+        }
+      },
+      {
+        "id": "18",
+        "title": "S17 Vector DB 관리 — 재임베딩·정리",
+        "description": "graphify — S17 (P2)",
+        "status": "pending",
+        "dependencies": [
+          "14"
+        ],
+        "priority": "low",
+        "details": "## graphify 태스크 메타\n- **구현 화면**: S17\n- **우선순위 등급**: P2 (Taskmaster priority=`low`)\n- **레이어**: Frontend=Y, Backend=Y, DB=Y\n\n## 참조 문서\n- PRD: `.taskmaster/docs/prd.txt`\n- 화면 흐름: `.taskmaster/docs/SCREEN_FLOW.md`\n- UI 명세: `.taskmaster/docs/ui_specs/UI_SPEC_S17_AdminVectorDB.md`\n\n## 산출물 (자동 생성)\n- `artifacts/T18_S17/API_SPEC.md`\n- `artifacts/T18_S17/DB_SCHEMA.md`\n- `artifacts/T18_S17/DEV_GUIDE.md`\n\n### 완료 기준 (필수)\n- [ ] UI_SPEC 레이아웃 구조 준수\n- [ ] 4가지 상태(loading / empty / error / populated) 구현\n- [ ] 인터랙션 규칙 구현 (해당 화면 UI_SPEC 기준)\n- [ ] 이전·다음 태스크 인터페이스 연동 확인 (라우팅·API 계약·세션 상태)\n\n\n## 구현 메모\n- 스택: React.js + Spring Boot + PostgreSQL\n- 인증·권한은 SCREEN_FLOW의 Guest/User/Admin 정책과 일치시킬 것\n",
+        "testStrategy": "DEV_GUIDE 완료 기준 체크리스트 + API_SPEC 계약 테스트(수동 또는 통합테스트)",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI 컴포넌트: AdminVectorDbPage (S17)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminVectorDbPage (S17)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminLayoutShell [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "UI 컴포넌트: AdminSidebar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminSidebar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "UI 컴포넌트: AdminTopBar",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: AdminTopBar",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "UI 컴포넌트: main",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: main",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "UI 컴포넌트: VectorStatsDashboard [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: VectorStatsDashboard [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "UI 컴포넌트: StatCard ×4",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: StatCard ×4",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "UI 컴포넌트: ReindexPanel [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ReindexPanel [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "UI 컴포넌트: ScopeRadio (all | selected)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ScopeRadio (all | selected)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 10,
+            "title": "UI 컴포넌트: EntityMultiSelect [SHARED] (조건부)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: EntityMultiSelect [SHARED] (조건부)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 11,
+            "title": "UI 컴포넌트: PrimaryButton → POST reindex (job id 반환)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PrimaryButton → POST reindex (job id 반환)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 12,
+            "title": "UI 컴포넌트: JobProgressBanner [SHARED] (폴링 상태)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: JobProgressBanner [SHARED] (폴링 상태)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 13,
+            "title": "UI 컴포넌트: PerformancePanel [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PerformancePanel [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 14,
+            "title": "UI 컴포넌트: MiniCharts (latency, similarity, qps)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: MiniCharts (latency, similarity, qps)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 15,
+            "title": "UI 컴포넌트: CleanupPanel [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: CleanupPanel [SHARED]",
+            "parentId": "undefined"
+          },
+          {
+            "id": 16,
+            "title": "UI 컴포넌트: RetentionRuleForm (days, types)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: RetentionRuleForm (days, types)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 17,
+            "title": "UI 컴포넌트: PreviewTable (삭제 대상 건수)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: PreviewTable (삭제 대상 건수)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 18,
+            "title": "UI 컴포넌트: DangerButton → DELETE cleanup (confirm dialog)",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: DangerButton → DELETE cleanup (confirm dialog)",
+            "parentId": "undefined"
+          },
+          {
+            "id": 19,
+            "title": "UI 컴포넌트: ConfirmDestructiveDialog [SHARED]",
+            "description": "UI_SPEC 컴포넌트 트리 체크리스트 항목",
+            "status": "pending",
+            "dependencies": [],
+            "details": "[ ] UI 컴포넌트: ConfirmDestructiveDialog [SHARED]",
+            "parentId": "undefined"
+          }
+        ],
+        "metadata": {
+          "graphifyScreen": "S17",
+          "priorityTier": "P2",
+          "layers": {
+            "fe": true,
+            "be": true,
+            "db": true
+          },
+          "artifactDir": "artifacts/T18_S17"
+        }
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2026-05-19T02:11:03.017Z",
+      "taskCount": 18,
+      "completedCount": 12,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}

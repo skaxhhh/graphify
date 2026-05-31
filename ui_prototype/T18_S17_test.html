@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>T18 S17 Vector DB — 4상태</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f7f4ef; padding: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    .card { background: #fff; border: 1px solid #e8e2d8; border-radius: 12px; padding: 16px; min-height: 160px; }
+    h2 { margin: 0 0 8px; font-size: 15px; }
+    .kpi { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 12px; }
+    .skeleton { height: 80px; background: linear-gradient(90deg, #ece7de 25%, #f5f1ea 50%, #ece7de 75%); background-size: 200% 100%; animation: s 1.2s infinite; border-radius: 8px; }
+    @keyframes s { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .bar { display: flex; align-items: flex-end; gap: 2px; height: 48px; margin-top: 8px; }
+    .bar span { flex: 1; background: #2d2d2d; border-radius: 2px 2px 0 0; min-height: 8px; }
+  </style>
+</head>
+<body>
+  <h1>S17 Vector DB 관리 — UI 상태 (T18)</h1>
+  <div class="grid">
+    <section class="card"><h2>loading</h2><div class="skeleton"></div><div class="skeleton" style="margin-top:8px;height:120px"></div></section>
+    <section class="card"><h2>empty</h2><p>인덱스가 비어 있습니다.</p><p style="color:#666;font-size:12px">OpenAI 설정 후 재임베딩 실행</p></section>
+    <section class="card"><h2>error</h2><p style="color:#9b2c2c">통계를 불러오지 못했습니다.</p></section>
+    <section class="card"><h2>populated</h2>
+      <div class="kpi">
+        <div>총 벡터 <strong>12,840</strong></div>
+        <div>인덱스 <strong>256 MB</strong></div>
+        <div>응답 <strong>142ms</strong></div>
+        <div>유사도 <strong>87.2%</strong></div>
+      </div>
+      <div class="bar" aria-hidden>
+        <span style="height:60%"></span><span style="height:75%"></span><span style="height:55%"></span><span style="height:80%"></span>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

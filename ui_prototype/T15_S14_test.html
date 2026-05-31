@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>T15 S14 MCP 도구 — 4상태</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f7f4ef; padding: 24px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: #fff; border: 1px solid #e8e2d8; border-radius: 12px; padding: 16px; min-height: 140px; }
+    h2 { margin: 0 0 8px; font-size: 15px; }
+    table { width: 100%; font-size: 12px; border-collapse: collapse; margin-top: 8px; }
+    th, td { border-bottom: 1px solid #eee; padding: 6px 4px; text-align: left; }
+    .skeleton { height: 80px; background: linear-gradient(90deg, #ece7de 25%, #f5f1ea 50%, #ece7de 75%); background-size: 200% 100%; animation: s 1.2s infinite; border-radius: 8px; }
+    @keyframes s { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  </style>
+</head>
+<body>
+  <h1>S14 MCP 도구 관리 — UI 상태 (T15)</h1>
+  <div class="grid">
+    <section class="card"><h2>loading</h2><div class="skeleton"></div></section>
+    <section class="card"><h2>empty</h2><p>등록된 MCP 도구가 없습니다.</p></section>
+    <section class="card"><h2>error</h2><p style="color:#9b2c2c">목록 로드 실패</p></section>
+    <section class="card"><h2>populated</h2>
+      <table><thead><tr><th>이름</th><th>상태</th><th>활성</th></tr></thead>
+      <tbody><tr><td>company-search</td><td>CONNECTED</td><td>ON</td></tr></tbody></table>
+    </section>
+  </div>
+</body>
+</html>

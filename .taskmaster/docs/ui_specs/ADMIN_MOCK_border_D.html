@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>graphify Admin — Border Token D Mock</title>
+  <style>
+    /* design_system.md + tailwind.config.js 톤, 테두리 D등급 */
+    :root {
+      --cream: #f7f4ed;
+      --charcoal: #1c1c1c;
+      --muted-gray: #5f5f5d;
+      --off-white: #fcfbf8;
+      --border-d: #b8aea0;           /* warm-border-strong (제안 D) */
+      --border-interactive: rgba(28, 28, 28, 0.4);
+      --charcoal-5: rgba(28, 28, 28, 0.05);
+      --charcoal-3: rgba(28, 28, 28, 0.03);
+      --sidebar-w: 256px;
+      --topbar-h: 56px;
+      --radius: 12px;
+      --radius-sm: 6px;
+      --shadow-focus: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--charcoal);
+      background: #ebe6de;
+    }
+
+  /* 문서 헤더 (검토용) */
+    .review-bar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--charcoal);
+      color: var(--off-white);
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 20px;
+      font-size: 12px;
+    }
+    .review-bar h1 { margin: 0; font-size: 14px; font-weight: 600; }
+    .review-bar p { margin: 0; opacity: 0.85; }
+    .swatches { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+    .swatch {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+    }
+    .swatch i {
+      display: block;
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .screen-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 12px 20px;
+      background: #e0dbd2;
+      border-bottom: 1px solid var(--border-d);
+    }
+    .screen-tabs button {
+      font: inherit;
+      font-size: 13px;
+      padding: 8px 14px;
+      border: 1px solid var(--border-d);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      color: var(--charcoal);
+      cursor: pointer;
+    }
+    .screen-tabs button[aria-selected="true"] {
+      background: var(--charcoal);
+      color: var(--off-white);
+      border-color: var(--charcoal);
+    }
+
+    .mock-wrap {
+      max-width: 1440px;
+      margin: 16px auto 48px;
+      padding: 0 16px;
+    }
+    .mock-frame {
+      border: 2px solid var(--border-d);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-focus);
+      background: var(--cream);
+      min-height: 720px;
+    }
+    .mock-screen { display: none; }
+    .mock-screen.active { display: flex; min-height: 720px; }
+
+    /* Admin shell */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      background: var(--cream);
+      border-right: 1px solid var(--border-d);
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-brand {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-d);
+    }
+    .sidebar-brand .logo { font-size: 18px; font-weight: 600; margin: 0; }
+    .admin-badge {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 8px;
+      font-size: 11px;
+      color: var(--muted-gray);
+      border: 1px solid var(--border-interactive);
+      border-radius: var(--radius-sm);
+    }
+    .sidebar nav { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      display: block;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      color: var(--muted-gray);
+      text-decoration: none;
+      font-size: 14px;
+      border: 1px solid transparent;
+    }
+    .nav-item:hover {
+      background: var(--charcoal-3);
+      color: var(--charcoal);
+    }
+    .nav-item.active {
+      background: var(--charcoal-5);
+      color: var(--charcoal);
+      font-weight: 500;
+      border-color: var(--border-d);
+    }
+    .sidebar-foot {
+      padding: 12px;
+      border-top: 1px solid var(--border-d);
+      font-size: 13px;
+    }
+    .sidebar-foot a { color: var(--muted-gray); }
+
+    .main-col { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar {
+      height: var(--topbar-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--border-d);
+      background: var(--cream);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar .pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border: 1px solid var(--border-interactive);
+      border-radius: var(--radius-sm);
+      color: var(--muted-gray);
+    }
+    .topbar-right { font-size: 13px; color: var(--muted-gray); }
+    .topbar-right strong { color: var(--charcoal); font-weight: 500; }
+
+    .content {
+      flex: 1;
+      overflow: auto;
+      padding: 32px;
+    }
+    .content-inner { max-width: 1400px; margin: 0 auto; }
+    .page-title { margin: 0 0 4px; font-size: 24px; font-weight: 600; }
+    .page-desc { margin: 0 0 24px; font-size: 14px; color: var(--muted-gray); }
+
+    .card {
+      background: var(--cream);
+      border: 1px solid var(--border-d);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: 0 1px 2px rgba(28, 28, 28, 0.04);
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      min-height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .stat-card .label { font-size: 13px; color: var(--muted-gray); margin: 0; }
+    .stat-card .value { font-size: 22px; font-weight: 600; margin: 8px 0 0; }
+    .stat-card .hint { font-size: 11px; color: var(--muted-gray); margin: 0; }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+    .panel h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; }
+    .panel .sub { margin: 0 0 16px; font-size: 13px; color: var(--muted-gray); }
+
+    .radio-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .radio-row label { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0 20px;
+      background: var(--charcoal);
+      color: var(--off-white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: rgba(255,255,255,0.2) 0 0.5px 0 0 inset, rgba(0,0,0,0.2) 0 0 0 0.5px inset;
+    }
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      padding: 0 16px;
+      background: transparent;
+      color: var(--charcoal);
+      border: 1px solid var(--border-interactive);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-danger {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 20px;
+      background: transparent;
+      color: var(--charcoal);
+      border: 1px solid var(--border-interactive);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .metrics-row dt { font-size: 11px; color: var(--muted-gray); }
+    .metrics-row dd { margin: 4px 0 0; font-size: 18px; font-weight: 600; }
+    .bars { display: flex; align-items: flex-end; gap: 3px; height: 56px; }
+    .bars span { flex: 1; background: rgba(28,28,28,0.75); border-radius: 2px 2px 0 0; min-height: 8px; }
+
+    .input {
+      width: 100%;
+      max-width: 200px;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border-d);
+      border-radius: var(--radius-sm);
+      background: var(--cream);
+      font: inherit;
+    }
+    .preview-box {
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid var(--border-d);
+      border-radius: var(--radius-sm);
+      background: rgba(236, 234, 228, 0.35);
+    }
+    .preview-count { font-size: 24px; font-weight: 600; margin: 8px 0 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-d);
+    }
+    th { color: var(--muted-gray); font-weight: 500; font-size: 12px; }
+    .chart-placeholder {
+      height: 140px;
+      border: 1px dashed var(--border-d);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted-gray);
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .alert-item {
+      padding: 10px 12px;
+      border: 1px solid var(--border-d);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .alert-item.warn { background: rgba(236, 234, 228, 0.5); }
+
+    .legend {
+      margin-top: 16px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--muted-gray);
+      background: var(--cream);
+      border: 1px solid var(--border-d);
+      border-radius: var(--radius-sm);
+    }
+    .legend code { color: var(--charcoal); font-size: 11px; }
+
+    @media (max-width: 1024px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .mock-screen.active { flex-direction: column; }
+      .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-d); }
+      .stat-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="review-bar">
+    <h1>Admin UI Mock — Border D</h1>
+    <p>구조선·카드·사이드: <strong>#b8aea0</strong> · 배경 cream <strong>#f7f4ed</strong> · UI_SPEC S13 / S17</p>
+    <div class="swatches">
+      <span class="swatch"><i style="background:#f7f4ed"></i> cream</span>
+      <span class="swatch"><i style="background:#b8aea0"></i> border-D</span>
+      <span class="swatch"><i style="background:rgba(28,28,28,0.4)"></i> interactive</span>
+    </div>
+  </header>
+
+  <div class="screen-tabs" role="tablist">
+    <button type="button" role="tab" id="tab-s13" aria-selected="true" aria-controls="screen-s13">S13 대시보드</button>
+    <button type="button" role="tab" id="tab-s17" aria-selected="false" aria-controls="screen-s17">S17 Vector DB</button>
+  </div>
+
+  <div class="mock-wrap">
+    <div class="mock-frame">
+      <!-- S13 Admin Dashboard -->
+      <div id="screen-s13" class="mock-screen active" role="tabpanel">
+        <aside class="sidebar" aria-label="관리자 사이드바">
+          <div class="sidebar-brand">
+            <p class="logo">graphify</p>
+            <span class="admin-badge">관리자 모드</span>
+          </div>
+          <nav>
+            <a class="nav-item active" href="#">대시보드</a>
+            <a class="nav-item" href="#">MCP 도구</a>
+            <a class="nav-item" href="#">프롬프트</a>
+            <a class="nav-item" href="#">OpenAI 설정</a>
+            <a class="nav-item" href="#">Vector DB</a>
+          </nav>
+          <div class="sidebar-foot"><a href="#">사용자 서비스로</a></div>
+        </aside>
+        <div class="main-col">
+          <header class="topbar">
+            <div class="topbar-left">
+              <span style="font-weight:500">관리자</span>
+              <span class="pill">Admin</span>
+            </div>
+            <div class="topbar-right">관리자 · <strong>허정훈</strong></div>
+          </header>
+          <main class="content">
+            <div class="content-inner">
+              <h1 class="page-title">관리자 대시보드</h1>
+              <p class="page-desc">Agent 실행·토큰·알림·사용자 사용량을 모니터링합니다.</p>
+
+              <div class="stat-grid">
+                <div class="card stat-card">
+                  <p class="label">실행 수</p>
+                  <p class="value">1,240</p>
+                  <p class="hint">최근 14일 합계</p>
+                </div>
+                <div class="card stat-card">
+                  <p class="label">평균 실행 시간</p>
+                  <p class="value">12.4s</p>
+                  <p class="hint">&nbsp;</p>
+                </div>
+                <div class="card stat-card">
+                  <p class="label">토큰 사용량</p>
+                  <p class="value">2,184,000</p>
+                  <p class="hint">&nbsp;</p>
+                </div>
+                <div class="card stat-card">
+                  <p class="label">오류율</p>
+                  <p class="value">3.2%</p>
+                  <p class="hint">&nbsp;</p>
+                </div>
+              </div>
+
+              <div class="two-col">
+                <div class="card panel">
+                  <h2>일별 실행 수</h2>
+                  <p class="sub">기간: 일</p>
+                  <div class="chart-placeholder">Chart · 실행 수 추이</div>
+                </div>
+                <div class="card panel">
+                  <h2>토큰 사용량</h2>
+                  <p class="sub">기간: 일</p>
+                  <div class="chart-placeholder">Chart · 토큰 추이</div>
+                </div>
+              </div>
+
+              <div class="two-col">
+                <div class="card panel">
+                  <h2>이상 알림</h2>
+                  <p class="sub">최근 감지</p>
+                  <div class="alert-item warn">WARN · 오류율이 24시간 평균 대비 상승했습니다.</div>
+                  <div class="alert-item">INFO · 토큰 사용량이 주간 목표의 80%에 도달했습니다.</div>
+                </div>
+                <div class="card panel">
+                  <h2>사용자별 사용량</h2>
+                  <p class="sub">상위 사용자</p>
+                  <table>
+                    <thead>
+                      <tr><th>사용자</th><th>실행</th><th>토큰</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr><td>user_a@example.com</td><td>420</td><td>890K</td></tr>
+                      <tr><td>user_b@example.com</td><td>318</td><td>612K</td></tr>
+                      <tr><td>user_c@example.com</td><td>205</td><td>401K</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      <!-- S17 Vector DB -->
+      <div id="screen-s17" class="mock-screen" role="tabpanel" hidden>
+        <aside class="sidebar">
+          <div class="sidebar-brand">
+            <p class="logo">graphify</p>
+            <span class="admin-badge">관리자 모드</span>
+          </div>
+          <nav>
+            <a class="nav-item" href="#">대시보드</a>
+            <a class="nav-item" href="#">MCP 도구</a>
+            <a class="nav-item" href="#">프롬프트</a>
+            <a class="nav-item" href="#">OpenAI 설정</a>
+            <a class="nav-item active" href="#">Vector DB</a>
+          </nav>
+          <div class="sidebar-foot"><a href="#">사용자 서비스로</a></div>
+        </aside>
+        <div class="main-col">
+          <header class="topbar">
+            <div class="topbar-left">
+              <span style="font-weight:500">관리자</span>
+              <span class="pill">Admin</span>
+            </div>
+            <div class="topbar-right">관리자 · <strong>허정훈</strong></div>
+          </header>
+          <main class="content">
+            <div class="content-inner">
+              <h1 class="page-title">Vector DB 관리</h1>
+              <p class="page-desc">벡터 인덱스 통계, 재임베딩, 만료 데이터 정리를 관리합니다.</p>
+
+              <div class="stat-grid">
+                <div class="card stat-card">
+                  <p class="label">총 벡터 수</p>
+                  <p class="value">12,840</p>
+                </div>
+                <div class="card stat-card">
+                  <p class="label">유형별 분포</p>
+                  <p class="value" style="font-size:14px;font-weight:500">COMPANY 5,200 · INSIGHT 4,100</p>
+                  <p class="hint">RELATION 3,540</p>
+                </div>
+                <div class="card stat-card">
+                  <p class="label">인덱스 크기</p>
+                  <p class="value">256 MB</p>
+                </div>
+                <div class="card stat-card">
+                  <p class="label">최근 작업</p>
+                  <p class="value" style="font-size:16px">재임베딩 · SUCCESS</p>
+                </div>
+              </div>
+
+              <div class="two-col">
+                <div class="card panel">
+                  <h2>재임베딩</h2>
+                  <p class="sub">전체 또는 선택한 기업 문서에 대해 벡터 인덱스를 다시 생성합니다.</p>
+                  <div class="radio-row">
+                    <label><input type="radio" name="scope" checked /> 전체 재임베딩</label>
+                    <label><input type="radio" name="scope" /> 선택 재임베딩</label>
+                  </div>
+                  <button type="button" class="btn-primary">재임베딩 실행</button>
+                </div>
+                <div class="card panel">
+                  <h2>성능 지표</h2>
+                  <p class="sub">최근 24시간</p>
+                  <dl class="metrics-row">
+                    <div><dt>평균 응답</dt><dd>143ms</dd></div>
+                    <div><dt>평균 유사도</dt><dd>87.2%</dd></div>
+                    <div><dt>24h 요청</dt><dd>1,842</dd></div>
+                  </dl>
+                  <div class="bars" aria-hidden>
+                    <span style="height:55%"></span><span style="height:70%"></span><span style="height:62%"></span>
+                    <span style="height:80%"></span><span style="height:75%"></span><span style="height:68%"></span>
+                    <span style="height:90%"></span><span style="height:85%"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card panel">
+                <h2>만료 벡터 정리</h2>
+                <p class="sub">보관 기간을 초과한 벡터를 삭제합니다.</p>
+                <div class="two-col" style="margin-bottom:0">
+                  <div>
+                    <label style="font-size:13px;font-weight:500">만료 기준 (일)</label><br />
+                    <input class="input" type="number" value="90" style="margin-top:8px" />
+                    <p style="font-size:13px;margin:16px 0 8px;font-weight:500">대상 유형</p>
+                    <label style="display:block;font-size:14px;margin:6px 0"><input type="checkbox" checked /> 기업</label>
+                    <label style="display:block;font-size:14px;margin:6px 0"><input type="checkbox" checked /> 인사이트</label>
+                    <label style="display:block;font-size:14px;margin:6px 0"><input type="checkbox" /> 관계</label>
+                  </div>
+                  <div class="preview-box">
+                    <span style="font-size:13px;font-weight:500">삭제 미리보기</span>
+                    <p class="preview-count">420건</p>
+                    <p style="font-size:11px;color:var(--muted-gray);margin:4px 0 0">규칙 변경 시 자동 갱신</p>
+                  </div>
+                </div>
+                <div style="margin-top:20px">
+                  <button type="button" class="btn-danger">만료 벡터 삭제 실행</button>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <p class="legend">
+      <strong>토큰 적용 범위 (이 mock)</strong><br />
+      사이드바·탑바·카드·테이블·입력·미리보기 박스: <code>border: 1px solid #b8aea0</code> (D)<br />
+      배지·Ghost/위험 버튼: <code>border: 1px solid rgba(28,28,28,0.4)</code> (interactive, 기존 유지)<br />
+      ✅ 반영됨 (2026-05): <code>tailwind.config.js</code> <code>warm-border: #b8aea0</code> ·
+      전역 <code>border-warm-border</code> (배경·스켈레톤은 <code>light-cream</code> 유지)
+    </p>
+  </div>
+
+  <script>
+    const tabs = document.querySelectorAll('.screen-tabs button');
+    const screens = document.querySelectorAll('.mock-screen');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const id = tab.getAttribute('aria-controls');
+        tabs.forEach((t) => t.setAttribute('aria-selected', t === tab ? 'true' : 'false'));
+        screens.forEach((s) => {
+          const on = s.id === id;
+          s.classList.toggle('active', on);
+          s.hidden = !on;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

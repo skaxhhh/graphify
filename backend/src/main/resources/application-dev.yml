@@ -1,0 +1,65 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+  datasource:
+    url: jdbc:postgresql://localhost:5432/graphify
+    username: graphify
+    password: graphify
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+graphify:
+  secrets:
+    encryption-key: dev-only-change-me-graphify-secrets-key-256bits-min!!
+  dart:
+    api-key: ${DART_API_KEY:}
+    corp-code-cache-hours: 24
+    search-max-results: 20
+    enrich-threshold: 3
+  news:
+    api-key: ${NEWS_API_KEY:}
+    refresh-minutes: 15
+  market:
+    provider: ${MARKET_PROVIDER:composite}
+    yahoo-enabled: ${MARKET_YAHOO_ENABLED:true}
+    yahoo-chart-base-url: ${MARKET_YAHOO_CHART_URL:https://query1.finance.yahoo.com}
+    naver-enabled: ${MARKET_NAVER_ENABLED:true}
+    naver-finance-base-url: ${MARKET_NAVER_URL:https://finance.naver.com}
+    krx-api-key: ${KRX_API_KEY:${API_KEY:}}
+    krx-api-base-url: ${KRX_API_BASE_URL:https://data-dbg.krx.co.kr/svc/apis/sto}
+    cnn-fear-greed-enabled: ${MARKET_CNN_FEAR_GREED_ENABLED:true}
+    cnn-fear-greed-base-url: ${MARKET_CNN_FEAR_GREED_URL:https://production.dataviz.cnn.io}
+  openai:
+    base-url: ${OPENAI_BASE_URL:}
+    api-key: ${OPENAI_API_KEY:}
+    api-version: ${OPENAI_API_VERSION:2024-12-01-preview}
+    deployment: ${OPENAI_DEPLOYMENT:${OPENAI_MODEL:gpt-4o}}
+    model: ${OPENAI_MODEL:gpt-4o}
+    fallback-deployment: ${OPENAI_FALLBACK_DEPLOYMENT:gpt-4o}
+    auth-mode: ${OPENAI_AUTH_MODE:api-key}
+    max-tokens: ${OPENAI_MAX_TOKENS:4096}
+    rss-feeds:
+      - https://www.hankyung.com/feed/economy
+      - https://www.mk.co.kr/rss/30000001/
+      - https://www.yna.co.kr/rss/economy.xml
+  auth:
+    jwt-secret: dev-only-change-me-graphify-jwt-secret-key-256bits-minimum!!
+    access-expiration-minutes: 15
+    refresh-expiration-days: 7
+    frontend-base-url: http://localhost:5173
+    api-public-base-url: http://localhost:8081
+
+logging:
+  level:
+    com.graphify: DEBUG
+    org.springframework.web: INFO
