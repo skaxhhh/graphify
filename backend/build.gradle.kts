@@ -39,3 +39,8 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// bootJar만 산출물로 사용 (plain jar 비활성화 → 컨테이너 COPY 시 단일 jar 보장)
+tasks.named<Jar>("jar") {
+    enabled = false
+}

@@ -37,3 +37,9 @@ frontend/dist/
 
 # OS specific
 .DS_Store
+
+# Internal tooling / planning artifacts (not part of the deployed app)
+.cursor/
+.taskmaster/
+.harness/
+.omc/
