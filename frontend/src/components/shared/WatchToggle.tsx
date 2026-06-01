@@ -5,11 +5,9 @@ import { addToWatchlist, fetchMyWatchlist, removeFromWatchlist } from "@/lib/wat
 
 interface WatchToggleProps {
   companyId: number;
-  isAuthenticated: boolean;
-  onGuestAttempt: () => void;
 }
 
-export function WatchToggle({ companyId, isAuthenticated, onGuestAttempt }: WatchToggleProps) {
+export function WatchToggle({ companyId }: WatchToggleProps) {
   const queryClient = useQueryClient();
   const [active, setActive] = useState(false);
 
@@ -19,17 +17,12 @@ export function WatchToggle({ companyId, isAuthenticated, onGuestAttempt }: Watc
       const response = await fetchMyWatchlist();
       return response.data;
     },
-    enabled: isAuthenticated,
   });
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      setActive(false);
-      return;
-    }
     const items = watchlistQuery.data?.items ?? [];
     setActive(items.some((item) => item.companyId === companyId));
-  }, [companyId, isAuthenticated, watchlistQuery.data]);
+  }, [companyId, watchlistQuery.data]);
 
   const addMutation = useMutation({
     mutationFn: () => addToWatchlist(companyId),
@@ -50,10 +43,6 @@ export function WatchToggle({ companyId, isAuthenticated, onGuestAttempt }: Watc
   const pending = addMutation.isPending || removeMutation.isPending;
 
   const handleClick = () => {
-    if (!isAuthenticated) {
-      onGuestAttempt();
-      return;
-    }
     if (pending) return;
     if (active) {
       removeMutation.mutate();
@@ -70,7 +59,7 @@ export function WatchToggle({ companyId, isAuthenticated, onGuestAttempt }: Watc
       <button
         type="button"
         onClick={handleClick}
-        disabled={pending || (isAuthenticated && watchlistQuery.isLoading)}
+        disabled={pending || watchlistQuery.isLoading}
         aria-pressed={active}
         className="inline-flex h-11 items-center justify-center rounded-md border border-warm-border px-4 text-sm text-charcoal transition-colors hover:bg-charcoal/[0.03] disabled:opacity-60"
       >

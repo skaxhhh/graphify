@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSmoothProgress } from "@/hooks/useSmoothProgress";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { AgentInsightPanel } from "@/components/company/AgentInsightPanel";
 import {
   COMPANY_DETAIL_COLUMN,
@@ -33,7 +33,6 @@ import {
   generateCompanyAgentInsight,
   syncCompanyFromDart,
 } from "@/lib/companyApi";
-import { useAuthStore } from "@/stores/authStore";
 
 function parseCompanyId(raw: string | undefined): number | null {
   if (!raw) return null;
@@ -45,12 +44,9 @@ function parseCompanyId(raw: string | undefined): number | null {
 export function CompanyDetailPage() {
   const { companyId: companyIdParam } = useParams<{ companyId: string }>();
   const companyId = parseCompanyId(companyIdParam);
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
 
   const [reliabilityOpen, setReliabilityOpen] = useState(false);
-  const [guestToast, setGuestToast] = useState<string | null>(null);
   const [pipelineError, setPipelineError] = useState<string | null>(null);
   const pipelineStarted = useRef(false);
   const pipelineProgress = useSmoothProgress();
@@ -213,29 +209,7 @@ export function CompanyDetailPage() {
       >
         {company ? (
           <div className={`${shellClass} space-y-8`}>
-            {guestToast ? (
-              <div
-                role="status"
-                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warm-border bg-cream px-4 py-3 text-sm text-charcoal"
-              >
-                <span>{guestToast}</span>
-                <button
-                  type="button"
-                  className="text-muted-gray underline hover:text-charcoal"
-                  onClick={() => navigate("/login", { state: { from: `/companies/${company.id}` } })}
-                >
-                  로그인
-                </button>
-              </div>
-            ) : null}
-
-            <CompanyHeroCard
-              company={company}
-              isAuthenticated={isAuthenticated}
-              onGuestWatchlist={() =>
-                setGuestToast("관심 기업 등록은 로그인 후 이용할 수 있습니다.")
-              }
-            />
+            <CompanyHeroCard company={company} />
 
             <div className={COMPANY_DETAIL_MAIN_GRID} data-testid="company-detail-layout">
               {/* 좌측: 기본정보 → 재무 → 공시 → 데이터 출처 */}

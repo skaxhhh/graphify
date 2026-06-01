@@ -12,7 +12,6 @@ import { Pagination } from "@/components/shared/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { fetchCompanySearch } from "@/lib/searchApi";
-import { useAuthStore } from "@/stores/authStore";
 import type { AutocompleteItem, CompanySort } from "@/types/search";
 
 const PAGE_SIZE = 20;
@@ -34,7 +33,6 @@ function filtersFromParams(params: URLSearchParams): SearchFilters {
 
 export function SearchResultPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { addEntry } = useRecentSearches();
 
   const q = searchParams.get("q")?.trim() ?? "";
@@ -140,9 +138,7 @@ export function SearchResultPage() {
   };
 
   const handleCompanySelect = (item: AutocompleteItem) => {
-    if (isAuthenticated) {
-      addEntry(item.id, item.name);
-    }
+    addEntry(item.id, item.name);
   };
 
   return (

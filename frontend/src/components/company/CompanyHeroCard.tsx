@@ -9,15 +9,9 @@ import type { CompanyDetail } from "@/types/company";
 
 interface CompanyHeroCardProps {
   company: CompanyDetail;
-  isAuthenticated: boolean;
-  onGuestWatchlist: () => void;
 }
 
-export function CompanyHeroCard({
-  company,
-  isAuthenticated,
-  onGuestWatchlist,
-}: CompanyHeroCardProps) {
+export function CompanyHeroCard({ company }: CompanyHeroCardProps) {
   const navigate = useNavigate();
 
   const goToGraph = () => {
@@ -51,17 +45,11 @@ export function CompanyHeroCard({
           </PrimaryButton>
           <GhostButton
             className="lg:min-w-[200px]"
-            disabled={!isAuthenticated}
-            title={!isAuthenticated ? "로그인 후 이용할 수 있습니다" : undefined}
             onClick={() => navigate("/app/history")}
           >
             분석 이력
           </GhostButton>
-          <WatchToggle
-            companyId={company.id}
-            isAuthenticated={isAuthenticated}
-            onGuestAttempt={onGuestWatchlist}
-          />
+          <WatchToggle companyId={company.id} />
         </div>
       </div>
     </section>
