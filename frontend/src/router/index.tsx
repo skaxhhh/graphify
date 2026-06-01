@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import { RequireAdmin } from "@/components/auth/RequireAdmin";
+import { RequireAuth } from "@/components/auth/RequireAuth";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { GuestLayout } from "@/layouts/GuestLayout";
 import { UserAppLayout } from "@/layouts/UserAppLayout";
@@ -40,9 +41,30 @@ export const router = createBrowserRouter([
         path: "/password-reset/confirm",
         element: <PasswordResetConfirmPage />,
       },
-      { path: "/search", element: <SearchResultPage /> },
-      { path: "/companies/:companyId", element: <CompanyDetailPage /> },
-      { path: "/companies/:companyId/graph", element: <GraphVisualizationPage /> },
+      {
+        path: "/search",
+        element: (
+          <RequireAuth>
+            <SearchResultPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "/companies/:companyId",
+        element: (
+          <RequireAuth>
+            <CompanyDetailPage />
+          </RequireAuth>
+        ),
+      },
+      {
+        path: "/companies/:companyId/graph",
+        element: (
+          <RequireAuth>
+            <GraphVisualizationPage />
+          </RequireAuth>
+        ),
+      },
     ],
   },
   {
