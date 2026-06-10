@@ -61,7 +61,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/oauth/**",
                                 "/api/v1/auth/password-reset/request",
                                 "/api/v1/auth/password-reset/validate",
-                                "/api/v1/auth/password-reset/confirm"
+                                "/api/v1/auth/password-reset/confirm",
+                                "/api/npo/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
