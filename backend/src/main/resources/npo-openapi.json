@@ -1,0 +1,348 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NPO Agent Platform API",
+    "description": "Npo Agent Platform - 장애 관리 Agent 및 운영 자동화 Agent용 통합 MCP API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://<YOUR_CLOUD_RUN_URL>",
+      "description": "Google Cloud Run (Production)"
+    }
+  ],
+  "tags": [
+    {
+      "name": "incident",
+      "description": "장애 관리 Agent API"
+    },
+    {
+      "name": "ops",
+      "description": "운영 자동화 Agent API (영업 시스템)"
+    }
+  ],
+  "paths": {
+    "/api/npo/incidents/all": {
+      "get": {
+        "tags": ["incident"],
+        "summary": "전체 장애 이력 조회",
+        "description": "조건 없이 모든 장애 데이터를 반환합니다.",
+        "operationId": "getAllIncidents",
+        "responses": {
+          "200": {
+            "description": "전체 장애 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Incident" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/incidents": {
+      "get": {
+        "tags": ["incident"],
+        "summary": "장애 목록 조회",
+        "description": "상태, 심각도, 날짜 범위 필터로 장애 목록을 조회합니다.",
+        "operationId": "getIncidents",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "장애 상태 (OPEN, INVESTIGATING, RESOLVED, CLOSED)",
+            "schema": { "type": "string", "enum": ["OPEN", "INVESTIGATING", "RESOLVED", "CLOSED"] }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "description": "심각도 (CRITICAL, HIGH, MEDIUM, LOW)",
+            "schema": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "description": "조회 시작일 (yyyy-MM-dd)",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "description": "조회 종료일 (yyyy-MM-dd)",
+            "schema": { "type": "string", "format": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "장애 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Incident" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/incidents/history": {
+      "get": {
+        "tags": ["incident"],
+        "summary": "장애 이력 조회",
+        "description": "기간별, 서비스별로 해결/종료된 장애 이력을 조회합니다.",
+        "operationId": "getIncidentHistory",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "description": "조회 시작일 (yyyy-MM-dd)",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "description": "조회 종료일 (yyyy-MM-dd)",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "service",
+            "in": "query",
+            "required": false,
+            "description": "서비스명 (예: payment, auth, database)",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "장애 이력 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Incident" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/incidents/stats": {
+      "get": {
+        "tags": ["incident"],
+        "summary": "장애 통계 조회",
+        "description": "기간 내 장애 건수, MTTR, 재발률 등 통계를 조회합니다.",
+        "operationId": "getIncidentStats",
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "description": "조회 시작일 (yyyy-MM-dd)",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "description": "조회 종료일 (yyyy-MM-dd)",
+            "schema": { "type": "string", "format": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "장애 통계",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/IncidentStats" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/closing/today": {
+      "get": {
+        "tags": ["ops"],
+        "summary": "금일자 마감 점검",
+        "description": "당일 영업 마감 항목(매출, 정산, 재고, 승인 등)을 점검한 결과를 반환합니다.",
+        "operationId": "getTodayClosing",
+        "responses": {
+          "200": {
+            "description": "금일 마감 점검 결과",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClosingReport" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/closing/yesterday": {
+      "get": {
+        "tags": ["ops"],
+        "summary": "전일자 마감 점검",
+        "description": "전일 영업 마감 항목 점검 결과를 반환합니다. 전일 처리 완료 여부 확인에 활용합니다.",
+        "operationId": "getYesterdayClosing",
+        "responses": {
+          "200": {
+            "description": "전일 마감 점검 결과",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClosingReport" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/jobs": {
+      "get": {
+        "tags": ["ops"],
+        "summary": "배치 작업 목록 조회",
+        "description": "전체 배치 작업 목록과 각 작업의 상태를 반환합니다.",
+        "operationId": "getBatchJobs",
+        "responses": {
+          "200": {
+            "description": "배치 작업 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BatchJob" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/jobs/failed": {
+      "get": {
+        "tags": ["ops"],
+        "summary": "실패 배치 작업 목록 조회",
+        "description": "현재 FAILED 상태인 배치 작업만 필터링하여 반환합니다.",
+        "operationId": "getFailedBatchJobs",
+        "responses": {
+          "200": {
+            "description": "실패 배치 작업 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BatchJob" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/jobs/{id}/retry": {
+      "post": {
+        "tags": ["ops"],
+        "summary": "배치 작업 재실행",
+        "description": "실패한 배치 작업을 재실행합니다. 상태가 RUNNING으로 변경되고 retryCount가 증가합니다.",
+        "operationId": "retryBatchJob",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "배치 작업 ID (예: JOB-002)",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "재실행된 배치 작업 정보",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BatchJob" }
+              }
+            }
+          },
+          "404": { "description": "해당 ID의 작업을 찾을 수 없음" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Incident": {
+        "type": "object",
+        "properties": {
+          "id":          { "type": "string", "example": "INC-001" },
+          "title":       { "type": "string", "example": "결제 서비스 응답 지연" },
+          "description": { "type": "string" },
+          "status":      { "type": "string", "enum": ["OPEN", "INVESTIGATING", "RESOLVED", "CLOSED"] },
+          "severity":    { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+          "service":     { "type": "string", "example": "payment" },
+          "occurredAt":  { "type": "string", "format": "date-time" },
+          "resolvedAt":  { "type": "string", "format": "date-time", "nullable": true },
+          "mttrMinutes": { "type": "integer", "nullable": true, "description": "장애 해결 소요 시간(분)" }
+        }
+      },
+      "IncidentStats": {
+        "type": "object",
+        "properties": {
+          "totalCount":     { "type": "integer", "description": "전체 장애 건수" },
+          "criticalCount":  { "type": "integer", "description": "CRITICAL 건수" },
+          "highCount":      { "type": "integer", "description": "HIGH 건수" },
+          "mediumCount":    { "type": "integer", "description": "MEDIUM 건수" },
+          "lowCount":       { "type": "integer", "description": "LOW 건수" },
+          "mttrMinutes":    { "type": "number", "description": "평균 장애 해결 시간(분)" },
+          "recurrenceRate": { "type": "number", "description": "재발률 (%)" }
+        }
+      },
+      "ClosingReport": {
+        "type": "object",
+        "properties": {
+          "targetDate":    { "type": "string", "format": "date", "description": "점검 기준일" },
+          "overallStatus": { "type": "string", "enum": ["OK", "WARNING", "FAILED"], "description": "전체 마감 상태" },
+          "summary":       { "type": "string", "description": "마감 요약 메시지" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ClosingItem" }
+          }
+        }
+      },
+      "ClosingItem": {
+        "type": "object",
+        "properties": {
+          "checkName": { "type": "string", "description": "점검 항목명" },
+          "category":  { "type": "string", "enum": ["SALES", "SETTLEMENT", "INVENTORY", "APPROVAL"] },
+          "status":    { "type": "string", "enum": ["OK", "WARNING", "FAILED", "PENDING"] },
+          "detail":    { "type": "string", "description": "상세 설명" },
+          "value":     { "nullable": true, "description": "수치 또는 관련 값" }
+        }
+      },
+      "BatchJob": {
+        "type": "object",
+        "properties": {
+          "id":           { "type": "string", "example": "JOB-002" },
+          "name":         { "type": "string", "example": "정산 데이터 생성" },
+          "description":  { "type": "string" },
+          "status":       { "type": "string", "enum": ["RUNNING", "SUCCESS", "FAILED", "PENDING"] },
+          "service":      { "type": "string", "example": "settlement" },
+          "startedAt":    { "type": "string", "format": "date-time", "nullable": true },
+          "finishedAt":   { "type": "string", "format": "date-time", "nullable": true },
+          "errorMessage": { "type": "string", "nullable": true },
+          "retryCount":   { "type": "integer", "description": "재시도 횟수" }
+        }
+      }
+    }
+  }
+}

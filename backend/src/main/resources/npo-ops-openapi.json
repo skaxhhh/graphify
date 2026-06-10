@@ -1,0 +1,157 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NPO 운영 자동화 API",
+    "description": "Npo Agent Platform - 운영 자동화 Agent용 MCP API (영업 시스템 기준)",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://<YOUR_CLOUD_RUN_URL>",
+      "description": "Google Cloud Run (Production)"
+    }
+  ],
+  "paths": {
+    "/api/npo/ops/closing/today": {
+      "get": {
+        "summary": "금일자 마감 점검",
+        "description": "당일 영업 마감 항목(매출, 정산, 재고, 승인 등)을 점검한 결과를 반환합니다.",
+        "operationId": "getTodayClosing",
+        "responses": {
+          "200": {
+            "description": "금일 마감 점검 결과",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClosingReport" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/closing/yesterday": {
+      "get": {
+        "summary": "전일자 마감 점검",
+        "description": "전일 영업 마감 항목 점검 결과를 반환합니다. 전일 처리 완료 여부 확인에 활용합니다.",
+        "operationId": "getYesterdayClosing",
+        "responses": {
+          "200": {
+            "description": "전일 마감 점검 결과",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ClosingReport" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/jobs": {
+      "get": {
+        "summary": "배치 작업 목록 조회",
+        "description": "전체 배치 작업 목록과 각 작업의 상태를 반환합니다.",
+        "operationId": "getBatchJobs",
+        "responses": {
+          "200": {
+            "description": "배치 작업 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BatchJob" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/jobs/failed": {
+      "get": {
+        "summary": "실패 배치 작업 목록 조회",
+        "description": "현재 FAILED 상태인 배치 작업만 필터링하여 반환합니다.",
+        "operationId": "getFailedBatchJobs",
+        "responses": {
+          "200": {
+            "description": "실패 배치 작업 목록",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/BatchJob" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/npo/ops/jobs/{id}/retry": {
+      "post": {
+        "summary": "배치 작업 재실행",
+        "description": "실패한 배치 작업을 재실행합니다. 상태가 RUNNING으로 변경되고 retryCount가 증가합니다.",
+        "operationId": "retryBatchJob",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "배치 작업 ID (예: JOB-002)",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "재실행된 배치 작업 정보",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BatchJob" }
+              }
+            }
+          },
+          "404": { "description": "해당 ID의 작업을 찾을 수 없음" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ClosingReport": {
+        "type": "object",
+        "properties": {
+          "targetDate":     { "type": "string", "format": "date", "description": "점검 기준일" },
+          "overallStatus":  { "type": "string", "enum": ["OK", "WARNING", "FAILED"], "description": "전체 마감 상태" },
+          "summary":        { "type": "string", "description": "마감 요약 메시지" },
+          "items": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ClosingItem" }
+          }
+        }
+      },
+      "ClosingItem": {
+        "type": "object",
+        "properties": {
+          "checkName":  { "type": "string", "description": "점검 항목명" },
+          "category":   { "type": "string", "enum": ["SALES", "SETTLEMENT", "INVENTORY", "APPROVAL"], "description": "항목 분류" },
+          "status":     { "type": "string", "enum": ["OK", "WARNING", "FAILED", "PENDING"], "description": "항목별 상태" },
+          "detail":     { "type": "string", "description": "상세 설명" },
+          "value":      { "description": "수치 또는 관련 값 (nullable)", "nullable": true }
+        }
+      },
+      "BatchJob": {
+        "type": "object",
+        "properties": {
+          "id":           { "type": "string", "example": "JOB-002" },
+          "name":         { "type": "string", "example": "정산 데이터 생성" },
+          "description":  { "type": "string" },
+          "status":       { "type": "string", "enum": ["RUNNING", "SUCCESS", "FAILED", "PENDING"] },
+          "service":      { "type": "string", "example": "settlement" },
+          "startedAt":    { "type": "string", "format": "date-time", "nullable": true },
+          "finishedAt":   { "type": "string", "format": "date-time", "nullable": true },
+          "errorMessage": { "type": "string", "nullable": true, "description": "실패 시 오류 메시지" },
+          "retryCount":   { "type": "integer", "description": "재시도 횟수" }
+        }
+      }
+    }
+  }
+}
