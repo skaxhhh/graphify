@@ -20,6 +20,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    url: ${FLYWAY_DATASOURCE_URL:${SPRING_DATASOURCE_URL}}
+    user: ${FLYWAY_DATASOURCE_USERNAME:${SPRING_DATASOURCE_USERNAME}}
+    password: ${FLYWAY_DATASOURCE_PASSWORD:${SPRING_DATASOURCE_PASSWORD}}
 
 graphify:
   cors:
