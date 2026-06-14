@@ -102,7 +102,8 @@ public class ConsentService {
                 true,
                 false,
                 authProvider,
-                user.getRole().name()
+                user.getRole().name(),
+                user.isTradingEnabled()
         );
 
         return new ConsentResponseDto(userDto);

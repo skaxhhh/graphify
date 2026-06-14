@@ -7,6 +7,7 @@ export interface UserMe {
   authProvider: AuthProvider;
   isPremium: boolean;
   customPrompt: string | null;
+  tradingEnabled: boolean;
 }
 
 export interface ChangePasswordRequest {

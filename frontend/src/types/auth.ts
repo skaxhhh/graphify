@@ -10,6 +10,7 @@ export interface AuthUser {
   isNewUser: boolean;
   authProvider: AuthProvider;
   role?: AuthRole;
+  tradingEnabled?: boolean;
 }
 
 export interface LoginResponse {

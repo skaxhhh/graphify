@@ -7,5 +7,6 @@ public record UserDto(
         boolean termsAccepted,
         boolean isNewUser,
         String authProvider,
-        String role
+        String role,
+        boolean tradingEnabled
 ) {}

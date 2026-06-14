@@ -1,5 +1,15 @@
 export type AdminPeriod = "day" | "week";
 
+export interface AdminUser {
+  id: number;
+  email: string;
+  displayName: string;
+  role: string;
+  tradingEnabled: boolean;
+  termsAccepted: boolean;
+  createdAt: string;
+}
+
 export interface StatsPoint {
   date: string;
   runCount: number;

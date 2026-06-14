@@ -5,6 +5,9 @@ import { InlineError } from "@/components/shared/InlineError";
 import { SkeletonBlock } from "@/components/shared/SkeletonBlock";
 import { useDebounce } from "@/hooks/useDebounce";
 import { fetchAutocomplete } from "@/lib/searchApi";
+import { useAuthStore } from "@/stores/authStore";
+import { useTradingStore } from "@/stores/tradingStore";
+import { fetchUserMe } from "@/lib/userApi";
 import type { AutocompleteItem } from "@/types/search";
 
 const MIN_QUERY_LENGTH = 2;
@@ -22,6 +25,8 @@ export function GlobalSearchBar({
   onCompanySelect,
 }: GlobalSearchBarProps) {
   const navigate = useNavigate();
+  const enableDarkMode = useTradingStore((s) => s.enableDarkMode);
+  const user = useAuthStore((s) => s.user);
   const listboxId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState(initialQuery);
@@ -67,6 +72,17 @@ export function GlobalSearchBar({
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    if (query.trim() === "/gg") {
+      if (user) {
+        void fetchUserMe().then((res) => {
+          if (res.data?.tradingEnabled) {
+            enableDarkMode();
+            navigate("/trading");
+          }
+        });
+      }
+      return;
+    }
     if (highlightIndex >= 0 && items[highlightIndex]) {
       goToCompany(items[highlightIndex]);
       return;

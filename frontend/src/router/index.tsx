@@ -4,6 +4,14 @@ import { RequireAuth } from "@/components/auth/RequireAuth";
 import { AdminLayout } from "@/layouts/AdminLayout";
 import { GuestLayout } from "@/layouts/GuestLayout";
 import { UserAppLayout } from "@/layouts/UserAppLayout";
+import { TradingLayout } from "@/layouts/TradingLayout";
+import { TradingChatPage } from "@/pages/trading/TradingChatPage";
+import { TradingDashboardPage } from "@/pages/trading/TradingDashboardPage";
+import { TradingHistoryPage } from "@/pages/trading/TradingHistoryPage";
+import { TradingRulesPage } from "@/pages/trading/TradingRulesPage";
+import { TradingRulesEditPage } from "@/pages/trading/TradingRulesEditPage";
+import { TradingMonitorPage } from "@/pages/trading/TradingMonitorPage";
+import { AdminUsersPage } from "@/pages/AdminUsersPage";
 import { BootstrapStatusPage } from "@/pages/BootstrapStatusPage";
 import { AuthCallbackPage } from "@/pages/AuthCallbackPage";
 import { HomePage } from "@/pages/HomePage";
@@ -91,6 +99,18 @@ export const router = createBrowserRouter([
     element: <Navigate to="/app/mypage" replace />,
   },
   {
+    path: "/trading",
+    element: <TradingLayout />,
+    children: [
+      { index: true, element: <TradingChatPage /> },
+      { path: "dashboard", element: <TradingDashboardPage /> },
+      { path: "history", element: <TradingHistoryPage /> },
+      { path: "rules", element: <TradingRulesPage /> },
+      { path: "rules/edit", element: <TradingRulesEditPage /> },
+      { path: "monitor", element: <TradingMonitorPage /> },
+    ],
+  },
+  {
     path: "/admin",
     element: (
       <RequireAdmin>
@@ -99,6 +119,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <AdminDashboardPage /> },
+      { path: "users", element: <AdminUsersPage /> },
       { path: "mcp", element: <AdminMcpToolsPage /> },
       { path: "prompts", element: <AdminPromptsPage /> },
       { path: "openai", element: <AdminOpenAIConfigPage /> },

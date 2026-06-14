@@ -140,7 +140,8 @@ public class AuthService {
                 user.isTermsAccepted(),
                 isNewUser,
                 authProvider,
-                user.getRole().name()
+                user.getRole().name(),
+                user.isTradingEnabled()
         );
         return new LoginResponseDto(accessToken, refreshToken, userDto);
     }

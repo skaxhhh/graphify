@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 const navItems = [
   { to: "/admin", label: "대시보드", end: true as const },
+  { to: "/admin/users", label: "유저 관리" },
   { to: "/admin/mcp", label: "MCP 도구" },
   { to: "/admin/prompts", label: "프롬프트" },
   { to: "/admin/openai", label: "OpenAI 설정" },

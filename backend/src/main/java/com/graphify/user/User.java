@@ -39,6 +39,9 @@ public class User {
     @Column(name = "is_premium", nullable = false)
     private boolean premium;
 
+    @Column(name = "trading_enabled", nullable = false)
+    private boolean tradingEnabled;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -111,5 +114,13 @@ public class User {
 
     public void setPremium(boolean premium) {
         this.premium = premium;
+    }
+
+    public boolean isTradingEnabled() {
+        return tradingEnabled;
+    }
+
+    public void setTradingEnabled(boolean tradingEnabled) {
+        this.tradingEnabled = tradingEnabled;
     }
 }

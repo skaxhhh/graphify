@@ -120,7 +120,8 @@ public class UserProfileService {
                 user.getDisplayName(),
                 authProvider,
                 user.isPremium(),
-                customPrompt
+                customPrompt,
+                user.isTradingEnabled()
         );
     }
 

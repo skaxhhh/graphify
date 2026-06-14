@@ -11,6 +11,7 @@ export function AppHeaderGuest({ hideLoginButton = false }: AppHeaderGuestProps)
   const location = useLocation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const user = useAuthStore((s) => s.user);
+  const role = useAuthStore((s) => s.role);
   const logout = useAuthStore((s) => s.logout);
 
   const handleLogoClick = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -38,6 +39,14 @@ export function AppHeaderGuest({ hideLoginButton = false }: AppHeaderGuestProps)
       </Link>
       {isAuthenticated && user ? (
         <nav className="flex items-center gap-2 text-sm sm:gap-3">
+          {role === "admin" ? (
+            <Link
+              to="/admin"
+              className="hidden rounded-md border border-charcoal/40 px-3 py-1.5 text-charcoal transition-opacity hover:opacity-80 sm:inline"
+            >
+              관리자 페이지
+            </Link>
+          ) : null}
           <Link to="/history" className="hidden text-charcoal hover:underline sm:inline">
             분석 이력
           </Link>
