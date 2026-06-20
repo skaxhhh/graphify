@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-stopped_at: "Completed 01-02-PLAN.md — IntradayBacktestEngine 5m backtest engine, BacktestResult extended with sharpe/sortino/pf/drawdownSegments, 3 tests GREEN"
-last_updated: "2026-06-20T14:50:00Z"
-last_activity: "2026-06-20 — 01-02 완료: IntradayBacktestEngine(DB캐시+Yahoo fallback), BacktestResult LocalDateTime/통계 필드, testDrawdownSegments/testStatsCalculation/equityPointSerializesDatetime GREEN"
+status: executing
+stopped_at: "Completed 01-03-PLAN.md — recharts@2.15.0 installed, TypeScript types fixed (datetime/DrawdownSegment/sharpe/sortino/pf), EquityCurveChart component with drawdown overlays"
+last_updated: "2026-06-21T00:20:00Z"
+last_activity: "2026-06-21 — 01-03 완료: recharts설치, trading.ts datetime/DrawdownSegment 타입 수정, EquityCurveChart(LineChart+ReferenceArea+CustomTooltip) 생성"
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
-  percent: 40
+  total_plans: 8
+  completed_plans: 8
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 1 of 7 (5분봉 인트라데이 백테스팅 & 시각화)
-Plan: 2 of 4 in current phase
-Status: Phase 1 in progress — 01-02 complete
-Last activity: 2026-06-20 — 01-02 완료: IntradayBacktestEngine(DB캐시+Yahoo fallback), BacktestResult LocalDateTime/sharpe/sortino/pf/drawdownSegments, 3 tests GREEN (CHART-01/02/03)
+Plan: 3 of 4 in current phase
+Status: Phase 1 in progress — 01-03 complete
+Last activity: 2026-06-21 — 01-03 완료: recharts설치, trading.ts datetime/DrawdownSegment 타입 수정, EquityCurveChart(LineChart+ReferenceArea+CustomTooltip) 생성
 
-Progress: [████░░░░░░] 40%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -76,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 1, 01-02]: computeDrawdownSegments uses >= peak (not >) for recovery detection — equity returning to previous peak correctly closes the drawdown segment
 - [Phase 1, 01-02]: package-private static computeSharpeRatio/Sortino/ProfitFactor/DrawdownSegments in IntradayBacktestEngine — avoids Spring context in unit tests
 - [Phase 1, 01-02]: BacktestService retains daily-bar load for volume_top_n symbolResolver — engine receives BiFunction lambda, not raw maps
+- [Phase 1, 01-03]: CustomTooltip uses inline interface (not recharts TooltipProps generic) to avoid recharts v2 TypeScript generic complexity
+- [Phase 1, 01-03]: ReferenceArea x1/x2 receive ISO datetime strings directly matching XAxis dataKey=datetime values for domain-based positioning
+- [Phase 1, 01-03]: XAxis tick labels shown only at 09:00 (session open) to avoid label crowding on 5m bars
 - [Roadmap]: recharts@2.15.0 for equity curve chart (SVG, React-friendly, 100-500 pts sufficient)
 - [Roadmap]: ShedLock mandatory before any LIVE rule activation (multi-instance safety)
 - [Roadmap]: AES-256-GCM via JPA AttributeConverter for Toss token storage (no plaintext in DB)
@@ -93,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-20T11:36:20.375Z
-Stopped at: Phase 1 context gathered — 5분봉 인트라데이 백테스팅 & 시각화 결정 완료
-Resume file: .planning/phases/01-backtest-visualization/01-CONTEXT.md
+Last session: 2026-06-21T00:20:00Z
+Stopped at: Completed 01-03-PLAN.md — recharts@2.15.0 installed, TypeScript types fixed, EquityCurveChart component created
+Resume file: .planning/phases/01-backtest-visualization/01-03-SUMMARY.md
