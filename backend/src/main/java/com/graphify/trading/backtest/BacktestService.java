@@ -20,8 +20,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -62,7 +64,7 @@ public class BacktestService {
                 ? request.initialCash()
                 : DEFAULT_CASH;
 
-        List<String> symbols = resolveSymbols(def);
+        List<String> symbols = resolveInitialSymbols(def);
         Map<String, double[]> closesBySymbol = new LinkedHashMap<>();
         Map<String, Double[]> volumesBySymbol = new LinkedHashMap<>();
         Map<String, LocalDate[]> datesBySymbol = new LinkedHashMap<>();
@@ -108,7 +110,7 @@ public class BacktestService {
         List<BacktestResult.EquityPoint> curve = new ArrayList<>();
 
         for (LocalDate date : allDates) {
-            for (String symbol : closesBySymbol.keySet()) {
+            for (String symbol : resolveSymbolsForDate(def, date, closesBySymbol, indexBySymbol)) {
                 Integer i = indexBySymbol.get(symbol).get(date);
                 if (i == null) {
                     continue;
@@ -206,15 +208,71 @@ public class BacktestService {
         return out;
     }
 
-    private List<String> resolveSymbols(RuleDefinition def) {
-        if (def.universe() == null || def.universe().symbols() == null || def.universe().symbols().isEmpty()) {
+    /**
+     * 데이터 로드용 초기 종목 결정.
+     * - symbols 타입: 유니버스 종목 목록 그대로
+     * - volume_top_n 타입: 해당 시장의 KOSPI 200 전체 종목 + additionalSymbols
+     *   (날짜 루프에서 거래량 상위 N종목만 평가하지만, 데이터는 미리 전체 로드해야 함)
+     */
+    private List<String> resolveInitialSymbols(RuleDefinition def) {
+        RuleDefinition.Universe u = def.universe();
+        if (u == null) {
             throw new GraphifyException(
-                    "ERR_BACKTEST_002",
-                    "유니버스 종목이 비어 있습니다.",
-                    HttpStatus.BAD_REQUEST
-            );
+                    "ERR_BACKTEST_002", "유니버스가 없습니다.", HttpStatus.BAD_REQUEST);
         }
-        return def.universe().symbols();
+
+        if ("volume_top_n".equals(u.type())) {
+            String market = u.market() != null ? u.market() : "KOSPI";
+            Set<String> all = new LinkedHashSet<>(marketData.symbolsByMarket(market));
+            if (u.additionalSymbols() != null) {
+                all.addAll(u.additionalSymbols());
+            }
+            if (all.isEmpty()) {
+                throw new GraphifyException(
+                        "ERR_BACKTEST_002",
+                        "volume_top_n 유니버스에 수집된 종목이 없습니다. "
+                        + "먼저 ingestDailyForKospi200()를 실행하세요.",
+                        HttpStatus.BAD_REQUEST);
+            }
+            return new ArrayList<>(all);
+        }
+
+        // symbols / watchlist 타입
+        if (u.symbols() == null || u.symbols().isEmpty()) {
+            throw new GraphifyException(
+                    "ERR_BACKTEST_002", "유니버스 종목이 비어 있습니다.", HttpStatus.BAD_REQUEST);
+        }
+        return u.symbols();
+    }
+
+    /**
+     * 해당 날짜의 실제 평가 종목 결정.
+     * - symbols/watchlist 타입: closesBySymbol의 모든 종목(date에 데이터 있는 것)
+     * - volume_top_n 타입: marketData.topVolumeSymbols(date, topN) + additionalSymbols
+     *   (단, closesBySymbol에 데이터가 있는 종목만)
+     */
+    private List<String> resolveSymbolsForDate(
+            RuleDefinition def, LocalDate date,
+            Map<String, double[]> closesBySymbol,
+            Map<String, Map<LocalDate, Integer>> indexBySymbol) {
+
+        RuleDefinition.Universe u = def.universe();
+        if ("volume_top_n".equals(u.type())) {
+            int topN = u.topN() != null ? u.topN() : 10;
+            List<String> dynamic = marketData.topVolumeSymbols(date, topN);
+            Set<String> result = new LinkedHashSet<>(dynamic);
+            if (u.additionalSymbols() != null) {
+                result.addAll(u.additionalSymbols());
+            }
+            return result.stream()
+                    .filter(s -> closesBySymbol.containsKey(s)
+                            && indexBySymbol.get(s).containsKey(date))
+                    .toList();
+        }
+        // symbols/watchlist 타입: 기존 방식 — closesBySymbol 전체 키 중 해당 날짜 데이터 있는 종목
+        return closesBySymbol.keySet().stream()
+                .filter(s -> indexBySymbol.get(s).containsKey(date))
+                .toList();
     }
 
     private RuleDefinition resolveDefinition(BacktestRequest request) {
