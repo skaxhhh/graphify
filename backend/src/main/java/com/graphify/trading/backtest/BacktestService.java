@@ -41,6 +41,7 @@ public class BacktestService {
     private final MarketDataPort marketData;
     private final RuleEvaluator evaluator;
     private final FillSimulator fillSimulator;
+    private final IntradayBacktestEngine intradayEngine;
 
     public BacktestService(
             TradingRuleRepository ruleRepository,
@@ -48,7 +49,8 @@ public class BacktestService {
             ObjectMapper objectMapper,
             MarketDataPort marketData,
             RuleEvaluator evaluator,
-            FillSimulator fillSimulator
+            FillSimulator fillSimulator,
+            IntradayBacktestEngine intradayEngine
     ) {
         this.ruleRepository = ruleRepository;
         this.validator = validator;
@@ -56,6 +58,7 @@ public class BacktestService {
         this.marketData = marketData;
         this.evaluator = evaluator;
         this.fillSimulator = fillSimulator;
+        this.intradayEngine = intradayEngine;
     }
 
     public ApiResponse<BacktestResult> run(BacktestRequest request) {
@@ -64,131 +67,38 @@ public class BacktestService {
                 ? request.initialCash()
                 : DEFAULT_CASH;
 
-        List<String> symbols = resolveInitialSymbols(def);
-        Map<String, double[]> closesBySymbol = new LinkedHashMap<>();
-        Map<String, Double[]> volumesBySymbol = new LinkedHashMap<>();
-        Map<String, LocalDate[]> datesBySymbol = new LinkedHashMap<>();
-        Map<String, Map<LocalDate, Integer>> indexBySymbol = new HashMap<>();
-        TreeSet<LocalDate> allDates = new TreeSet<>();
+        List<String> allSymbols = resolveInitialSymbols(def);
 
-        for (String symbol : symbols) {
+        // Load daily close data for volume_top_n symbol resolution
+        Map<String, double[]> closesBySymbol = new LinkedHashMap<>();
+        Map<String, Map<LocalDate, Integer>> indexBySymbol = new HashMap<>();
+
+        for (String symbol : allSymbols) {
             List<Bar> bars = filterRange(marketData.historicalDailyBars(symbol), request.from(), request.to());
             if (bars.isEmpty()) {
                 continue;
             }
             double[] closes = new double[bars.size()];
-            Double[] volumes = new Double[bars.size()];
-            LocalDate[] dates = new LocalDate[bars.size()];
             Map<LocalDate, Integer> idx = new HashMap<>();
             for (int i = 0; i < bars.size(); i++) {
                 closes[i] = bars.get(i).close();
-                volumes[i] = bars.get(i).volume();
-                dates[i] = bars.get(i).date();
-                idx.put(dates[i], i);
-                allDates.add(dates[i]);
+                idx.put(bars.get(i).date(), i);
             }
             closesBySymbol.put(symbol, closes);
-            volumesBySymbol.put(symbol, volumes);
-            datesBySymbol.put(symbol, dates);
             indexBySymbol.put(symbol, idx);
         }
 
-        if (allDates.isEmpty()) {
-            throw new GraphifyException(
-                    "ERR_BACKTEST_001",
-                    "백테스트할 시세 데이터가 없습니다. 종목/기간을 확인하세요.",
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
         PaperLedger ledger = new PaperLedger(initialCash, fillSimulator);
-        Map<String, Double> lastPrices = new HashMap<>();
-        Map<String, Integer> lastExitIndex = new HashMap<>();
-        int cooldown = def.constraints() != null && def.constraints().cooldownBars() != null
-                ? def.constraints().cooldownBars() : 0;
 
-        List<BacktestResult.EquityPoint> curve = new ArrayList<>();
-
-        for (LocalDate date : allDates) {
-            for (String symbol : resolveSymbolsForDate(def, date, closesBySymbol, indexBySymbol)) {
-                Integer i = indexBySymbol.get(symbol).get(date);
-                if (i == null) {
-                    continue;
-                }
-                double[] closes = closesBySymbol.get(symbol);
-                Double[] vols = volumesBySymbol.getOrDefault(symbol, null);
-                lastPrices.put(symbol, closes[i]);
-
-                if (ledger.holds(symbol)) {
-                    double entryPrice = ledger.position(symbol).avgPrice();
-                    if (evaluator.exitTriggered(def.exit(), closes, vols, i, entryPrice)) {
-                        ledger.sell(date, symbol, closes[i]);
-                        lastExitIndex.put(symbol, i);
-                    }
-                } else {
-                    Integer exitedAt = lastExitIndex.get(symbol);
-                    if (exitedAt != null && i - exitedAt <= cooldown) {
-                        continue;
-                    }
-                    if (evaluator.entryTriggered(def.entry(), closes, vols, i)) {
-                        double qty = sizeQty(def.sizing(), ledger.cash(), closes[i]);
-                        ledger.buy(date, symbol, qty, closes[i]);
-                    }
-                }
-            }
-            curve.add(new BacktestResult.EquityPoint(date, ledger.equity(lastPrices)));
-        }
-
-        return ApiResponse.ok(buildResult(initialCash, ledger, curve));
-    }
-
-    private double sizeQty(RuleDefinition.Sizing sizing, double cash, double price) {
-        if (sizing == null || price <= 0) {
-            return 0;
-        }
-        double value = sizing.value() == null ? 0 : sizing.value();
-        String type = sizing.type() == null ? "cash" : sizing.type().toLowerCase();
-        double amount = switch (type) {
-            case "percent" -> cash * (value / 100.0);
-            case "qty" -> value * price;
-            default -> value; // cash
-        };
-        if ("qty".equals(type)) {
-            return Math.floor(value);
-        }
-        return Math.floor(amount / price);
-    }
-
-    private BacktestResult buildResult(double initialCash, PaperLedger ledger, List<BacktestResult.EquityPoint> curve) {
-        double finalEquity = curve.isEmpty() ? initialCash : curve.get(curve.size() - 1).equity();
-        double returnPct = (finalEquity - initialCash) / initialCash * 100.0;
-
-        double peak = Double.NEGATIVE_INFINITY;
-        double maxDd = 0;
-        for (BacktestResult.EquityPoint p : curve) {
-            peak = Math.max(peak, p.equity());
-            if (peak > 0) {
-                maxDd = Math.max(maxDd, (peak - p.equity()) / peak * 100.0);
-            }
-        }
-
-        int wins = 0;
-        int sells = 0;
-        List<BacktestResult.TradeDto> trades = new ArrayList<>();
-        for (PaperLedger.TradeRecord t : ledger.trades()) {
-            trades.add(new BacktestResult.TradeDto(t.date(), t.symbol(), t.side(), t.qty(), t.price(), t.pnl()));
-            if ("SELL".equals(t.side())) {
-                sells++;
-                if (t.pnl() != null && t.pnl() > 0) {
-                    wins++;
-                }
-            }
-        }
-        double winRate = sells > 0 ? (double) wins / sells * 100.0 : 0;
-
-        return new BacktestResult(
-                initialCash, finalEquity, returnPct, maxDd, winRate, sells, trades, curve
+        // Delegate to intraday engine (5m is now the standard mode for Phase 1+)
+        BacktestResult result = intradayEngine.run(
+                request,
+                def,
+                allSymbols,
+                (d, date) -> resolveSymbolsForDate(d, date, closesBySymbol, indexBySymbol),
+                ledger
         );
+        return ApiResponse.ok(result);
     }
 
     private List<Bar> filterRange(List<Bar> bars, LocalDate from, LocalDate to) {
