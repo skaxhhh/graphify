@@ -321,7 +321,7 @@ public class IntradayBacktestEngine {
         LocalDateTime ddStart = null;
 
         for (BacktestResult.EquityPoint p : curve) {
-            if (p.equity() > peak) {
+            if (p.equity() >= peak) {
                 if (ddStart != null) {
                     segments.add(new BacktestResult.DrawdownSegment(ddStart, p.datetime()));
                     ddStart = null;
