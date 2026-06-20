@@ -10,7 +10,7 @@
 - Integer phases (0, 1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 0: 데이터 인프라 & 동적 유니버스** - KOSPI 200 일봉 OHLCV 전체 수집, volume_top_n 동적 유니버스 타입 추가, BacktestService volume 버그 수정을 완료해 이후 모든 phase의 데이터 기반을 확보한다
+- [x] **Phase 0: 데이터 인프라 & 동적 유니버스** - KOSPI 200 일봉 OHLCV 전체 수집, volume_top_n 동적 유니버스 타입 추가, BacktestService volume 버그 수정을 완료해 이후 모든 phase의 데이터 기반을 확보한다 (completed 2026-06-20)
 - [ ] **Phase 1: 백테스트 시각화** - 기존 백테스트 엔진 결과를 수익 곡선 차트 + 드로우다운 음영 + 고급 지표로 시각화한다
 - [ ] **Phase 2: 실시간 데이터 수집 & 스케줄러 인프라** - KRX 장 중 5분 주기 분봉 수집, 공휴일 가드, ShedLock 분산 잠금을 구축한다
 - [ ] **Phase 3: PAPER_LIVE 평가 엔진** - 스케줄러 기반 실시간 룰 평가 + 가상 체결 + 스냅샷 저장 엔진을 완성한다
@@ -137,7 +137,7 @@ Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. 데이터 인프라 & 동적 유니버스 | 3/4 | In Progress|  |
+| 0. 데이터 인프라 & 동적 유니버스 | 4/4 | Complete   | 2026-06-20 |
 | 1. 백테스트 시각화 | 0/2 | Not started | - |
 | 2. 실시간 데이터 수집 & 스케줄러 인프라 | 0/2 | Not started | - |
 | 3. PAPER_LIVE 평가 엔진 | 0/2 | Not started | - |

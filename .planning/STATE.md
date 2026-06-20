@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 0 of 7 (데이터 인프라 & 동적 유니버스)
-Plan: 3 of 4 in current phase
-Status: In progress — executing Phase 0 plans
-Last activity: 2026-06-20 — 00-03 완료: ingestDailyForKospi200() 추가 (DATA-02), 5 Mockito tests GREEN
+Plan: 4 of 4 in current phase
+Status: Phase 0 complete — all 4 plans executed
+Last activity: 2026-06-20 — 00-04 완료: volume_top_n 동적 유니버스 전체 스택 구현 (DATA-03, DATA-04), 8 tests GREEN
 
-Progress: [███░░░░░░░] 30%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -48,6 +48,9 @@ Recent decisions affecting current work:
 - [Phase 0, 00-02]: H2 testRuntimeOnly 추가 — PostgreSQL 전용 SQL 때문에 Flyway 마이그레이션 실행 안 함, ddl-auto=create-drop으로 스키마 생성
 - [Phase 0, 00-03]: @Scheduled 어노테이션 미추가 — Phase 2에서 스케줄러 추가 예정, 현재는 InternalMarketController HTTP 엔드포인트로 수동 트리거
 - [Phase 0, 00-03]: Mockito Spy + doReturn 패턴 — ingestDaily()가 외부 Yahoo API 호출하므로 count 집계 로직 검증 시 Spy로 stub
+- [Phase 0, 00-04]: MarketDataPort에 default 메서드로 topVolumeSymbols()/symbolsByMarket() 추가 — 기존 구현체 깨짐 없이 확장
+- [Phase 0, 00-04]: resolveInitialSymbols()로 전체 KOSPI 200 후보군 사전 로드, resolveSymbolsForDate()로 날짜별 동적 선정 분리 — look-ahead bias 방지
+- [Phase 0, 00-04]: LinkedHashSet으로 dynamic + additionalSymbols 합산 후 closesBySymbol 필터링 — 데이터 없는 종목 자동 제외
 - [Phase 0]: 유니버스 = KOSPI 거래량 상위 10종목 (자동) + additionalSymbols (수동 추가) 병행 방식 확정
 - [Phase 0]: 백테스트 유니버스는 날짜마다 동적으로 재선정 (look-ahead 없이 해당일 기준 상위 10종목)
 - [Phase 0]: KOSPI 200 범위에서 거래량 상위 10 선정 (전체 800종목 대비 현실적인 첫 단계)
@@ -69,5 +72,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-06-20
-Stopped at: Completed 00-03-PLAN.md — ingestDailyForKospi200() 추가 (DATA-02), 5 Mockito tests GREEN
+Stopped at: Completed 00-04-PLAN.md — volume_top_n 동적 유니버스 전체 스택 구현 (DATA-03, DATA-04), 8 tests GREEN, Phase 0 complete
 Resume file: None
