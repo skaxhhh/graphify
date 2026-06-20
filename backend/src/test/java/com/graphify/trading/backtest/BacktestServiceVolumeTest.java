@@ -75,7 +75,7 @@ class BacktestServiceVolumeTest {
         when(marketData.historicalDailyBars("005930")).thenReturn(List.of(bar));
 
         JsonNode defNode = buildVolumeGt30000DefNode("005930");
-        BacktestRequest request = new BacktestRequest(null, defNode, null, null, null);
+        BacktestRequest request = new BacktestRequest(null, defNode, null, null, null, null, null);
 
         ApiResponse<BacktestResult> response = service.run(request);
         List<BacktestResult.TradeDto> trades = response.data().trades();
@@ -95,7 +95,7 @@ class BacktestServiceVolumeTest {
         when(marketData.historicalDailyBars("005930")).thenReturn(List.of(bar));
 
         JsonNode defNode = buildVolumeGt30000DefNode("005930");
-        BacktestRequest request = new BacktestRequest(null, defNode, null, null, null);
+        BacktestRequest request = new BacktestRequest(null, defNode, null, null, null, null, null);
 
         service.run(request);
 
