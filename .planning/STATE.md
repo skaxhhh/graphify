@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 01-03-PLAN.md — recharts@2.15.0 installed, TypeScript types fixed, EquityCurveChart component created
-last_updated: "2026-06-20T15:26:22.162Z"
+stopped_at: Completed 01-04-PLAN.md — PaperBacktestPage rewritten with EquityCurveChart, 고급통계 section, timeFrom/timeTo inputs, datetime fix. Phase 1 complete.
+last_updated: "2026-06-20T15:31:59.554Z"
 last_activity: "2026-06-21 — 01-04 완료: PaperBacktestPage에 EquityCurveChart 연결, Sharpe/Sortino/PF 카드 추가, 시간 입력 필드 추가, t.datetime 수정"
 progress:
   total_phases: 7
