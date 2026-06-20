@@ -1,0 +1,249 @@
+package com.graphify.trading.backtest;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphify.common.dto.ApiResponse;
+import com.graphify.common.exception.GraphifyException;
+import com.graphify.history.HistoryService;
+import com.graphify.trading.backtest.dto.BacktestRequest;
+import com.graphify.trading.backtest.dto.BacktestResult;
+import com.graphify.trading.engine.Bar;
+import com.graphify.trading.engine.FillSimulator;
+import com.graphify.trading.engine.MarketDataPort;
+import com.graphify.trading.engine.PaperLedger;
+import com.graphify.trading.engine.RuleEvaluator;
+import com.graphify.trading.rule.TradingRule;
+import com.graphify.trading.rule.TradingRuleRepository;
+import com.graphify.trading.rule.definition.RuleDefinition;
+import com.graphify.trading.rule.definition.RuleDefinitionValidator;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(readOnly = true)
+public class BacktestService {
+
+    private static final double DEFAULT_CASH = 10_000_000;
+
+    private final TradingRuleRepository ruleRepository;
+    private final RuleDefinitionValidator validator;
+    private final ObjectMapper objectMapper;
+    private final MarketDataPort marketData;
+    private final RuleEvaluator evaluator;
+    private final FillSimulator fillSimulator;
+
+    public BacktestService(
+            TradingRuleRepository ruleRepository,
+            RuleDefinitionValidator validator,
+            ObjectMapper objectMapper,
+            MarketDataPort marketData,
+            RuleEvaluator evaluator,
+            FillSimulator fillSimulator
+    ) {
+        this.ruleRepository = ruleRepository;
+        this.validator = validator;
+        this.objectMapper = objectMapper;
+        this.marketData = marketData;
+        this.evaluator = evaluator;
+        this.fillSimulator = fillSimulator;
+    }
+
+    public ApiResponse<BacktestResult> run(BacktestRequest request) {
+        RuleDefinition def = resolveDefinition(request);
+        double initialCash = request.initialCash() != null && request.initialCash() > 0
+                ? request.initialCash()
+                : DEFAULT_CASH;
+
+        List<String> symbols = resolveSymbols(def);
+        Map<String, double[]> closesBySymbol = new LinkedHashMap<>();
+        Map<String, Double[]> volumesBySymbol = new LinkedHashMap<>();
+        Map<String, LocalDate[]> datesBySymbol = new LinkedHashMap<>();
+        Map<String, Map<LocalDate, Integer>> indexBySymbol = new HashMap<>();
+        TreeSet<LocalDate> allDates = new TreeSet<>();
+
+        for (String symbol : symbols) {
+            List<Bar> bars = filterRange(marketData.historicalDailyBars(symbol), request.from(), request.to());
+            if (bars.isEmpty()) {
+                continue;
+            }
+            double[] closes = new double[bars.size()];
+            Double[] volumes = new Double[bars.size()];
+            LocalDate[] dates = new LocalDate[bars.size()];
+            Map<LocalDate, Integer> idx = new HashMap<>();
+            for (int i = 0; i < bars.size(); i++) {
+                closes[i] = bars.get(i).close();
+                volumes[i] = bars.get(i).volume();
+                dates[i] = bars.get(i).date();
+                idx.put(dates[i], i);
+                allDates.add(dates[i]);
+            }
+            closesBySymbol.put(symbol, closes);
+            volumesBySymbol.put(symbol, volumes);
+            datesBySymbol.put(symbol, dates);
+            indexBySymbol.put(symbol, idx);
+        }
+
+        if (allDates.isEmpty()) {
+            throw new GraphifyException(
+                    "ERR_BACKTEST_001",
+                    "백테스트할 시세 데이터가 없습니다. 종목/기간을 확인하세요.",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        PaperLedger ledger = new PaperLedger(initialCash, fillSimulator);
+        Map<String, Double> lastPrices = new HashMap<>();
+        Map<String, Integer> lastExitIndex = new HashMap<>();
+        int cooldown = def.constraints() != null && def.constraints().cooldownBars() != null
+                ? def.constraints().cooldownBars() : 0;
+
+        List<BacktestResult.EquityPoint> curve = new ArrayList<>();
+
+        for (LocalDate date : allDates) {
+            for (String symbol : closesBySymbol.keySet()) {
+                Integer i = indexBySymbol.get(symbol).get(date);
+                if (i == null) {
+                    continue;
+                }
+                double[] closes = closesBySymbol.get(symbol);
+                Double[] vols = volumesBySymbol.getOrDefault(symbol, null);
+                lastPrices.put(symbol, closes[i]);
+
+                if (ledger.holds(symbol)) {
+                    double entryPrice = ledger.position(symbol).avgPrice();
+                    if (evaluator.exitTriggered(def.exit(), closes, vols, i, entryPrice)) {
+                        ledger.sell(date, symbol, closes[i]);
+                        lastExitIndex.put(symbol, i);
+                    }
+                } else {
+                    Integer exitedAt = lastExitIndex.get(symbol);
+                    if (exitedAt != null && i - exitedAt <= cooldown) {
+                        continue;
+                    }
+                    if (evaluator.entryTriggered(def.entry(), closes, vols, i)) {
+                        double qty = sizeQty(def.sizing(), ledger.cash(), closes[i]);
+                        ledger.buy(date, symbol, qty, closes[i]);
+                    }
+                }
+            }
+            curve.add(new BacktestResult.EquityPoint(date, ledger.equity(lastPrices)));
+        }
+
+        return ApiResponse.ok(buildResult(initialCash, ledger, curve));
+    }
+
+    private double sizeQty(RuleDefinition.Sizing sizing, double cash, double price) {
+        if (sizing == null || price <= 0) {
+            return 0;
+        }
+        double value = sizing.value() == null ? 0 : sizing.value();
+        String type = sizing.type() == null ? "cash" : sizing.type().toLowerCase();
+        double amount = switch (type) {
+            case "percent" -> cash * (value / 100.0);
+            case "qty" -> value * price;
+            default -> value; // cash
+        };
+        if ("qty".equals(type)) {
+            return Math.floor(value);
+        }
+        return Math.floor(amount / price);
+    }
+
+    private BacktestResult buildResult(double initialCash, PaperLedger ledger, List<BacktestResult.EquityPoint> curve) {
+        double finalEquity = curve.isEmpty() ? initialCash : curve.get(curve.size() - 1).equity();
+        double returnPct = (finalEquity - initialCash) / initialCash * 100.0;
+
+        double peak = Double.NEGATIVE_INFINITY;
+        double maxDd = 0;
+        for (BacktestResult.EquityPoint p : curve) {
+            peak = Math.max(peak, p.equity());
+            if (peak > 0) {
+                maxDd = Math.max(maxDd, (peak - p.equity()) / peak * 100.0);
+            }
+        }
+
+        int wins = 0;
+        int sells = 0;
+        List<BacktestResult.TradeDto> trades = new ArrayList<>();
+        for (PaperLedger.TradeRecord t : ledger.trades()) {
+            trades.add(new BacktestResult.TradeDto(t.date(), t.symbol(), t.side(), t.qty(), t.price(), t.pnl()));
+            if ("SELL".equals(t.side())) {
+                sells++;
+                if (t.pnl() != null && t.pnl() > 0) {
+                    wins++;
+                }
+            }
+        }
+        double winRate = sells > 0 ? (double) wins / sells * 100.0 : 0;
+
+        return new BacktestResult(
+                initialCash, finalEquity, returnPct, maxDd, winRate, sells, trades, curve
+        );
+    }
+
+    private List<Bar> filterRange(List<Bar> bars, LocalDate from, LocalDate to) {
+        if (from == null && to == null) {
+            return bars;
+        }
+        List<Bar> out = new ArrayList<>();
+        for (Bar b : bars) {
+            if (from != null && b.date().isBefore(from)) {
+                continue;
+            }
+            if (to != null && b.date().isAfter(to)) {
+                continue;
+            }
+            out.add(b);
+        }
+        return out;
+    }
+
+    private List<String> resolveSymbols(RuleDefinition def) {
+        if (def.universe() == null || def.universe().symbols() == null || def.universe().symbols().isEmpty()) {
+            throw new GraphifyException(
+                    "ERR_BACKTEST_002",
+                    "유니버스 종목이 비어 있습니다.",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+        return def.universe().symbols();
+    }
+
+    private RuleDefinition resolveDefinition(BacktestRequest request) {
+        JsonNode node;
+        if (request.ruleId() != null) {
+            Long userId = HistoryService.requireCurrentUserId();
+            TradingRule rule = ruleRepository.findByIdAndUserId(request.ruleId(), userId)
+                    .orElseThrow(() -> new GraphifyException(
+                            "ERR_RULE_002", "룰을 찾을 수 없습니다.", HttpStatus.NOT_FOUND));
+            try {
+                node = objectMapper.readTree(rule.getDefinition());
+            } catch (Exception e) {
+                throw new GraphifyException(
+                        "ERR_BACKTEST_003", "룰 정의를 읽을 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else if (request.definition() != null && !request.definition().isNull()) {
+            node = request.definition();
+        } else {
+            throw new GraphifyException(
+                    "ERR_BACKTEST_004", "ruleId 또는 definition 중 하나가 필요합니다.", HttpStatus.BAD_REQUEST);
+        }
+        RuleDefinition def;
+        try {
+            def = objectMapper.treeToValue(node, RuleDefinition.class);
+        } catch (Exception e) {
+            throw new GraphifyException(
+                    "ERR_BACKTEST_005", "룰 정의 형식이 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+        }
+        validator.validate(def);
+        return def;
+    }
+}
