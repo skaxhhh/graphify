@@ -142,7 +142,7 @@ Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 0. 데이터 인프라 & 동적 유니버스 | 4/4 | Complete   | 2026-06-20 |
-| 1. 백테스트 시각화 | 3/4 | In Progress|  |
+| 1. 백테스트 시각화 | 4/4 | Complete   | 2026-06-20 |
 | 2. 실시간 데이터 수집 & 스케줄러 인프라 | 0/2 | Not started | - |
 | 3. PAPER_LIVE 평가 엔진 | 0/2 | Not started | - |
 | 4. 대시보드·룰 생애주기·모니터·리포트 UI | 0/4 | Not started | - |

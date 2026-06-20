@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: "Completed 01-03-PLAN.md — recharts@2.15.0 installed, TypeScript types fixed (datetime/DrawdownSegment/sharpe/sortino/pf), EquityCurveChart component with drawdown overlays"
-last_updated: "2026-06-21T00:20:00Z"
-last_activity: "2026-06-21 — 01-03 완료: recharts설치, trading.ts datetime/DrawdownSegment 타입 수정, EquityCurveChart(LineChart+ReferenceArea+CustomTooltip) 생성"
+status: completed
+stopped_at: Completed 01-03-PLAN.md — recharts@2.15.0 installed, TypeScript types fixed, EquityCurveChart component created
+last_updated: "2026-06-20T15:26:22.162Z"
+last_activity: "2026-06-21 — 01-04 완료: PaperBacktestPage에 EquityCurveChart 연결, Sharpe/Sortino/PF 카드 추가, 시간 입력 필드 추가, t.datetime 수정"
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
   completed_plans: 8
-  percent: 88
+  percent: 100
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 1 of 7 (5분봉 인트라데이 백테스팅 & 시각화)
-Plan: 3 of 4 in current phase
-Status: Phase 1 in progress — 01-03 complete
-Last activity: 2026-06-21 — 01-03 완료: recharts설치, trading.ts datetime/DrawdownSegment 타입 수정, EquityCurveChart(LineChart+ReferenceArea+CustomTooltip) 생성
+Plan: 4 of 4 in current phase (COMPLETE)
+Status: Phase 1 complete — all 4 plans done
+Last activity: 2026-06-21 — 01-04 완료: PaperBacktestPage에 EquityCurveChart 연결, Sharpe/Sortino/PF 카드 추가, 시간 입력 필드 추가, t.datetime 수정
 
-Progress: [█████████░] 88%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Progress: [█████████░] 88%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01 P04 | 8 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Roadmap]: ShedLock mandatory before any LIVE rule activation (multi-instance safety)
 - [Roadmap]: AES-256-GCM via JPA AttributeConverter for Toss token storage (no plaintext in DB)
 - [Roadmap]: DB write-through pattern for paper account state (load → evaluate → flush per tick)
+- [Phase 01]: [Phase 1, 01-04]: drawdownSegments ?? [] null-guard applied — server may return result with no drawdown segments
+- [Phase 01]: [Phase 1, 01-04]: StatCard component defined inline in PaperBacktestPage — no need for separate file at this scale
+- [Phase 01]: [Phase 1, 01-04]: lg:grid-cols-6 form layout with lg:col-span-1 on rule select — fits 6 inputs without overflow
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T00:20:00Z
-Stopped at: Completed 01-03-PLAN.md — recharts@2.15.0 installed, TypeScript types fixed, EquityCurveChart component created
-Resume file: .planning/phases/01-backtest-visualization/01-03-SUMMARY.md
+Last session: 2026-06-21T15:26:00Z
+Stopped at: Completed 01-04-PLAN.md — PaperBacktestPage rewritten with EquityCurveChart, 고급통계 section, timeFrom/timeTo inputs, datetime fix. Phase 1 complete.
+Resume file: .planning/phases/01-backtest-visualization/01-04-SUMMARY.md
