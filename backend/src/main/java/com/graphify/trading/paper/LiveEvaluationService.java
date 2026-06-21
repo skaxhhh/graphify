@@ -7,6 +7,8 @@ import com.graphify.trading.engine.Indicators;
 import com.graphify.trading.engine.MarketDataPort;
 import com.graphify.trading.engine.RuleEvaluator;
 import com.graphify.trading.engine.Signal;
+import com.graphify.trading.rule.PaperLiveSymbol;
+import com.graphify.trading.rule.PaperLiveSymbolRepository;
 import com.graphify.trading.rule.RuleStatus;
 import com.graphify.trading.rule.TradingRule;
 import com.graphify.trading.rule.TradingRuleRepository;
@@ -50,6 +52,7 @@ public class LiveEvaluationService {
     private final PaperPositionRepository       positionRepo;
     private final PaperEquitySnapshotRepository snapshotRepo;
     private final ObjectMapper                  objectMapper;
+    private final PaperLiveSymbolRepository     paperLiveSymbolRepository;
 
     public LiveEvaluationService(
             TradingRuleRepository ruleRepo,
@@ -60,16 +63,18 @@ public class LiveEvaluationService {
             PaperAccountRepository accountRepo,
             PaperPositionRepository positionRepo,
             PaperEquitySnapshotRepository snapshotRepo,
-            ObjectMapper objectMapper) {
-        this.ruleRepo       = ruleRepo;
-        this.marketDataPort = marketDataPort;
-        this.intradayRepo   = intradayRepo;
-        this.ruleEvaluator  = ruleEvaluator;
-        this.executors      = executors;
-        this.accountRepo    = accountRepo;
-        this.positionRepo   = positionRepo;
-        this.snapshotRepo   = snapshotRepo;
-        this.objectMapper   = objectMapper;
+            ObjectMapper objectMapper,
+            PaperLiveSymbolRepository paperLiveSymbolRepository) {
+        this.ruleRepo                  = ruleRepo;
+        this.marketDataPort            = marketDataPort;
+        this.intradayRepo              = intradayRepo;
+        this.ruleEvaluator             = ruleEvaluator;
+        this.executors                 = executors;
+        this.accountRepo               = accountRepo;
+        this.positionRepo              = positionRepo;
+        this.snapshotRepo              = snapshotRepo;
+        this.objectMapper              = objectMapper;
+        this.paperLiveSymbolRepository = paperLiveSymbolRepository;
     }
 
     private OrderExecutorPort executorFor(TradingRule rule) {
@@ -111,7 +116,7 @@ public class LiveEvaluationService {
             return;
         }
 
-        List<String> symbols = resolveSymbols(def);
+        List<String> symbols = resolveSymbols(rule);
         PaperAccount account = accountRepo.findByUserId(rule.getUserId()).orElse(null);
         if (account == null) {
             log.warn("No paper account for user {} (rule {}), skipping", rule.getUserId(), rule.getId());
@@ -218,16 +223,21 @@ public class LiveEvaluationService {
         }
     }
 
-    private List<String> resolveSymbols(RuleDefinition def) {
-        if (def.universe() == null) return List.of();
-        // type="symbols": explicit list
-        if (def.universe().symbols() != null && !def.universe().symbols().isEmpty()) {
-            return def.universe().symbols();
+    /**
+     * paper_live_symbols 테이블을 단일 정보 소스로 사용.
+     * promote()가 이미 유니버스를 해석해 행을 삽입했으므로 ingested symbols == evaluated symbols 보장.
+     * volume_top_n 룰도 올바르게 평가됨 (후보군 전체가 테이블에 저장된 상태).
+     */
+    private List<String> resolveSymbols(TradingRule rule) {
+        List<String> symbols = paperLiveSymbolRepository.findByRuleId(rule.getId())
+            .stream()
+            .map(PaperLiveSymbol::getSymbol)
+            .distinct()
+            .toList();
+        if (symbols.isEmpty()) {
+            log.debug("No symbols in paper_live_symbols for rule {} — rule may have been promoted with empty universe",
+                rule.getId());
         }
-        // type="volume_top_n": additionalSymbols (volume_top_n managed by PaperLiveSymbolService)
-        if (def.universe().additionalSymbols() != null && !def.universe().additionalSymbols().isEmpty()) {
-            return def.universe().additionalSymbols();
-        }
-        return List.of();
+        return symbols;
     }
 }
