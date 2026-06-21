@@ -2,7 +2,7 @@
 
 ## Overview
 
-부분 구현된 모의투자(백테스트 엔진 + 룰 CRUD)를 완전한 서비스로 고도화하고, 검증된 룰을 토스증권 Open API를 통해 실투자로 승격시키는 엔드-투-엔드 파이프라인을 완성한다. 핵심 설계: **거래량 상위 KOSPI 10종목**을 자동으로 유니버스로 선정하여 백테스트·모의투자를 실행한다. 데이터 인프라 & 동적 유니버스(Phase 0) → 백테스트 시각화(Phase 1) → 실시간 데이터 수집 인프라(Phase 2) → PAPER_LIVE 평가 엔진(Phase 3) → 대시보드·룰 생애주기·모니터·리포트 UI(Phase 4) → 토스증권 OAuth 연동(Phase 5) → 실투자 주문 실행(Phase 6) 순으로 의존성에 따라 빌드한다.
+부분 구현된 모의투자(백테스트 엔진 + 룰 CRUD)를 완전한 서비스로 고도화하고, 검증된 룰을 토스증권 Open API를 통해 실투자로 승격시키는 엔드-투-엔드 파이프라인을 완성한다. 핵심 설계: **거래량 상위 KOSPI 10종목**을 자동으로 유니버스로 선정하여 백테스트·모의투자를 실행한다. 데이터 인프라 & 동적 유니버스(Phase 0) → 백테스트 시각화(Phase 1) → 실시간 데이터 수집 인프라(Phase 2) → PAPER_LIVE 평가 엔진(Phase 3) → 대시보드·룰 생애주기·모니터·리포트 UI(Phase 4) → 토스증권 OAuth 연동(Phase 5) → 룰 빌더 UI(Phase 6) → 실투자 주문 실행(Phase 7) 순으로 의존성에 따라 빌드한다.
 
 ## Phases
 
@@ -16,7 +16,8 @@
 - [x] **Phase 3: PAPER_LIVE 평가 엔진** - 스케줄러 기반 실시간 룰 평가 + 가상 체결 + 스냅샷 저장 엔진을 완성한다 (completed 2026-06-21)
 - [x] **Phase 4: 대시보드·룰 생애주기·모니터·리포트 UI** - 모의 대시보드, 룰 상태 전환 UI, 실시간 모니터, 성과 리포트 페이지를 완성한다 (completed 2026-06-21)
 - [x] **Phase 5: 토스증권 OAuth & 자격증명 관리** - 토스증권 client_id/secret 암호화 저장, 토큰 자동 발급·갱신, 실계좌 잔고 조회를 구현한다 (completed 2026-06-21)
-- [ ] **Phase 6: 실투자 주문 실행 & LIVE 승격** - LIVE 룰 평가에 따른 토스증권 실제 주문 발행, 시세 연동, 서킷 브레이커를 구현한다
+- [ ] **Phase 6: 룰 빌더 UI** - JSON 직접 입력 대신 드롭다운/폼으로 유니버스·진입/청산 조건·사이징을 시각적으로 구성할 수 있는 룰 빌더 UI를 구현한다
+- [ ] **Phase 7: 실투자 주문 실행 & LIVE 승격** - LIVE 룰 평가에 따른 토스증권 실제 주문 발행, 시세 연동, 서킷 브레이커를 구현한다
 
 ## Phase Details
 
@@ -122,9 +123,24 @@ Plans:
 - [ ] 05-01: toss_credentials 마이그레이션 + AesGcmAttributeConverter + TossCredentialService
 - [ ] 05-02: TossTokenManager (자동 발급·갱신) + 실계좌 잔고 조회 API + 대시보드 연동
 
-### Phase 6: 실투자 주문 실행 & LIVE 승격
-**Goal**: LIVE 룰 평가 결과에 따라 토스증권 REST API로 실제 매수/매도 주문을 발행하고, 실시간 시세를 LIVE 평가에 활용하며, API 연속 실패 시 서킷 브레이커로 주문을 안전하게 중단한다
+### Phase 6: 룰 빌더 UI
+**Goal**: JSON 직접 입력 방식을 드롭다운·폼 기반 시각적 룰 빌더로 교체한다. 유니버스(거래량 상위 N / 직접 종목 지정), 진입 조건(PRICE·SMA·EMA·RSI·VOLUME + 비교 연산자 + crossAbove/Below), 청산 조건(익절%·손절%·지표 조건), 포지션 사이징(고정금액·전액), 쿨다운 봉 수를 모두 드롭다운/입력 필드로 구성할 수 있다
 **Depends on**: Phase 5
+**Requirements**: RULE-06, RULE-07
+**Success Criteria** (what must be TRUE):
+  1. 룰 생성/편집 페이지에서 JSON 에디터 없이 드롭다운과 입력 필드만으로 완전한 RuleDefinition JSON을 구성할 수 있다
+  2. 유니버스 타입(거래량 상위 N / 직접 종목 지정), 진입 조건 지표(PRICE·SMA·EMA·RSI·VOLUME), 연산자(>·>=·<·<=·crossAbove·crossBelow), 청산(익절%·손절%·지표 조건), 사이징(고정금액·전액), 쿨다운을 모두 UI에서 설정 가능하다
+  3. 빌더에서 구성한 룰을 저장하면 기존 백테스트·PAPER_LIVE 파이프라인이 그대로 동작한다
+  4. 기존 JSON 룰도 빌더 폼에 로드(역직렬화)하여 편집할 수 있다
+**Plans**: 2 plans
+
+Plans:
+- [ ] 06-01: RuleBuilderForm 컴포넌트 (유니버스·진입·청산·사이징 섹션) + RuleDefinition 직렬화/역직렬화 로직
+- [ ] 06-02: PaperRulesPage에 빌더 통합 + 기존 JSON 에디터 교체 + 빌더↔JSON 토글(개발자용 선택)
+
+### Phase 7: 실투자 주문 실행 & LIVE 승격
+**Goal**: LIVE 룰 평가 결과에 따라 토스증권 REST API로 실제 매수/매도 주문을 발행하고, 실시간 시세를 LIVE 평가에 활용하며, API 연속 실패 시 서킷 브레이커로 주문을 안전하게 중단한다
+**Depends on**: Phase 6
 **Requirements**: TOSS-04, TOSS-05, TOSS-06, RULE-04
 **Success Criteria** (what must be TRUE):
   1. LIVE 룰 평가에서 신호 발생 시 토스증권 REST API로 실제 매수/매도 주문이 발행된다
@@ -134,13 +150,13 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: TossOrderExecutor 구현 + live_accounts/live_trades 마이그레이션 + 서킷 브레이커
-- [ ] 06-02: LIVE 시세 어댑터(TossLiveIntradayAdapter) + PAPER_LIVE→LIVE 승격 게이트 UI/API
+- [ ] 07-01: TossOrderExecutor 구현 + live_accounts/live_trades 마이그레이션 + 서킷 브레이커
+- [ ] 07-02: LIVE 시세 어댑터(TossLiveIntradayAdapter) + PAPER_LIVE→LIVE 승격 게이트 UI/API
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6
+Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -150,4 +166,5 @@ Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6
 | 3. PAPER_LIVE 평가 엔진 | 2/2 | Complete   | 2026-06-21 |
 | 4. 대시보드·룰 생애주기·모니터·리포트 UI | 7/7 | Complete   | 2026-06-21 |
 | 5. 토스증권 OAuth & 자격증명 관리 | 2/2 | Complete   | 2026-06-21 |
-| 6. 실투자 주문 실행 & LIVE 승격 | 0/2 | Not started | - |
+| 6. 룰 빌더 UI | 0/2 | Not started | - |
+| 7. 실투자 주문 실행 & LIVE 승격 | 0/2 | Not started | - |
