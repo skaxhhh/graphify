@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 04-07-PLAN.md
-last_updated: "2026-06-21T07:20:00.000Z"
+stopped_at: Completed 04-05-PLAN.md
+last_updated: "2026-06-21T07:08:58.484Z"
 last_activity: "2026-06-21 — 04-07 완료: GET /api/v1/trading/paper/history endpoint + PaperHistoryService + PaperTradeHistoryItem DTO + PaperHistoryPage table (replaces 준비 중 stub)"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 21
-  completed_plans: 20
-  percent: 95
+  completed_plans: 21
+  percent: 100
 ---
 
 # Project State
@@ -60,6 +60,7 @@ Progress: [██████████] 100%
 | Phase 05 P01 | 6m | 2 tasks | 8 files |
 | Phase 05 P02 | 7m | 2 tasks | 8 files |
 | Phase 04 P07 | 5m | 2 tasks | 6 files |
+| Phase 04 P05 | 4m | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,9 @@ Recent decisions affecting current work:
 - [Phase 04, 04-07]: fee field set null in PaperTradeHistoryItem — paper_trades schema has no fee column; null avoids a migration; Phase 6 can add fee via migration + DTO update
 - [Phase 04, 04-07]: PaperTradeHistoryItem kept as generic-shaped record so Phase 6 LIVE history reuses same DTO/table structure with minimal additions
 - [Phase 04, 04-06]: Reuse TradingRulesPage unchanged under paper/rules-lifecycle route — promote/pause/resume/copy already wired to paperApi endpoints; only routing + nav needed
+- [Phase 04]: paper_live_symbols is the single canonical symbol source for both scheduler ingestion (activeSymbolsUnion) and live evaluation (resolveSymbols via findByRuleId) — eliminates the two-source divergence that caused scheduler Guard 3 short-circuit
+- [Phase 04]: RuleStatus.isLiveActive is the single edit point for live-loop status filtering; Phase 6 extends with one added clause for LIVE status
+- [Phase 04]: OrderExecutorPort.supports(TradingRule) enables per-rule executor routing; PaperExecutor handles PAPER-mode; Phase 6 TossOrderExecutor auto-joins via Spring for LIVE-mode
 
 ### Pending Todos
 
@@ -127,6 +131,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T07:20:00.000Z
-Stopped at: Completed 04-07-PLAN.md
+Last session: 2026-06-21T07:08:58.300Z
+Stopped at: Completed 04-05-PLAN.md
 Resume file: None
