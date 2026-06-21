@@ -59,8 +59,8 @@
 
 ### 토스증권 연동 (TOSS)
 
-- [ ] **TOSS-01**: 사용자는 설정 페이지에서 토스증권 client_id와 client_secret을 등록할 수 있다 (AES-256-GCM 암호화 저장)
-- [ ] **TOSS-02**: 시스템은 토스증권 OAuth 액세스 토큰을 자동 발급하고, 만료 10분 전 선제적으로 갱신한다
+- [x] **TOSS-01**: 사용자는 설정 페이지에서 토스증권 client_id와 client_secret을 등록할 수 있다 (AES-256-GCM 암호화 저장)
+- [x] **TOSS-02**: 시스템은 토스증권 OAuth 액세스 토큰을 자동 발급하고, 만료 10분 전 선제적으로 갱신한다
 - [ ] **TOSS-03**: 사용자는 연동된 토스증권 실계좌 잔고를 대시보드에서 조회할 수 있다
 - [ ] **TOSS-04**: 시스템은 LIVE 룰 평가 결과에 따라 토스증권 REST API로 실제 매수/매도 주문을 발행한다
 - [ ] **TOSS-05**: 시스템은 토스증권 API에서 수신한 실시간 시세를 LIVE 룰 평가에 사용한다
@@ -144,8 +144,8 @@
 | MON-03 | Phase 4 | Complete |
 | REPORT-01 | Phase 4 | Complete |
 | REPORT-02 | Phase 4 | Complete |
-| TOSS-01 | Phase 5 | Pending |
-| TOSS-02 | Phase 5 | Pending |
+| TOSS-01 | Phase 5 | Complete |
+| TOSS-02 | Phase 5 | Complete |
 | TOSS-03 | Phase 5 | Pending |
 | TOSS-04 | Phase 6 | Pending |
 | TOSS-05 | Phase 6 | Pending |
