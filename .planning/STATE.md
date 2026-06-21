@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-06-21T02:33:01.053Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-06-21T02:35:53.809Z"
 last_activity: "2026-06-21 — 04-01 완료: PaperDashboardService (mark-to-market positions, today realized PnL), PaperDashboardController, PaperDashboardPage (4 stat cards + positions table)"
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 16
-  completed_plans: 14
+  completed_plans: 15
   percent: 100
 ---
 
@@ -55,6 +55,7 @@ Progress: [██████████] 100%
 | Phase 03 P02 | 2.5m | 1 tasks | 4 files |
 | Phase 04 P01 | 1.5m | 2 tasks | 7 files |
 | Phase 04 P02 | 3m | 2 tasks | 9 files |
+| Phase 04 P03 | 4m | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -102,6 +103,7 @@ Recent decisions affecting current work:
 - [Phase 03]: LiveEvaluationService swallows per-symbol exceptions so one bad symbol never blocks the full tick evaluation
 - [Phase 04]: paper.ts centralizes all Phase 4 types so later plans import without new files
 - [Phase 04]: backtested flag set lazily on first BacktestService.run() — no separate backtest_count table needed
+- [Phase 04]: schedulerLastRun derived from max(ts) of paper_signal_log — avoids separate scheduler_run table
 
 ### Pending Todos
 
@@ -115,6 +117,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T02:33:01.051Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-06-21T02:35:53.807Z
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
