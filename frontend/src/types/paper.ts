@@ -39,6 +39,17 @@ export interface TradeItem {
   tradedAt: string;
 }
 
+export interface PaperTradeHistoryItem {
+  id: number;
+  tradedAt: string;
+  symbol: string;
+  side: "BUY" | "SELL";
+  qty: number;
+  price: number;
+  fee: number | null;
+  pnl: number | null;
+}
+
 export interface MonitorData {
   schedulerLastRun: string | null;
   marketStatus: "OPEN" | "CLOSED";

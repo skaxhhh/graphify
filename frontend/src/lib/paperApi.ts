@@ -1,5 +1,5 @@
 import { apiGet, apiPost } from "@/lib/apiClient";
-import type { PaperDashboardData, MonitorData, ReportData } from "@/types/paper";
+import type { PaperDashboardData, MonitorData, ReportData, PaperTradeHistoryItem } from "@/types/paper";
 
 const BASE = "/api/v1/trading/paper";
 
@@ -13,6 +13,10 @@ export async function fetchPaperMonitor() {
 
 export async function fetchPaperReport() {
   return apiGet<ReportData>(`${BASE}/report`);
+}
+
+export async function fetchPaperHistory() {
+  return apiGet<PaperTradeHistoryItem[]>(`${BASE}/history`);
 }
 
 export async function promoteRule(id: number) {
