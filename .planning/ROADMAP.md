@@ -166,5 +166,5 @@ Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. PAPER_LIVE 평가 엔진 | 2/2 | Complete   | 2026-06-21 |
 | 4. 대시보드·룰 생애주기·모니터·리포트 UI | 7/7 | Complete   | 2026-06-21 |
 | 5. 토스증권 OAuth & 자격증명 관리 | 2/2 | Complete   | 2026-06-21 |
-| 6. 룰 빌더 UI | 0/2 | Not started | - |
+| 6. 룰 빌더 UI | 1/2 | In Progress|  |
 | 7. 실투자 주문 실행 & LIVE 승격 | 0/2 | Not started | - |
