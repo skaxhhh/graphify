@@ -26,7 +26,7 @@
 - [x] **LIVE-01**: 시스템은 KRX 장 중(09:00–15:30 KST, 거래일)에 한해 5분마다 활성 종목의 인트라데이 봉을 수집한다
 - [x] **LIVE-02**: 시스템은 KRX 공휴일 목록을 유지하고, 장 외에는 평가를 건너뛴다
 - [x] **LIVE-03**: 시스템은 다중 인스턴스 환경에서 이중 평가가 발생하지 않도록 분산 잠금(ShedLock)을 적용한다
-- [ ] **LIVE-04**: 시스템은 데이터 수집 후 최신 봉이 10분 이상 오래된 경우 평가를 건너뛰고 경고를 기록한다
+- [x] **LIVE-04**: 시스템은 데이터 수집 후 최신 봉이 10분 이상 오래된 경우 평가를 건너뛰고 경고를 기록한다
 - [ ] **LIVE-05**: 시스템은 PAPER_LIVE 상태인 룰을 매 평가 주기마다 자동으로 평가하고 가상 체결을 실행한다
 - [ ] **LIVE-06**: 시스템은 각 평가 주기 종료 시 가상 계좌의 평가금액 스냅샷을 DB에 저장한다
 
@@ -34,8 +34,8 @@
 
 - [ ] **DASH-01**: 사용자는 모의 대시보드에서 가상 현금 잔고와 총 평가금액을 확인할 수 있다
 - [ ] **DASH-02**: 사용자는 모의 대시보드에서 현재 보유 포지션 목록(종목, 수량, 평균단가, 평가손익)을 확인할 수 있다
-- [ ] **DASH-03**: 사용자는 모의 대시보드에서 오늘 실현된 손익 합계를 확인할 수 있다
-- [ ] **DASH-04**: 사용자는 모의 대시보드에서 현재 PAPER_LIVE 상태인 룰 목록과 마지막 신호 발생 시각을 확인할 수 있다
+- [x] **DASH-03**: 사용자는 모의 대시보드에서 오늘 실현된 손익 합계를 확인할 수 있다
+- [x] **DASH-04**: 사용자는 모의 대시보드에서 현재 PAPER_LIVE 상태인 룰 목록과 마지막 신호 발생 시각을 확인할 수 있다
 
 ### 룰 생애주기 관리 (RULE)
 
@@ -47,15 +47,15 @@
 
 ### 실시간 모니터 (MON)
 
-- [ ] **MON-01**: 사용자는 모니터 페이지에서 각 룰의 신호 평가 로그(시각, 종목, 신호 종류, 결과)를 확인할 수 있다
-- [ ] **MON-02**: 사용자는 모니터 페이지에서 스케줄러 마지막 실행 시각과 장중/장외 상태를 확인할 수 있다
-- [ ] **MON-03**: 사용자는 모니터 페이지에서 오늘 체결된 가상 거래 피드를 실시간으로 확인할 수 있다
-- [ ] **MON-04**: 신호 발생 로그에는 신호 평가 시점의 주요 지표값(RSI, SMA 등)이 함께 기록된다
+- [x] **MON-01**: 사용자는 모니터 페이지에서 각 룰의 신호 평가 로그(시각, 종목, 신호 종류, 결과)를 확인할 수 있다
+- [x] **MON-02**: 사용자는 모니터 페이지에서 스케줄러 마지막 실행 시각과 장중/장외 상태를 확인할 수 있다
+- [x] **MON-03**: 사용자는 모니터 페이지에서 오늘 체결된 가상 거래 피드를 실시간으로 확인할 수 있다
+- [x] **MON-04**: 신호 발생 로그에는 신호 평가 시점의 주요 지표값(RSI, SMA 등)이 함께 기록된다
 
 ### 성과 리포트 (REPORT)
 
-- [ ] **REPORT-01**: 사용자는 성과 리포트 페이지에서 모의 실행 기간의 수익 곡선과 핵심 지표(수익률, MDD, 승률, 거래 횟수)를 확인할 수 있다
-- [ ] **REPORT-02**: 사용자는 성과 리포트 페이지에서 모의 기간 동안의 Sharpe Ratio와 Sortino Ratio를 확인할 수 있다
+- [x] **REPORT-01**: 사용자는 성과 리포트 페이지에서 모의 실행 기간의 수익 곡선과 핵심 지표(수익률, MDD, 승률, 거래 횟수)를 확인할 수 있다
+- [x] **REPORT-02**: 사용자는 성과 리포트 페이지에서 모의 기간 동안의 Sharpe Ratio와 Sortino Ratio를 확인할 수 있다
 
 ### 토스증권 연동 (TOSS)
 
@@ -127,23 +127,23 @@
 | LIVE-01 | Phase 2 | Complete |
 | LIVE-02 | Phase 2 | Complete |
 | LIVE-03 | Phase 2 | Complete |
-| LIVE-04 | Phase 2 | Pending |
+| LIVE-04 | Phase 2 | Complete |
 | LIVE-05 | Phase 3 | Pending |
 | LIVE-06 | Phase 3 | Pending |
-| MON-04 | Phase 3 | Pending |
+| MON-04 | Phase 3 | Complete |
 | DASH-01 | Phase 4 | Pending |
 | DASH-02 | Phase 4 | Pending |
-| DASH-03 | Phase 4 | Pending |
-| DASH-04 | Phase 4 | Pending |
+| DASH-03 | Phase 4 | Complete |
+| DASH-04 | Phase 4 | Complete |
 | RULE-01 | Phase 4 | Pending |
 | RULE-02 | Phase 4 | Pending |
 | RULE-03 | Phase 4 | Pending |
 | RULE-05 | Phase 4 | Pending |
-| MON-01 | Phase 4 | Pending |
-| MON-02 | Phase 4 | Pending |
-| MON-03 | Phase 4 | Pending |
-| REPORT-01 | Phase 4 | Pending |
-| REPORT-02 | Phase 4 | Pending |
+| MON-01 | Phase 4 | Complete |
+| MON-02 | Phase 4 | Complete |
+| MON-03 | Phase 4 | Complete |
+| REPORT-01 | Phase 4 | Complete |
+| REPORT-02 | Phase 4 | Complete |
 | TOSS-01 | Phase 5 | Pending |
 | TOSS-02 | Phase 5 | Pending |
 | TOSS-03 | Phase 5 | Pending |
