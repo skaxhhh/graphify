@@ -17,13 +17,16 @@ public class DbMarketDataAdapter implements MarketDataPort {
 
     private final MarketBarRepository barRepository;
     private final MarketDataIngestionService ingestionService;
+    private final MarketBarIntradayRepository intradayRepository;
 
     public DbMarketDataAdapter(
             MarketBarRepository barRepository,
-            MarketDataIngestionService ingestionService
+            MarketDataIngestionService ingestionService,
+            MarketBarIntradayRepository intradayRepository
     ) {
         this.barRepository = barRepository;
         this.ingestionService = ingestionService;
+        this.intradayRepository = intradayRepository;
     }
 
     @Override
@@ -49,5 +52,10 @@ public class DbMarketDataAdapter implements MarketDataPort {
     @Override
     public List<String> symbolsByMarket(String market) {
         return barRepository.findDistinctKospi200Symbols(market);
+    }
+
+    @Override
+    public List<MarketBarIntraday> recentIntradayBars(String symbol) {
+        return intradayRepository.findBySymbolAndIntervalOrderByTsAsc(symbol, "5m");
     }
 }

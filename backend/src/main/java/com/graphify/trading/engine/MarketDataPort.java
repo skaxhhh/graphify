@@ -1,5 +1,6 @@
 package com.graphify.trading.engine;
 
+import com.graphify.market.MarketBarIntraday;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,6 +25,14 @@ public interface MarketDataPort {
      * volume_top_n 백테스트 시 데이터 사전 로드에 사용.
      */
     default List<String> symbolsByMarket(String market) {
+        return List.of();
+    }
+
+    /**
+     * 종목의 당일 최신 5분봉 목록 반환 (오래된 → 최신). Phase 3 평가 엔진이 소비.
+     * 기본 구현은 빈 리스트 — DbMarketDataAdapter에서 override.
+     */
+    default List<MarketBarIntraday> recentIntradayBars(String symbol) {
         return List.of();
     }
 }

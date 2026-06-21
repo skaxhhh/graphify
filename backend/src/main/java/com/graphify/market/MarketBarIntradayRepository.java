@@ -26,4 +26,10 @@ public interface MarketBarIntradayRepository extends JpaRepository<MarketBarIntr
         @Param("from") Instant from,
         @Param("to") Instant to
     );
+
+    @Query("SELECT MAX(m.ts) FROM MarketBarIntraday m WHERE m.symbol = :symbol AND m.interval = :interval")
+    Optional<Instant> findMaxTsBySymbolAndInterval(
+        @Param("symbol") String symbol,
+        @Param("interval") String interval
+    );
 }
