@@ -53,7 +53,7 @@ public class PaperLiveSymbolService {
     @Transactional(readOnly = true)
     public Set<String> activeSymbolsUnion() {
         List<Long> activeRuleIds = ruleRepository.findAll().stream()
-            .filter(r -> "PAPER_LIVE".equals(r.getStatus()))
+            .filter(r -> RuleStatus.isLiveActive(r.getStatus()))
             .map(TradingRule::getId)
             .toList();
         if (activeRuleIds.isEmpty()) {

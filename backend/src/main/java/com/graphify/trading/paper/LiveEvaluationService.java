@@ -7,6 +7,7 @@ import com.graphify.trading.engine.Indicators;
 import com.graphify.trading.engine.MarketDataPort;
 import com.graphify.trading.engine.RuleEvaluator;
 import com.graphify.trading.engine.Signal;
+import com.graphify.trading.rule.RuleStatus;
 import com.graphify.trading.rule.TradingRule;
 import com.graphify.trading.rule.TradingRuleRepository;
 import com.graphify.trading.rule.definition.RuleDefinition;
@@ -77,7 +78,7 @@ public class LiveEvaluationService {
     @Transactional
     public void evaluateTick(Instant tickTime) {
         List<TradingRule> paperLiveRules = ruleRepo.findAll().stream()
-            .filter(r -> "PAPER_LIVE".equals(r.getStatus()))
+            .filter(r -> RuleStatus.isLiveActive(r.getStatus()))
             .toList();
 
         if (paperLiveRules.isEmpty()) {
