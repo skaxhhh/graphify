@@ -3,7 +3,7 @@ export type RuleIndicator = "PRICE" | "SMA" | "EMA" | "RSI" | "VOLUME";
 export type RuleOperator = ">" | ">=" | "<" | "<=" | "==" | "crossAbove" | "crossBelow";
 export type RuleLogic = "AND" | "OR";
 export type SizingType = "cash" | "percent" | "qty";
-export type UniverseType = "symbols" | "watchlist";
+export type UniverseType = "symbols" | "watchlist" | "volume_top_n";
 
 export interface RuleOperand {
   indicator?: RuleIndicator;
@@ -41,7 +41,7 @@ export interface RuleConstraints {
 
 export interface RuleDefinition {
   version: 1;
-  universe: { type: UniverseType; symbols?: string[] };
+  universe: { type: UniverseType; symbols?: string[]; market?: string; topN?: number; additionalSymbols?: string[] };
   entry: RuleConditionGroup;
   exit?: RuleExitSpec;
   sizing: RuleSizing;
