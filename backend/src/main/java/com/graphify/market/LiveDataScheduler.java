@@ -1,5 +1,6 @@
 package com.graphify.market;
 
+import com.graphify.trading.paper.LiveEvaluationService;
 import com.graphify.trading.rule.PaperLiveSymbolService;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -35,16 +36,19 @@ public class LiveDataScheduler {
     private final PaperLiveSymbolService symbolService;
     private final MarketDataIngestionService ingestionService;
     private final MarketBarIntradayRepository intradayRepository;
+    private final LiveEvaluationService evaluationService;
 
     public LiveDataScheduler(
             KrxMarketCalendar calendar,
             PaperLiveSymbolService symbolService,
             MarketDataIngestionService ingestionService,
-            MarketBarIntradayRepository intradayRepository) {
+            MarketBarIntradayRepository intradayRepository,
+            LiveEvaluationService evaluationService) {
         this.calendar = calendar;
         this.symbolService = symbolService;
         this.ingestionService = ingestionService;
         this.intradayRepository = intradayRepository;
+        this.evaluationService = evaluationService;
     }
 
     /**
@@ -84,6 +88,9 @@ public class LiveDataScheduler {
             ingested++;
         }
         log.info("Live intraday collection done: {} symbols at {}", ingested, now);
+
+        // Phase 3: evaluate all PAPER_LIVE rules against freshly ingested bars
+        evaluationService.evaluateTick(now.toInstant());
     }
 
     /**
