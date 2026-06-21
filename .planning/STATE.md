@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-06-21T03:12:21.624Z"
-last_activity: "2026-06-21 — 04-01 완료: PaperDashboardService (mark-to-market positions, today realized PnL), PaperDashboardController, PaperDashboardPage (4 stat cards + positions table)"
+stopped_at: Completed 04-06-PLAN.md
+last_updated: "2026-06-21T07:05:20.102Z"
+last_activity: "2026-06-21 — 04-06 완료: PAPER-mode 룰 라이프사이클 route (paper/rules-lifecycle) + sidebar entry 추가, TradingRulesPage 재사용"
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 18
-  completed_plans: 18
+  completed_phases: 5
+  total_plans: 21
+  completed_plans: 19
   percent: 100
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 4 of 7 (대시보드·룰 생애주기·모니터·리포트 UI)
-Plan: 1 of 4 in current phase (COMPLETE)
-Status: Phase 4, Plan 1 complete — PaperDashboard API + UI (cash/positions/PnL/30s refresh)
-Last activity: 2026-06-21 — 04-01 완료: PaperDashboardService (mark-to-market positions, today realized PnL), PaperDashboardController, PaperDashboardPage (4 stat cards + positions table)
+Plan: 6 of 6 in current phase (COMPLETE)
+Status: Phase 4, Plan 6 complete — PAPER-mode 룰 라이프사이클 route + sidebar entry (TradingRulesPage 재사용)
+Last activity: 2026-06-21 — 04-06 완료: PAPER-mode 룰 라이프사이클 route (paper/rules-lifecycle) + sidebar entry 추가, TradingRulesPage 재사용
 
 Progress: [██████████] 100%
 
@@ -110,6 +110,7 @@ Recent decisions affecting current work:
 - [Phase 04]: equity curve built from last 30 days of paper_equity_snapshots reversed to ascending — no separate date-range param needed for initial version
 - [Phase 05]: reuse SecretEncryptionService (AES-256-GCM) for Toss credentials — no new crypto code needed
 - [Phase 05]: TossAccountService returns empty list when unconfigured — dashboard never errors on Toss call
+- [Phase 04, 04-06]: Reuse TradingRulesPage unchanged under paper/rules-lifecycle route — promote/pause/resume/copy already wired to paperApi endpoints; only routing + nav needed
 
 ### Pending Todos
 
@@ -123,6 +124,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T02:46:34.639Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-06-21T07:05:20.099Z
+Stopped at: Completed 04-06-PLAN.md
 Resume file: None

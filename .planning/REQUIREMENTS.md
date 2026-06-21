@@ -39,9 +39,9 @@
 
 ### 룰 생애주기 관리 (RULE)
 
-- [ ] **RULE-01**: 사용자는 백테스트를 최소 1회 실행한 룰을 PAPER_LIVE로 승격할 수 있다 (미실행 시 차단)
-- [ ] **RULE-02**: 사용자는 PAPER_LIVE 룰을 일시정지(PAUSED)하거나 재개할 수 있다
-- [ ] **RULE-03**: 사용자는 룰 목록에서 각 룰의 현재 상태(DRAFT / BACKTESTED / PAPER_LIVE / PAUSED / LIVE)를 배지로 확인할 수 있다
+- [x] **RULE-01**: 사용자는 백테스트를 최소 1회 실행한 룰을 PAPER_LIVE로 승격할 수 있다 (미실행 시 차단)
+- [x] **RULE-02**: 사용자는 PAPER_LIVE 룰을 일시정지(PAUSED)하거나 재개할 수 있다
+- [x] **RULE-03**: 사용자는 룰 목록에서 각 룰의 현재 상태(DRAFT / BACKTESTED / PAPER_LIVE / PAUSED / LIVE)를 배지로 확인할 수 있다
 - [ ] **RULE-04**: 사용자는 PAPER_LIVE 룰을 LIVE로 승격할 수 있다 (토스증권 인증 완료 + 최소 5거래일 운영 확인 필수)
 - [ ] **RULE-05**: LIVE 룰은 정의 편집이 불가하며, 수정 시 DRAFT 복사본으로만 가능하다
 
@@ -135,9 +135,9 @@
 | DASH-02 | Phase 4 | Pending |
 | DASH-03 | Phase 4 | Complete |
 | DASH-04 | Phase 4 | Complete |
-| RULE-01 | Phase 4 | Pending |
-| RULE-02 | Phase 4 | Pending |
-| RULE-03 | Phase 4 | Pending |
+| RULE-01 | Phase 4 | Complete |
+| RULE-02 | Phase 4 | Complete |
+| RULE-03 | Phase 4 | Complete |
 | RULE-05 | Phase 4 | Pending |
 | MON-01 | Phase 4 | Complete |
 | MON-02 | Phase 4 | Complete |
