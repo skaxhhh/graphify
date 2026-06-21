@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-06-21T15:36:00Z"
-last_activity: "2026-06-21 — 06-01 완료: RuleBuilderPage (full form UI) + volume_top_n universe type extension in trading.ts"
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-06-21T15:43:00Z"
+last_activity: "2026-06-21 — 06-02 완료: router wiring (paper/rules/new, paper/rules/edit/:id) + PaperRulesPage modal removal + copy/cooldown"
 progress:
   total_phases: 7
   completed_phases: 6
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 6 of 7 (룰 빌더 UI)
-Plan: 1 of N in current phase (COMPLETE)
-Status: Phase 6, Plan 1 complete — RuleBuilderPage full form UI + volume_top_n universe type
-Last activity: 2026-06-21 — 06-01 완료: RuleBuilderPage (universe/entry/exit/sizing/constraints form) + toDefinition/fromDefinition serialization + builder/JSON tab toggle
+Plan: 2 of N in current phase (COMPLETE)
+Status: Phase 6, Plan 2 complete — router wiring + PaperRulesPage modal removal + copy/cooldown
+Last activity: 2026-06-21 — 06-02 완료: paper/rules/new + paper/rules/edit/:id routes; PaperRulesPage inline modal removed; navigate-based flows; 복제 button (RULE-06); 쿨다운 column (RULE-07)
 
 Progress: [██████████] 100% (Phase 6 in progress)
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100% (Phase 6 in progress)
 | Phase 04 P07 | 5m | 2 tasks | 6 files |
 | Phase 04 P05 | 4m | 3 tasks | 6 files |
 | Phase 06 P01 | 3m | 2 tasks | 2 files |
+| Phase 06 P02 | 2m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,9 @@ Recent decisions affecting current work:
 - [Phase 06, 06-01]: toDefinition/fromDefinition defined outside component as pure functions — no React dependencies, trivially testable
 - [Phase 06, 06-01]: universe.market hardcoded to "KOSPI" in toDefinition — only KOSPI supported in v1; can be promoted to BuilderState field in Phase 7
 - [Phase 06, 06-01]: ConditionRow extracted as sub-component to avoid inline JSX repetition for entry/exit condition rows
+- [Phase 06, 06-02]: copyMutation uses per-rule id only — no optimistic update; invalidateQueries re-fetches list after copy
+- [Phase 06, 06-02]: cooldown display formula: cooldownBars * 5m (5-minute bar assumption, consistent with backtest engine)
+- [Phase 06, 06-02]: PaperRulesPage table column order: 이름 | 상태 | 쿨다운 | 수정일 | 관리 (5 columns, thead/tbody aligned)
 
 ### Pending Todos
 
@@ -135,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T15:36:00Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-06-21T15:43:00Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
