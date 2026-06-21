@@ -30,6 +30,8 @@ dependencies {
     implementation("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
     implementation("com.rometools:rome:2.1.0")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.7.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.7.0")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
