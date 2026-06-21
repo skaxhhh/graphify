@@ -81,8 +81,9 @@ export interface BacktestRequest {
 }
 
 export interface BacktestTrade {
-  datetime: string;   // was: date
+  datetime: string;
   symbol: string;
+  companyName: string | null;
   side: "BUY" | "SELL";
   qty: number;
   price: number;

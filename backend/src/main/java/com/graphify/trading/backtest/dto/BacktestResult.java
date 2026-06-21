@@ -21,6 +21,7 @@ public record BacktestResult(
     public record TradeDto(
             LocalDateTime datetime,
             String symbol,
+            String companyName,
             String side,
             double qty,
             double price,

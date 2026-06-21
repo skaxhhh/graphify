@@ -209,7 +209,9 @@ export function PaperBacktestPage() {
                   result.trades.map((t, i) => (
                     <tr key={i} className="border-b border-white/5 last:border-0">
                       <td className="px-4 py-2 text-gray-300">{t.datetime}</td>
-                      <td className="px-4 py-2 text-white">{t.symbol}</td>
+                      <td className="px-4 py-2 text-white">
+                        {t.companyName ? `${t.companyName} (${t.symbol})` : t.symbol}
+                      </td>
                       <td className="px-4 py-2">
                         <span
                           className={

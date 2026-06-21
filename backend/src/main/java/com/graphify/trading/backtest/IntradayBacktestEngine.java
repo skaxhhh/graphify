@@ -1,5 +1,7 @@
 package com.graphify.trading.backtest;
 
+import com.graphify.company.Company;
+import com.graphify.company.CompanyRepository;
 import com.graphify.company.market.IntradayBar;
 import com.graphify.company.market.YahooFinanceChartClient;
 import com.graphify.market.MarketBarIntraday;
@@ -41,17 +43,23 @@ public class IntradayBacktestEngine {
     private final YahooFinanceChartClient yahooClient;
     private final RuleEvaluator ruleEvaluator;
     private final FillSimulator fillSimulator;
+    private final IntradayBarCacheService cacheService;
+    private final CompanyRepository companyRepository;
 
     public IntradayBacktestEngine(
             MarketBarIntradayRepository intradayRepository,
             YahooFinanceChartClient yahooClient,
             RuleEvaluator ruleEvaluator,
-            FillSimulator fillSimulator
+            FillSimulator fillSimulator,
+            IntradayBarCacheService cacheService,
+            CompanyRepository companyRepository
     ) {
         this.intradayRepository = intradayRepository;
         this.yahooClient = yahooClient;
         this.ruleEvaluator = ruleEvaluator;
         this.fillSimulator = fillSimulator;
+        this.cacheService = cacheService;
+        this.companyRepository = companyRepository;
     }
 
     /**
@@ -78,7 +86,9 @@ public class IntradayBacktestEngine {
         LocalTime timeFrom = LocalTime.parse(request.timeFrom() != null ? request.timeFrom() : "09:00");
         LocalTime timeTo = LocalTime.parse(request.timeTo() != null ? request.timeTo() : "12:00");
 
-        List<LocalDate> dates = request.from().datesUntil(request.to().plusDays(1)).toList();
+        LocalDate resolvedTo = request.to() != null ? request.to() : LocalDate.now();
+        LocalDate resolvedFrom = request.from() != null ? request.from() : resolvedTo.minusDays(60);
+        List<LocalDate> dates = resolvedFrom.datesUntil(resolvedTo.plusDays(1)).toList();
         List<BacktestResult.EquityPoint> curve = new ArrayList<>();
         Map<String, Double> lastPrices = new HashMap<>();
         Map<String, Integer> lastExitIndex = new HashMap<>();
@@ -154,7 +164,8 @@ public class IntradayBacktestEngine {
                 })
                 .toList();
 
-        if (!filtered.isEmpty()) {
+        if (!dbBars.isEmpty()) {
+            // Day already in DB — return whatever matches the window (may be empty)
             return filtered;
         }
 
@@ -167,8 +178,10 @@ public class IntradayBacktestEngine {
             return List.of();
         }
 
-        // 4. Convert and save to DB
+        // 4. Convert — filter to requested date only to avoid duplicate key conflicts
+        // Yahoo returns a fixed recent window (e.g. last 5 days) regardless of requested date.
         List<MarketBarIntraday> toSave = fetched.stream()
+                .filter(bar -> bar.ts().atZone(KST).toLocalDate().equals(date))
                 .map(bar -> new MarketBarIntraday(
                         symbol,
                         bar.ts(),
@@ -182,11 +195,8 @@ public class IntradayBacktestEngine {
                 ))
                 .toList();
 
-        try {
-            intradayRepository.saveAll(toSave);
-        } catch (Exception ex) {
-            log.warn("Failed to save intraday bars symbol={} date={}: {}", symbol, date, ex.getMessage());
-        }
+        // Save in a separate transaction so a conflict doesn't corrupt the outer backtest tx.
+        cacheService.saveQuietly(symbol, date, toSave);
 
         // 5. Filter saved bars by time window
         return toSave.stream()
@@ -215,13 +225,21 @@ public class IntradayBacktestEngine {
             }
         }
 
+        // Symbol → company name lookup (batch, one query per unique symbol)
+        Map<String, String> nameBySymbol = new HashMap<>();
+        for (PaperLedger.TradeRecord t : ledger.trades()) {
+            nameBySymbol.computeIfAbsent(t.symbol(), sym ->
+                companyRepository.findByTicker(sym).map(Company::getName).orElse(null));
+        }
+
         // Trades
         int wins = 0;
         int sells = 0;
         List<BacktestResult.TradeDto> trades = new ArrayList<>();
         for (PaperLedger.TradeRecord t : ledger.trades()) {
             LocalDateTime dt = t.date().atStartOfDay(); // date-only → use start of day
-            trades.add(new BacktestResult.TradeDto(dt, t.symbol(), t.side(), t.qty(), t.price(), t.pnl()));
+            trades.add(new BacktestResult.TradeDto(dt, t.symbol(), nameBySymbol.get(t.symbol()),
+                    t.side(), t.qty(), t.price(), t.pnl()));
             if ("SELL".equals(t.side())) {
                 sells++;
                 if (t.pnl() != null && t.pnl() > 0) {
