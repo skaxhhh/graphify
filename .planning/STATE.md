@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-06-21T15:43:00Z"
-last_activity: "2026-06-21 — 06-02 완료: router wiring (paper/rules/new, paper/rules/edit/:id) + PaperRulesPage modal removal + copy/cooldown"
+status: 로드맵 확장 완료 — Phase 6.5/6.6/7(TradingView)/8(Toss LIVE) 정의됨, 아직 계획 전
+stopped_at: Phase 6.5 context gathered
+last_updated: "2026-06-22T05:52:36.308Z"
+last_activity: 2026-06-22 — 로드맵에 Phase 6.5(역할분리+매매근거), 6.6(5분봉 캔들차트), 7(TradingView webhook) 추가; 기존 LIVE phase는 8로 이동
 progress:
-  total_phases: 7
-  completed_phases: 6
-  total_plans: 22
-  completed_plans: 22
-  percent: 100
+  total_phases: 11
+  completed_phases: 7
+  total_plans: 23
+  completed_plans: 23
+  percent: 64
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6 of 7 (룰 빌더 UI)
-Plan: 2 of N in current phase (COMPLETE)
-Status: Phase 6, Plan 2 complete — router wiring + PaperRulesPage modal removal + copy/cooldown
-Last activity: 2026-06-21 — 06-02 완료: paper/rules/new + paper/rules/edit/:id routes; PaperRulesPage inline modal removed; navigate-based flows; 복제 button (RULE-06); 쿨다운 column (RULE-07)
+Phase: 6 complete → next 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
+Plan: Phase 6.5 미계획 (다음: /gsd:plan-phase 6.5)
+Status: 로드맵 확장 완료 — Phase 6.5/6.6/7(TradingView)/8(Toss LIVE) 정의됨, 아직 계획 전
+Last activity: 2026-06-22 — 로드맵에 Phase 6.5(역할분리+매매근거), 6.6(5분봉 캔들차트), 7(TradingView webhook) 추가; 기존 LIVE phase는 8로 이동
 
-Progress: [██████████] 100% (Phase 6 in progress)
+Progress: [██████░░░░] 64% (7/11 phases complete)
 
 ## Performance Metrics
 
@@ -139,6 +139,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T15:43:00Z
-Stopped at: Completed 06-02-PLAN.md
-Resume file: None
+Last session: 2026-06-22T05:52:36.304Z
+Stopped at: Phase 6.5 context gathered
+Resume file: .planning/phases/06.5-role-split-trade-rationale/06.5-CONTEXT.md
