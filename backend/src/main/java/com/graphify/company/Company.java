@@ -48,6 +48,9 @@ public class Company {
     @Column(name = "in_kospi200", nullable = false)
     private boolean inKospi200 = false;
 
+    @Column(name = "instrument_type", nullable = false)
+    private String instrumentType = "COMMON_STOCK";
+
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
 
@@ -105,6 +108,14 @@ public class Company {
 
     public boolean isInKospi200() {
         return inKospi200;
+    }
+
+    public String getInstrumentType() {
+        return instrumentType;
+    }
+
+    public void setInstrumentType(String instrumentType) {
+        this.instrumentType = instrumentType;
     }
 
     public void setName(String name) {
