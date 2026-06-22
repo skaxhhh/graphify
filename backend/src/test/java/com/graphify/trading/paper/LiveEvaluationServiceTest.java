@@ -3,6 +3,7 @@ package com.graphify.trading.paper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphify.market.MarketBarIntraday;
 import com.graphify.market.MarketBarIntradayRepository;
+import com.graphify.market.volume.VolumeRankingProvider;
 import com.graphify.trading.engine.EvalResult;
 import com.graphify.trading.engine.MarketDataPort;
 import com.graphify.trading.engine.RuleEvaluator;
@@ -39,6 +40,7 @@ class LiveEvaluationServiceTest {
     @Mock PaperPositionRepository positionRepo;
     @Mock PaperEquitySnapshotRepository snapshotRepo;
     @Mock PaperLiveSymbolRepository paperLiveSymbolRepository;
+    @Mock VolumeRankingProvider liveRanking;
     ObjectMapper objectMapper = new ObjectMapper();
 
     LiveEvaluationService service;
@@ -58,7 +60,7 @@ class LiveEvaluationServiceTest {
         service = new LiveEvaluationService(
             ruleRepo, marketDataPort, intradayRepo, ruleEvaluator,
             List.of(executor), accountRepo, positionRepo, snapshotRepo, objectMapper,
-            paperLiveSymbolRepository
+            paperLiveSymbolRepository, liveRanking
         );
     }
 

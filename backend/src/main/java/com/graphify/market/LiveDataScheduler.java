@@ -1,6 +1,7 @@
 package com.graphify.market;
 
 import com.graphify.trading.paper.LiveEvaluationService;
+import com.graphify.trading.paper.VolumeRankRefresher;
 import com.graphify.trading.rule.PaperLiveSymbolService;
 import java.time.Instant;
 import java.time.LocalTime;
@@ -37,18 +38,21 @@ public class LiveDataScheduler {
     private final MarketDataIngestionService ingestionService;
     private final MarketBarIntradayRepository intradayRepository;
     private final LiveEvaluationService evaluationService;
+    private final VolumeRankRefresher volumeRankRefresher;
 
     public LiveDataScheduler(
             KrxMarketCalendar calendar,
             PaperLiveSymbolService symbolService,
             MarketDataIngestionService ingestionService,
             MarketBarIntradayRepository intradayRepository,
-            LiveEvaluationService evaluationService) {
+            LiveEvaluationService evaluationService,
+            VolumeRankRefresher volumeRankRefresher) {
         this.calendar = calendar;
         this.symbolService = symbolService;
         this.ingestionService = ingestionService;
         this.intradayRepository = intradayRepository;
         this.evaluationService = evaluationService;
+        this.volumeRankRefresher = volumeRankRefresher;
     }
 
     /**
@@ -73,6 +77,9 @@ public class LiveDataScheduler {
             log.debug("Non-trading day {}, skipping tick", now.toLocalDate());
             return;
         }
+
+        // volume_top_n 룰 재선정 + 보유 포지션 union (SC3/SC4) — activeSymbolsUnion() 직전에 갱신
+        volumeRankRefresher.refreshIfVolumeTopN(now.toLocalDate());
 
         // Guard 3: 활성 종목 없으면 스킵
         Set<String> symbols = symbolService.activeSymbolsUnion();

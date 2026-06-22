@@ -1,6 +1,7 @@
 package com.graphify.market;
 
 import com.graphify.trading.paper.LiveEvaluationService;
+import com.graphify.trading.paper.VolumeRankRefresher;
 import com.graphify.trading.rule.PaperLiveSymbolService;
 import java.lang.reflect.Method;
 import java.time.Instant;
@@ -26,13 +27,14 @@ class LiveDataSchedulerTest {
     @Mock MarketDataIngestionService ingestionService;
     @Mock MarketBarIntradayRepository intradayRepository;
     @Mock LiveEvaluationService evaluationService;
+    @Mock VolumeRankRefresher volumeRankRefresher;
 
     LiveDataScheduler scheduler;
 
     @BeforeEach
     void setUp() {
         scheduler = new LiveDataScheduler(calendar, symbolService, ingestionService,
-            intradayRepository, evaluationService);
+            intradayRepository, evaluationService, volumeRankRefresher);
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.graphify.market.MarketBarIntraday;
 import com.graphify.market.MarketBarIntradayRepository;
+import com.graphify.market.volume.VolumeRankingProvider;
 import com.graphify.trading.engine.EvalResult;
 import com.graphify.trading.engine.Indicators;
 import com.graphify.trading.engine.MarketDataPort;
@@ -18,12 +19,17 @@ import com.graphify.trading.rule.definition.RuleDefinition;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +51,8 @@ public class LiveEvaluationService {
     static final int  MIN_BARS_REQUIRED = 20;   // RSI-14 + SMA-20 계산 최소치
     static final long STALENESS_MINUTES = 10L;
 
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+
     private final TradingRuleRepository         ruleRepo;
     private final MarketDataPort                marketDataPort;
     private final MarketBarIntradayRepository   intradayRepo;
@@ -55,6 +63,7 @@ public class LiveEvaluationService {
     private final PaperEquitySnapshotRepository snapshotRepo;
     private final ObjectMapper                  objectMapper;
     private final PaperLiveSymbolRepository     paperLiveSymbolRepository;
+    private final VolumeRankingProvider         liveRanking;
 
     public LiveEvaluationService(
             TradingRuleRepository ruleRepo,
@@ -66,7 +75,8 @@ public class LiveEvaluationService {
             PaperPositionRepository positionRepo,
             PaperEquitySnapshotRepository snapshotRepo,
             ObjectMapper objectMapper,
-            PaperLiveSymbolRepository paperLiveSymbolRepository) {
+            PaperLiveSymbolRepository paperLiveSymbolRepository,
+            @Qualifier("yahooCumulativeVolumeAdapter") VolumeRankingProvider liveRanking) {
         this.ruleRepo                  = ruleRepo;
         this.marketDataPort            = marketDataPort;
         this.intradayRepo              = intradayRepo;
@@ -77,6 +87,7 @@ public class LiveEvaluationService {
         this.snapshotRepo              = snapshotRepo;
         this.objectMapper              = objectMapper;
         this.paperLiveSymbolRepository = paperLiveSymbolRepository;
+        this.liveRanking               = liveRanking;
     }
 
     private OrderExecutorPort executorFor(TradingRule rule) {
@@ -125,9 +136,12 @@ public class LiveEvaluationService {
             return;
         }
 
+        // 진입 게이팅: volume_top_n 룰이면 현재 top-N 계산(룰당 1회). null이면 게이팅 없음.
+        Set<String> entrySet = buildEntrySet(def, tickTime);
+
         for (String symbol : symbols) {
             try {
-                evaluateSymbol(rule, def, account, symbol, tickTime);
+                evaluateSymbol(rule, def, account, symbol, tickTime, entrySet);
             } catch (Exception e) {
                 log.warn("Error evaluating symbol {} for rule {}: {}", symbol, rule.getId(), e.getMessage());
             }
@@ -137,8 +151,29 @@ public class LiveEvaluationService {
         saveEquitySnapshot(account, tickTime);
     }
 
+    /**
+     * volume_top_n 룰이면 현재 top-N 집합을 1회 계산해 반환. 비-volume_top_n이면 null(게이팅 없음).
+     * top-N 조회 실패 시 null 반환 — 실패가 평가 자체를 막지 않게 함.
+     */
+    private Set<String> buildEntrySet(RuleDefinition def, Instant tickTime) {
+        if (def.universe() == null || !"volume_top_n".equals(def.universe().type())) {
+            return null; // 게이팅 없음
+        }
+        try {
+            String market = def.universe().market() != null ? def.universe().market() : "KOSPI";
+            int topN = def.universe().topN() != null ? def.universe().topN() : 10;
+            LocalDate today = tickTime.atZone(KST).toLocalDate();
+            List<String> topList = liveRanking.topVolume(market, today, topN, true);
+            return new HashSet<>(topList);
+        } catch (Exception e) {
+            log.warn("Failed to compute entrySet for volume_top_n rule: {}", e.getMessage());
+            return null; // 실패 시 게이팅 없이 기존 동작 유지
+        }
+    }
+
     private void evaluateSymbol(TradingRule rule, RuleDefinition def,
-                                PaperAccount account, String symbol, Instant tickTime) {
+                                PaperAccount account, String symbol, Instant tickTime,
+                                Set<String> entrySet) {
         // Staleness check
         Optional<Instant> maxTs = intradayRepo.findMaxTsBySymbolAndInterval(symbol, "5m");
         if (maxTs.isEmpty() || maxTs.get().isBefore(tickTime.minus(STALENESS_MINUTES, ChronoUnit.MINUTES))) {
@@ -168,7 +203,7 @@ public class LiveEvaluationService {
         Signal signal;
         String snapshotJson = indicatorJson; // default: plain snapshot (no rationale)
         if (posOpt.isPresent()) {
-            // Already holding — check exit
+            // Already holding — check exit (청산은 top-N 무관 항상 평가, SC4)
             double entryPrice = posOpt.get().getAvgPrice().doubleValue();
             EvalResult exitResult = ruleEvaluator.evalExit(def.exit(), closes, volumes, last, entryPrice);
             signal = exitResult.triggered() ? Signal.SELL : Signal.HOLD;
@@ -176,6 +211,11 @@ public class LiveEvaluationService {
                 snapshotJson = mergeRationale(indicatorJson, exitResult, "SELL");
             }
         } else {
+            // 진입 게이팅: volume_top_n 룰이면 top-N 멤버십 체크 (SC4 — 비멤버 진입 차단)
+            if (entrySet != null && !entrySet.contains(symbol)) {
+                log.debug("Entry gated for {}: not in current top-N", symbol);
+                return;
+            }
             // No position — check entry
             EvalResult entryResult = ruleEvaluator.evalEntry(def.entry(), closes, volumes, last);
             signal = entryResult.triggered() ? Signal.BUY : Signal.HOLD;
