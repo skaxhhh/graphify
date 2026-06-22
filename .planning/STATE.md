@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Phase 6.6 Plan 01 완료 — 캔들 바 백엔드 엔드포인트 (GET /bars, CandleBarDto, BarQueryTest)
-stopped_at: Completed 06.6-02-PLAN.md
-last_updated: "2026-06-22T12:50:39.538Z"
+stopped_at: Completed 06.6-03-PLAN.md
+last_updated: "2026-06-22T12:59:17.434Z"
 last_activity: "2026-06-22 — 06.6-01 완료: MarketBarIntraday OHLC getters, CandleBarDto, GET /bars endpoint, BarQueryTest 5/5 green"
 progress:
   total_phases: 11
-  completed_phases: 8
+  completed_phases: 9
   total_plans: 31
-  completed_plans: 30
+  completed_plans: 31
   percent: 72
 ---
 
@@ -70,6 +70,7 @@ Progress: [████████░░] 72% (8/11 phases complete, 29/29 plan
 | Phase 06.5 P05 | 12m | 3 tasks | 7 files |
 | Phase 06.6 P01 | 5m | 3 tasks | 4 files |
 | Phase 06.6 P02 | 6m | 2 tasks | 6 files |
+| Phase 06.6 P03 | 4m | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -159,6 +160,8 @@ Recent decisions affecting current work:
 - [Phase 06.6, 06.6-01]: GET /bars returns full KST day session (no trade-window slicing) — locked decision §2; findBySymbolAndRange orders ts ASC
 - [Phase 06.6]: ColorType.Solid enum (not string literal) required by lightweight-charts v5 TypeScript types
 - [Phase 06.6]: noUncheckedIndexedAccess: bars[i]! non-null assertions for bounds-checked loop access in candleIndicators
+- [Phase 06.6]: CandleSection 4 dark inline states instead of shared/ EmptyState/ErrorBanner — light cream/charcoal tokens incompatible with dark gray-900 page theme (RESEARCH Pitfall 7)
+- [Phase 06.6]: PaperHistoryPage useEffect auto-select triggers on data only (not selected) — single first-load trigger without re-triggering on user row clicks
 
 ### Pending Todos
 
@@ -172,6 +175,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-22T12:50:39.534Z
-Stopped at: Completed 06.6-02-PLAN.md
+Last session: 2026-06-22T12:59:17.430Z
+Stopped at: Completed 06.6-03-PLAN.md
 Resume file: None
