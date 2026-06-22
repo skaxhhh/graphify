@@ -32,6 +32,12 @@ public class TradingRule {
     @Column(nullable = false)
     private String status = "DRAFT";
 
+    @Column(name = "config_status", nullable = false)
+    private String configStatus = "DRAFT";  // DRAFT | ACTIVE
+
+    @Column(name = "run_status", nullable = false)
+    private String runStatus = "STOPPED";   // STOPPED | RUNNING
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
     private String definition;
@@ -125,6 +131,22 @@ public class TradingRule {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getConfigStatus() {
+        return configStatus;
+    }
+
+    public void setConfigStatus(String configStatus) {
+        this.configStatus = configStatus;
+    }
+
+    public String getRunStatus() {
+        return runStatus;
+    }
+
+    public void setRunStatus(String runStatus) {
+        this.runStatus = runStatus;
     }
 
     public void setDefinition(String definition) {
