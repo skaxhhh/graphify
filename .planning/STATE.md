@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.5 Plan 05 완료 — 프론트엔드 2축 역할 분리 + 매매 근거 아코디언
-stopped_at: Phase 6.6 context gathered
-last_updated: "2026-06-22T11:08:03.208Z"
-last_activity: "2026-06-22 — 06.5-05 완료: PaperRulesPage config축, TradingRulesPage run축, TradeRationaleRow 아코디언 (tsc+build 통과)"
+status: Phase 6.6 Plan 01 완료 — 캔들 바 백엔드 엔드포인트 (GET /bars, CandleBarDto, BarQueryTest)
+stopped_at: Completed 06.6-01-PLAN.md
+last_updated: "2026-06-22T12:49:00Z"
+last_activity: "2026-06-22 — 06.6-01 완료: MarketBarIntraday OHLC getters, CandleBarDto, GET /bars endpoint, BarQueryTest green"
 progress:
   total_phases: 11
   completed_phases: 8
-  total_plans: 28
-  completed_plans: 28
-  percent: 71
+  total_plans: 29
+  completed_plans: 29
+  percent: 72
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
-Plan: 06.5-05 완료 → Phase 6.5 전체 완료 (Task 4 checkpoint:human-verify 대기)
-Status: Phase 6.5 Plan 05 완료 — 프론트엔드 2축 역할 분리 + 매매 근거 아코디언
-Last activity: 2026-06-22 — 06.5-05 완료: PaperRulesPage config축, TradingRulesPage run축, TradeRationaleRow 아코디언 (tsc+build 통과)
+Phase: 6.6 (캔들 차트 시각화)
+Plan: 06.6-01 완료 → 06.6-02 진행 예정
+Status: Phase 6.6 Plan 01 완료 — 캔들 바 백엔드 엔드포인트 (GET /bars, CandleBarDto, BarQueryTest)
+Last activity: 2026-06-22 — 06.6-01 완료: MarketBarIntraday OHLC getters, CandleBarDto, GET /bars endpoint, BarQueryTest 5/5 green
 
-Progress: [███████░░░] 71% (8/11 phases complete, 28/28 plans complete)
+Progress: [████████░░] 72% (8/11 phases complete, 29/29 plans complete)
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [███████░░░] 71% (8/11 phases complete, 28/28 plan
 | Phase 06.5 P04 | 6m | 3 tasks | 7 files |
 | Phase 06.5 P03 | 4m | 3 tasks | 5 files |
 | Phase 06.5 P05 | 12m | 3 tasks | 7 files |
+| Phase 06.6 P01 | 5m | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -152,6 +153,9 @@ Recent decisions affecting current work:
 - [Phase 06.5, 06.5-05]: expandedId: 백테스트=배열인덱스(BacktestTrade에 id 없음), 모의이력=t.id
 - [Phase 06.5, 06.5-05]: 마지막 신호 시각 컬럼 생략 — listActive()가 max(signal_log.ts) JOIN 미반환; Phase 7에서 추가
 - [Phase 06.5, 06.5-05]: deactivate guard UI — runStatus=RUNNING 시 비활성화 + tooltip, 백엔드 ERR_LIFECYCLE_006과 동일 의미
+- [Phase 06.6, 06.6-01]: CandleBarDto time = epoch seconds (getEpochSecond) not millis — lightweight-charts requirement (time < 1e11 for current-era dates)
+- [Phase 06.6, 06.6-01]: open/high/low fall back to close when null in CandleBarDto.from() — no null OHLC ever reaches the frontend
+- [Phase 06.6, 06.6-01]: GET /bars returns full KST day session (no trade-window slicing) — locked decision §2; findBySymbolAndRange orders ts ASC
 
 ### Pending Todos
 
