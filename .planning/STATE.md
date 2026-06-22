@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: Phase 6.5 Plan 01 완료 — 2축 상태 모델(config_status/run_status) DB + 서비스 + 테스트 구현
 stopped_at: Completed 06.5-02-PLAN.md
-last_updated: "2026-06-22T06:26:57.435Z"
+last_updated: "2026-06-22T06:27:05.346Z"
 last_activity: "2026-06-22 — 06.5-01 완료: V35 마이그레이션 + activate/deactivate/start/stop 엔드포인트 + RUNNING 가드 + Wave 0 테스트"
 progress:
   total_phases: 11
@@ -134,6 +134,9 @@ Recent decisions affecting current work:
 - [Phase 06.5, 06.5-01]: listActive() PaperLifecycleService 배치 — ACTIVE 필터는 lifecycle 서비스 책임, CRUD 서비스 아님
 - [Phase 06.5, 06.5-01]: STATUSES whitelist DRAFT|ACTIVE only — PAUSED 제거; run_status는 lifecycle 엔드포인트 전용
 - [Phase 06.5, 06.5-01]: RuleResponse에 configStatus/runStatus 추가 — 프론트가 두 화면 역할 분리에 즉시 소비 가능
+- [Phase 06.5]: operandLabel 포맷: 상수=String.valueOf(Double), 지표=IND(period) — crossAbove expr에 방향 포함
+- [Phase 06.5]: evalExit 우선순위: TP→SL→INDICATOR, TP/SL은 exitPct 반환, INDICATOR는 exitPct=null
+- [Phase 06.5]: 기존 entryTriggered/exitTriggered → evalEntry/evalExit 위임, 별도 boolean 로직 제거로 단일 편집 지점 유지
 
 ### Pending Todos
 
