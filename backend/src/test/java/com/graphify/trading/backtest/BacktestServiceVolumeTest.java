@@ -73,7 +73,7 @@ class BacktestServiceVolumeTest {
         BacktestResult fakeResult = new BacktestResult(
                 10_000_000.0, 10_010_000.0, 0.1, 0.0, 100.0, 1,
                 0.1, 0.0, Double.MAX_VALUE, List.of(),
-                List.of(new BacktestResult.TradeDto(dt, "005930", "BUY", 1.0, 10000.0, null)),
+                List.of(new BacktestResult.TradeDto(dt, "005930", null, "BUY", 1.0, 10000.0, null)),
                 List.of(new BacktestResult.EquityPoint(dt, 10_010_000.0))
         );
         when(intradayEngine.run(any(), any(RuleDefinition.class), anyList(), any(), any()))

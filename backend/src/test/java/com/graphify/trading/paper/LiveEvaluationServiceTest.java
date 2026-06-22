@@ -6,6 +6,8 @@ import com.graphify.market.MarketBarIntradayRepository;
 import com.graphify.trading.engine.MarketDataPort;
 import com.graphify.trading.engine.RuleEvaluator;
 import com.graphify.trading.engine.Signal;
+import com.graphify.trading.rule.PaperLiveSymbol;
+import com.graphify.trading.rule.PaperLiveSymbolRepository;
 import com.graphify.trading.rule.TradingRule;
 import com.graphify.trading.rule.TradingRuleRepository;
 import java.math.BigDecimal;
@@ -35,9 +37,11 @@ class LiveEvaluationServiceTest {
     @Mock PaperAccountRepository accountRepo;
     @Mock PaperPositionRepository positionRepo;
     @Mock PaperEquitySnapshotRepository snapshotRepo;
+    @Mock PaperLiveSymbolRepository paperLiveSymbolRepository;
     ObjectMapper objectMapper = new ObjectMapper();
 
     LiveEvaluationService service;
+    static final Long RULE_ID = 1L;
     static final String SYMBOL = "A005930";
     static final Instant NOW = Instant.now();
     static final String RULE_DEF = """
@@ -52,12 +56,28 @@ class LiveEvaluationServiceTest {
     void setUp() {
         service = new LiveEvaluationService(
             ruleRepo, marketDataPort, intradayRepo, ruleEvaluator,
-            executor, accountRepo, positionRepo, snapshotRepo, objectMapper
+            List.of(executor), accountRepo, positionRepo, snapshotRepo, objectMapper,
+            paperLiveSymbolRepository
         );
     }
 
-    private TradingRule paperLiveRule() {
-        return new TradingRule(1L, "Test", "PAPER", "PAPER_LIVE", RULE_DEF);
+    /**
+     * Phase 6.5: RuleStatus.isLiveActive(TradingRule) checks run_status = "RUNNING".
+     * Rule must have runStatus="RUNNING" to be included in evaluation tick.
+     */
+    private TradingRule runningRule() {
+        TradingRule rule = new TradingRule(1L, "Test", "PAPER", "PAPER_LIVE", RULE_DEF);
+        rule.setConfigStatus("ACTIVE");
+        rule.setRunStatus("RUNNING");
+        // Inject id via reflection (no-arg constructor is protected)
+        try {
+            var field = TradingRule.class.getDeclaredField("id");
+            field.setAccessible(true);
+            field.set(rule, RULE_ID);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return rule;
     }
 
     private List<MarketBarIntraday> makeBars(int count, boolean stale) {
@@ -72,6 +92,12 @@ class LiveEvaluationServiceTest {
         return bars;
     }
 
+    /** Stub paperLiveSymbolRepository to return SYMBOL for the rule. */
+    private void stubSymbols() {
+        when(paperLiveSymbolRepository.findByRuleId(RULE_ID))
+            .thenReturn(List.of(new PaperLiveSymbol(RULE_ID, SYMBOL)));
+    }
+
     @Test
     void no_paper_live_rules_skips_everything() {
         when(ruleRepo.findAll()).thenReturn(List.of());
@@ -81,13 +107,15 @@ class LiveEvaluationServiceTest {
 
     @Test
     void entry_triggered_calls_buy() {
-        TradingRule rule = paperLiveRule();
+        TradingRule rule = runningRule();
         when(ruleRepo.findAll()).thenReturn(List.of(rule));
+        stubSymbols();
         when(marketDataPort.recentIntradayBars(SYMBOL)).thenReturn(makeBars(25, false));
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(2, ChronoUnit.MINUTES)));
         when(positionRepo.findByAccountIdAndSymbol(any(), eq(SYMBOL))).thenReturn(Optional.empty());
         when(ruleEvaluator.entryTriggered(any(), any(), any(), anyInt())).thenReturn(true);
+        when(executor.supports(any())).thenReturn(true);
         when(executor.execute(eq(Signal.BUY), any(), eq(SYMBOL), anyDouble(), any(), any()))
             .thenReturn(TradeResult.filled("BUY", SYMBOL, 70000.0, 142.0, null));
         PaperAccount acc = new PaperAccount(1L, BigDecimal.valueOf(10_000_000));
@@ -102,8 +130,9 @@ class LiveEvaluationServiceTest {
 
     @Test
     void exit_triggered_calls_sell() {
-        TradingRule rule = paperLiveRule();
+        TradingRule rule = runningRule();
         when(ruleRepo.findAll()).thenReturn(List.of(rule));
+        stubSymbols();
         when(marketDataPort.recentIntradayBars(SYMBOL)).thenReturn(makeBars(25, false));
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(2, ChronoUnit.MINUTES)));
@@ -111,6 +140,7 @@ class LiveEvaluationServiceTest {
             BigDecimal.valueOf(100), BigDecimal.valueOf(70000));
         when(positionRepo.findByAccountIdAndSymbol(any(), eq(SYMBOL))).thenReturn(Optional.of(pos));
         when(ruleEvaluator.exitTriggered(any(), any(), any(), anyInt(), anyDouble())).thenReturn(true);
+        when(executor.supports(any())).thenReturn(true);
         when(executor.execute(eq(Signal.SELL), any(), eq(SYMBOL), anyDouble(), any(), any()))
             .thenReturn(TradeResult.filled("SELL", SYMBOL, 72000.0, 100.0, 200000.0));
         PaperAccount acc = new PaperAccount(1L, BigDecimal.valueOf(10_000_000));
@@ -125,8 +155,9 @@ class LiveEvaluationServiceTest {
 
     @Test
     void stale_bars_skips_evaluation() {
-        TradingRule rule = paperLiveRule();
+        TradingRule rule = runningRule();
         when(ruleRepo.findAll()).thenReturn(List.of(rule));
+        stubSymbols();
         // Max ts is 30 minutes ago — stale; evaluateSymbol returns early before bars are read
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(30, ChronoUnit.MINUTES)));
@@ -142,8 +173,9 @@ class LiveEvaluationServiceTest {
 
     @Test
     void insufficient_bars_skips_evaluation() {
-        TradingRule rule = paperLiveRule();
+        TradingRule rule = runningRule();
         when(ruleRepo.findAll()).thenReturn(List.of(rule));
+        stubSymbols();
         when(marketDataPort.recentIntradayBars(SYMBOL)).thenReturn(makeBars(5, false));
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(2, ChronoUnit.MINUTES)));
@@ -159,8 +191,9 @@ class LiveEvaluationServiceTest {
 
     @Test
     void equity_snapshot_saved_after_tick() {
-        TradingRule rule = paperLiveRule();
+        TradingRule rule = runningRule();
         when(ruleRepo.findAll()).thenReturn(List.of(rule));
+        stubSymbols();
         when(marketDataPort.recentIntradayBars(SYMBOL)).thenReturn(makeBars(25, false));
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(2, ChronoUnit.MINUTES)));
