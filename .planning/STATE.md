@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.5 Plan 01 완료 — 2축 상태 모델(config_status/run_status) DB + 서비스 + 테스트 구현
-stopped_at: Completed 06.5-02-PLAN.md
-last_updated: "2026-06-22T06:27:05.346Z"
-last_activity: "2026-06-22 — 06.5-01 완료: V35 마이그레이션 + activate/deactivate/start/stop 엔드포인트 + RUNNING 가드 + Wave 0 테스트"
+status: Phase 6.5 Plan 03 완료 — 백테스트 TradeDto rationaleJson 인라인 운반 + buildRationale 헬퍼 + 테스트 3개
+stopped_at: Completed 06.5-03-PLAN.md
+last_updated: "2026-06-22T06:34:00Z"
+last_activity: "2026-06-22 — 06.5-03 완료: PaperLedger.rationaleJson + IntradayBacktestEngine.buildRationale + BacktestServiceIntradayTest 3개 신규 케이스"
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 28
-  completed_plans: 25
+  completed_plans: 26
   percent: 64
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
-Plan: 06.5-01 완료 → 다음: 06.5-02 (프론트엔드 역할 분리 + 아코디언 UI)
-Status: Phase 6.5 Plan 01 완료 — 2축 상태 모델(config_status/run_status) DB + 서비스 + 테스트 구현
-Last activity: 2026-06-22 — 06.5-01 완료: V35 마이그레이션 + activate/deactivate/start/stop 엔드포인트 + RUNNING 가드 + Wave 0 테스트
+Plan: 06.5-03 완료 → 다음: 06.5-04 (모의 거래 rationale 연결)
+Status: Phase 6.5 Plan 03 완료 — 백테스트 TradeDto rationaleJson 인라인 운반 + buildRationale 헬퍼 + 테스트 3개
+Last activity: 2026-06-22 — 06.5-03 완료: PaperLedger.rationaleJson + IntradayBacktestEngine.buildRationale + BacktestServiceIntradayTest 3개 신규 케이스
 
 Progress: [██████░░░░] 64% (7/11 phases complete, 25/28 plans complete)
 
@@ -65,6 +65,7 @@ Progress: [██████░░░░] 64% (7/11 phases complete, 25/28 plan
 | Phase 06 P02 | 2m | 2 tasks | 2 files |
 | Phase 06.5-role-split-trade-rationale P01 | 6m | 3 tasks | 9 files |
 | Phase 06.5 P02 | 8m | 2 tasks | 7 files |
+| Phase 06.5 P03 | 4m | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,9 @@ Recent decisions affecting current work:
 - [Phase 06.5]: operandLabel 포맷: 상수=String.valueOf(Double), 지표=IND(period) — crossAbove expr에 방향 포함
 - [Phase 06.5]: evalExit 우선순위: TP→SL→INDICATOR, TP/SL은 exitPct 반환, INDICATOR는 exitPct=null
 - [Phase 06.5]: 기존 entryTriggered/exitTriggered → evalEntry/evalExit 위임, 별도 boolean 로직 제거로 단일 편집 지점 유지
+- [Phase 06.5, 06.5-03]: PaperLedger.buy()/sell() 오버로드 위임 — no-arg rationale 기존 호출자 하위 호환 유지
+- [Phase 06.5, 06.5-03]: ObjectMapper Spring 빈 주입으로 buildRationale 직렬화 — JsonProcessingException은 log.warn+null 반환으로 백테스트 중단 방지
+- [Phase 06.5, 06.5-03]: 백테스트 rationale = 인라인 운반 (Discretion 4) — TradeRecord → TradeDto 동일 객체 경로, DB 조인 불필요
 
 ### Pending Todos
 
@@ -150,6 +154,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-22T06:26:57.432Z
-Stopped at: Completed 06.5-02-PLAN.md
+Last session: 2026-06-22T06:34:00Z
+Stopped at: Completed 06.5-03-PLAN.md
 Resume file: None
