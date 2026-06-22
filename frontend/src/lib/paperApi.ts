@@ -34,3 +34,20 @@ export async function resumeRule(id: number) {
 export async function copyRule(id: number) {
   return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/copy`, undefined);
 }
+
+// 2-axis lifecycle — Wave 3 (06.5-05)
+export async function activateRule(id: number) {
+  return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/activate`, undefined);
+}
+
+export async function deactivateRule(id: number) {
+  return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/deactivate`, undefined);
+}
+
+export async function startRule(id: number) {
+  return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/start`, undefined);
+}
+
+export async function stopRule(id: number) {
+  return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/stop`, undefined);
+}

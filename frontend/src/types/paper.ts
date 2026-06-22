@@ -48,6 +48,7 @@ export interface PaperTradeHistoryItem {
   price: number;
   fee: number | null;
   pnl: number | null;
+  rationaleJson: string | null;
 }
 
 export interface MonitorData {

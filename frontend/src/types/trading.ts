@@ -50,6 +50,8 @@ export interface RuleDefinition {
 
 export type RuleStatus = "DRAFT" | "ACTIVE" | "PAUSED" | "BACKTESTED" | "PAPER_LIVE" | "LIVE";
 export type RuleMode = "PAPER" | "LIVE";
+export type ConfigStatus = "DRAFT" | "ACTIVE";
+export type RunStatus = "STOPPED" | "RUNNING";
 
 export interface TradingRule {
   id: number;
@@ -61,6 +63,8 @@ export interface TradingRule {
   promotedFrom: number | null;
   createdAt: string;
   updatedAt: string;
+  configStatus: ConfigStatus;
+  runStatus: RunStatus;
 }
 
 export interface RuleUpsertRequest {
@@ -88,6 +92,7 @@ export interface BacktestTrade {
   qty: number;
   price: number;
   pnl: number | null;
+  rationaleJson: string | null;
 }
 
 export interface BacktestEquityPoint {
