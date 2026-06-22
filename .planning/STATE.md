@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.5 Plan 03 완료 — 백테스트 TradeDto rationaleJson 인라인 운반 + buildRationale 헬퍼 + 테스트 3개
-stopped_at: Completed 06.5-03-PLAN.md
-last_updated: "2026-06-22T06:34:00Z"
-last_activity: "2026-06-22 — 06.5-03 완료: PaperLedger.rationaleJson + IntradayBacktestEngine.buildRationale + BacktestServiceIntradayTest 3개 신규 케이스"
+status: Phase 6.5 Plan 04 완료 — 모의 거래 rationale JOIN + MON-05 PRICE_LIMIT_PENDING 감지
+stopped_at: Completed 06.5-04-PLAN.md
+last_updated: "2026-06-22T06:35:37Z"
+last_activity: "2026-06-22 — 06.5-04 완료: LiveEvaluationService.mergeRationale + PaperHistoryService JOIN + PaperExecutor MON-05 PRICE_LIMIT_PENDING"
 progress:
   total_phases: 11
   completed_phases: 7
   total_plans: 28
-  completed_plans: 26
-  percent: 64
+  completed_plans: 27
+  percent: 68
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
-Plan: 06.5-03 완료 → 다음: 06.5-04 (모의 거래 rationale 연결)
-Status: Phase 6.5 Plan 03 완료 — 백테스트 TradeDto rationaleJson 인라인 운반 + buildRationale 헬퍼 + 테스트 3개
-Last activity: 2026-06-22 — 06.5-03 완료: PaperLedger.rationaleJson + IntradayBacktestEngine.buildRationale + BacktestServiceIntradayTest 3개 신규 케이스
+Plan: 06.5-04 완료 → 다음: 06.5-05 (프론트엔드 아코디언 UI)
+Status: Phase 6.5 Plan 04 완료 — 모의 거래 rationale JOIN + MON-05 PRICE_LIMIT_PENDING 감지
+Last activity: 2026-06-22 — 06.5-04 완료: LiveEvaluationService.mergeRationale + PaperHistoryService JOIN + PaperExecutor MON-05 PRICE_LIMIT_PENDING
 
-Progress: [██████░░░░] 64% (7/11 phases complete, 25/28 plans complete)
+Progress: [███████░░░] 68% (7/11 phases complete, 27/28 plans complete)
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [██████░░░░] 64% (7/11 phases complete, 25/28 plan
 | Phase 06 P02 | 2m | 2 tasks | 2 files |
 | Phase 06.5-role-split-trade-rationale P01 | 6m | 3 tasks | 9 files |
 | Phase 06.5 P02 | 8m | 2 tasks | 7 files |
+| Phase 06.5 P04 | 6m | 3 tasks | 7 files |
 | Phase 06.5 P03 | 4m | 3 tasks | 5 files |
 
 ## Accumulated Context
@@ -141,6 +142,10 @@ Recent decisions affecting current work:
 - [Phase 06.5, 06.5-03]: PaperLedger.buy()/sell() 오버로드 위임 — no-arg rationale 기존 호출자 하위 호환 유지
 - [Phase 06.5, 06.5-03]: ObjectMapper Spring 빈 주입으로 buildRationale 직렬화 — JsonProcessingException은 log.warn+null 반환으로 백테스트 중단 방지
 - [Phase 06.5, 06.5-03]: 백테스트 rationale = 인라인 운반 (Discretion 4) — TradeRecord → TradeDto 동일 객체 경로, DB 조인 불필요
+- [Phase 06.5, 06.5-04]: mergeRationale()은 Jackson ObjectNode.set("rationale")로 기존 indicatorSnapshot에 병합 — Plan 03 백테스트와 동일 스키마
+- [Phase 06.5, 06.5-04]: JOIN 키 rule_id+symbol+ts+signal(=side) — 동일 ts BUY+SELL 로그 충돌 방어 (Pitfall 2)
+- [Phase 06.5, 06.5-04]: MON-05 prevDate = tickDate(KST) - 1 calendar day — 주말/공휴일 market_bar 없으면 false(conservative), 체결 허용
+- [Phase 06.5, 06.5-04]: PENDING 7자 = VARCHAR(8) 제약 충족, DB 마이그레이션 불필요
 
 ### Pending Todos
 
@@ -154,6 +159,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-22T06:34:00Z
-Stopped at: Completed 06.5-03-PLAN.md
+Last session: 2026-06-22T06:35:37Z
+Stopped at: Completed 06.5-04-PLAN.md
 Resume file: None
