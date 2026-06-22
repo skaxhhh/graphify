@@ -20,6 +20,7 @@
 - [x] **CHART-01**: 사용자는 백테스트 결과 페이지에서 수익 곡선(equity curve) 라인 차트를 볼 수 있다
 - [x] **CHART-02**: 사용자는 백테스트 결과에서 드로우다운 구간을 수익 곡선 위에 음영으로 확인할 수 있다
 - [x] **CHART-03**: 사용자는 백테스트 결과에서 Sharpe Ratio, Sortino Ratio, Profit Factor를 확인할 수 있다 (서버사이드 계산)
+- [x] **CHART-07**: 사용자는 백테스트 결과 및 모의 거래 이력 화면에서 선택한 거래일의 5분봉 OHLCV를 lightweight-charts 캔들스틱 차트(거래량 서브패널 + 룰 지표선 오버레이)로 보고, 진입/청산 시점을 매수=상향·매도=하향 마커로 확인하며, 거래 행을 클릭해 해당일 캔들로 전환할 수 있다 (Phase 6.6)
 
 ### 실시간 데이터 수집 & 평가 엔진 (LIVE)
 
@@ -124,6 +125,7 @@
 | CHART-01 | Phase 1 | Complete |
 | CHART-02 | Phase 1 | Complete |
 | CHART-03 | Phase 1 | Complete |
+| CHART-07 | Phase 6.6 | Complete |
 | LIVE-01 | Phase 2 | Complete |
 | LIVE-02 | Phase 2 | Complete |
 | LIVE-03 | Phase 2 | Complete |
@@ -153,10 +155,11 @@
 | RULE-04 | Phase 6 | Pending |
 
 **Coverage:**
-- v1 requirements: 34 total (29 original + 5 DATA)
-- Mapped to phases: 34
+- v1 requirements: 35 total (29 original + 5 DATA + 1 CHART-07)
+- Mapped to phases: 35
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-20*
+*Last updated: 2026-06-22 — added CHART-07 (5분봉 캔들 차트, Phase 6.6 INSERTED). Note: Phase 6.6 plans were originally mis-tagged CHART-04/05 (those remain v2 backlog: 월별 수익 히트맵 / 벤치마크 비교선); retagged to CHART-07.*
 *Last updated: 2026-06-20 — RULE-04 moved Phase 4 → Phase 6 (requires Toss auth completion, belongs with LIVE promotion gate)*

@@ -4,7 +4,7 @@ milestone: v1.0
 milestone_name: milestone
 status: Phase 6.6 Plan 01 완료 — 캔들 바 백엔드 엔드포인트 (GET /bars, CandleBarDto, BarQueryTest)
 stopped_at: Completed 06.6-03-PLAN.md
-last_updated: "2026-06-22T12:59:17.434Z"
+last_updated: "2026-06-22T13:22:20.767Z"
 last_activity: "2026-06-22 — 06.6-01 완료: MarketBarIntraday OHLC getters, CandleBarDto, GET /bars endpoint, BarQueryTest 5/5 green"
 progress:
   total_phases: 11
