@@ -1,6 +1,7 @@
 package com.graphify.trading.paper;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphify.market.MarketBarRepository;
 import com.graphify.trading.engine.FillSimulator;
 import com.graphify.trading.engine.Signal;
 import com.graphify.trading.rule.TradingRule;
@@ -8,6 +9,8 @@ import com.graphify.trading.rule.definition.RuleDefinition;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,23 +26,29 @@ public class PaperExecutor implements OrderExecutorPort {
 
     private static final Logger log = LoggerFactory.getLogger(PaperExecutor.class);
 
+    /** KRX 상한가/하한가 변동률 임계: ±29.5% (MON-05) */
+    static final double PRICE_LIMIT_THRESHOLD = 0.295;
+
     private final PaperAccountRepository accountRepo;
     private final PaperPositionRepository positionRepo;
     private final PaperTradeRepository tradeRepo;
     private final PaperSignalLogRepository signalLogRepo;
     private final FillSimulator fillSimulator;
+    private final MarketBarRepository marketBarRepository;
 
     public PaperExecutor(
             PaperAccountRepository accountRepo,
             PaperPositionRepository positionRepo,
             PaperTradeRepository tradeRepo,
             PaperSignalLogRepository signalLogRepo,
-            FillSimulator fillSimulator) {
+            FillSimulator fillSimulator,
+            MarketBarRepository marketBarRepository) {
         this.accountRepo = accountRepo;
         this.positionRepo = positionRepo;
         this.tradeRepo = tradeRepo;
         this.signalLogRepo = signalLogRepo;
         this.fillSimulator = fillSimulator;
+        this.marketBarRepository = marketBarRepository;
     }
 
     @Override
@@ -54,6 +63,13 @@ public class PaperExecutor implements OrderExecutorPort {
         if (signal == Signal.HOLD) {
             saveSignalLog(rule.getId(), symbol, ts, "HOLD", indicatorSnapshotJson, false);
             return TradeResult.skipped("HOLD", symbol, "HOLD");
+        }
+
+        // MON-05: 상한가/하한가 감지 — 체결 불가 종목은 PENDING으로 기록 후 미체결 반환
+        if (isPriceLimitPending(symbol, price, ts)) {
+            log.warn("PRICE_LIMIT_PENDING for {} price={} — skipping execution (MON-05)", symbol, price);
+            saveSignalLog(rule.getId(), symbol, ts, "PENDING", indicatorSnapshotJson, false);
+            return TradeResult.skipped(signal.name(), symbol, "PRICE_LIMIT_PENDING");
         }
 
         PaperAccount account = accountRepo.findByUserId(rule.getUserId())
@@ -144,6 +160,30 @@ public class PaperExecutor implements OrderExecutorPort {
             log.warn("Failed to parse sizing from rule {}: {}", rule.getId(), e.getMessage());
         }
         return 1_000_000.0;
+    }
+
+    /**
+     * MON-05: KRX 상한가/하한가 감지.
+     * 전일 종가(market_bars 일봉)와 비교해 변동률이 ±29.5% 이상이면 체결 불가 상태로 판정.
+     * prevClose 없으면 감지 건너뜀(보수적 처리 — 데이터 누락 시 체결 허용).
+     */
+    boolean isPriceLimitPending(String symbol, double price, Instant ts) {
+        try {
+            // 전일 기준: tick 날짜의 전일 일봉 종가 조회 (KST)
+            LocalDate tickDate = ts.atZone(ZoneId.of("Asia/Seoul")).toLocalDate();
+            LocalDate prevDate = tickDate.minusDays(1);
+            return marketBarRepository.findBySymbolAndTradingDate(symbol, prevDate)
+                    .map(bar -> {
+                        double prevClose = bar.getClose();
+                        if (prevClose <= 0) return false;
+                        double changePct = Math.abs(price - prevClose) / prevClose;
+                        return changePct >= PRICE_LIMIT_THRESHOLD;
+                    })
+                    .orElse(false);
+        } catch (Exception e) {
+            log.warn("Failed to check price limit for {} ({}): {}", symbol, ts, e.getMessage());
+            return false;
+        }
     }
 
     private void saveSignalLog(Long ruleId, String symbol, Instant ts, String signal,
