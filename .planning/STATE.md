@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.5 Plan 04 완료 — 모의 거래 rationale JOIN + MON-05 PRICE_LIMIT_PENDING 감지
-stopped_at: Completed 06.5-04-PLAN.md
-last_updated: "2026-06-22T06:35:37Z"
-last_activity: "2026-06-22 — 06.5-04 완료: LiveEvaluationService.mergeRationale + PaperHistoryService JOIN + PaperExecutor MON-05 PRICE_LIMIT_PENDING"
+status: Phase 6.5 Plan 05 완료 — 프론트엔드 2축 역할 분리 + 매매 근거 아코디언 (Task 4 육안 검증 대기)
+stopped_at: Completed 06.5-05-PLAN.md (checkpoint:human-verify Task 4 pending)
+last_updated: "2026-06-22T06:55:00Z"
+last_activity: "2026-06-22 — 06.5-05 완료: PaperRulesPage config축, TradingRulesPage run축, TradeRationaleRow 아코디언 (tsc+build 통과)"
 progress:
   total_phases: 11
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 28
-  completed_plans: 27
-  percent: 68
+  completed_plans: 28
+  percent: 71
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
-Plan: 06.5-04 완료 → 다음: 06.5-05 (프론트엔드 아코디언 UI)
-Status: Phase 6.5 Plan 04 완료 — 모의 거래 rationale JOIN + MON-05 PRICE_LIMIT_PENDING 감지
-Last activity: 2026-06-22 — 06.5-04 완료: LiveEvaluationService.mergeRationale + PaperHistoryService JOIN + PaperExecutor MON-05 PRICE_LIMIT_PENDING
+Plan: 06.5-05 완료 → Phase 6.5 전체 완료 (Task 4 checkpoint:human-verify 대기)
+Status: Phase 6.5 Plan 05 완료 — 프론트엔드 2축 역할 분리 + 매매 근거 아코디언
+Last activity: 2026-06-22 — 06.5-05 완료: PaperRulesPage config축, TradingRulesPage run축, TradeRationaleRow 아코디언 (tsc+build 통과)
 
-Progress: [███████░░░] 68% (7/11 phases complete, 27/28 plans complete)
+Progress: [███████░░░] 71% (8/11 phases complete, 28/28 plans complete)
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Progress: [███████░░░] 68% (7/11 phases complete, 27/28 plan
 | Phase 06.5 P02 | 8m | 2 tasks | 7 files |
 | Phase 06.5 P04 | 6m | 3 tasks | 7 files |
 | Phase 06.5 P03 | 4m | 3 tasks | 5 files |
+| Phase 06.5 P05 | 12m | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,11 @@ Recent decisions affecting current work:
 - [Phase 06.5, 06.5-04]: JOIN 키 rule_id+symbol+ts+signal(=side) — 동일 ts BUY+SELL 로그 충돌 방어 (Pitfall 2)
 - [Phase 06.5, 06.5-04]: MON-05 prevDate = tickDate(KST) - 1 calendar day — 주말/공휴일 market_bar 없으면 false(conservative), 체결 허용
 - [Phase 06.5, 06.5-04]: PENDING 7자 = VARCHAR(8) 제약 충족, DB 마이그레이션 불필요
+- [Phase 06.5, 06.5-05]: configStatus ?? 'DRAFT' fallback — V35 마이그레이션 이전 레거시 룰 방어
+- [Phase 06.5, 06.5-05]: parseRationale() 이중 포맷 — 백테스트 직접 root vs 모의 indicatorSnapshot 래퍼 양쪽 처리
+- [Phase 06.5, 06.5-05]: expandedId: 백테스트=배열인덱스(BacktestTrade에 id 없음), 모의이력=t.id
+- [Phase 06.5, 06.5-05]: 마지막 신호 시각 컬럼 생략 — listActive()가 max(signal_log.ts) JOIN 미반환; Phase 7에서 추가
+- [Phase 06.5, 06.5-05]: deactivate guard UI — runStatus=RUNNING 시 비활성화 + tooltip, 백엔드 ERR_LIFECYCLE_006과 동일 의미
 
 ### Pending Todos
 
