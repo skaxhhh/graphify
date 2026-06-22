@@ -18,9 +18,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 룰 생애주기 상태 머신.
- * DRAFT → (backtested=true 조건) → PAPER_LIVE → PAUSED → PAPER_LIVE
- * LIVE → 편집 불가 (DRAFT 복사본 생성 경로만 허용)
+ * 룰 생애주기 상태 머신 (Phase 6.5: 2축 상태 모델).
+ * config_status: DRAFT ↔ ACTIVE  (설정축)
+ * run_status:    STOPPED ↔ RUNNING (운영축)
+ *
+ * 전이 규칙:
+ *   activate:   DRAFT → ACTIVE (백테스트 게이트 없음)
+ *   deactivate: ACTIVE/STOPPED → DRAFT (RUNNING이면 차단)
+ *   start:      ACTIVE/STOPPED → ACTIVE/RUNNING (paperLiveSymbols 재할당)
+ *   stop:       ACTIVE/RUNNING → ACTIVE/STOPPED (config ACTIVE 유지)
+ *   copy:        모든 상태 → DRAFT 복사본 생성 (변경 없음)
  */
 @Service
 @Transactional
@@ -44,57 +51,93 @@ public class PaperLifecycleService {
         this.marketData = marketData;
     }
 
-    /** DRAFT → PAPER_LIVE (백테스트 완료 조건 필요) */
-    public RuleResponse promote(Long userId, Long ruleId) {
+    // ─── 신규 2축 메서드 ────────────────────────────────────────────────────────
+
+    /** config축: DRAFT → ACTIVE. 백테스트 게이트 없음 (RULE-01 폐지). */
+    public RuleResponse activate(Long userId, Long ruleId) {
         TradingRule rule = findOwned(userId, ruleId);
-        if (!"DRAFT".equals(rule.getStatus()) && !"BACKTESTED".equals(rule.getStatus())) {
+        if (!"DRAFT".equals(rule.getConfigStatus())) {
             throw new GraphifyException("ERR_LIFECYCLE_001",
-                "DRAFT 또는 BACKTESTED 상태인 룰만 PAPER_LIVE로 승격할 수 있습니다.", HttpStatus.BAD_REQUEST);
+                "DRAFT 상태인 룰만 ACTIVE로 전환할 수 있습니다.", HttpStatus.BAD_REQUEST);
         }
-        if (!rule.isBacktested()) {
-            throw new GraphifyException("ERR_LIFECYCLE_002",
-                "백테스트를 1회 이상 실행한 룰만 PAPER_LIVE로 승격할 수 있습니다.", HttpStatus.BAD_REQUEST);
+        rule.setConfigStatus("ACTIVE");
+        return toResponse(ruleRepo.save(rule));
+    }
+
+    /** config축: ACTIVE/STOPPED → DRAFT. RUNNING이면 먼저 stop 필요. */
+    public RuleResponse deactivate(Long userId, Long ruleId) {
+        TradingRule rule = findOwned(userId, ruleId);
+        if (!"ACTIVE".equals(rule.getConfigStatus())) {
+            throw new GraphifyException("ERR_LIFECYCLE_001",
+                "ACTIVE 상태인 룰만 DRAFT로 하향할 수 있습니다.", HttpStatus.BAD_REQUEST);
+        }
+        if ("RUNNING".equals(rule.getRunStatus())) {
+            throw new GraphifyException("ERR_LIFECYCLE_006",
+                "RUNNING 중인 룰은 하향할 수 없습니다. 먼저 중지하세요.", HttpStatus.BAD_REQUEST);
+        }
+        rule.setConfigStatus("DRAFT");
+        return toResponse(ruleRepo.save(rule));
+    }
+
+    /** run축: ACTIVE/STOPPED → ACTIVE/RUNNING. paperLiveSymbols 재할당. */
+    public RuleResponse start(Long userId, Long ruleId) {
+        TradingRule rule = findOwned(userId, ruleId);
+        if (!"ACTIVE".equals(rule.getConfigStatus())) {
+            throw new GraphifyException("ERR_LIFECYCLE_007",
+                "ACTIVE 상태인 룰만 시작할 수 있습니다.", HttpStatus.BAD_REQUEST);
+        }
+        if ("RUNNING".equals(rule.getRunStatus())) {
+            throw new GraphifyException("ERR_LIFECYCLE_008",
+                "이미 RUNNING 상태인 룰입니다.", HttpStatus.BAD_REQUEST);
         }
         List<String> symbols = resolveSymbols(rule);
         if (symbols.isEmpty()) {
             throw new GraphifyException("ERR_LIFECYCLE_005",
-                "승격할 룰의 유니버스 종목을 확인할 수 없습니다. 먼저 종목 데이터를 수집하세요.", HttpStatus.BAD_REQUEST);
+                "룰의 유니버스 종목을 확인할 수 없습니다. 먼저 종목 데이터를 수집하세요.", HttpStatus.BAD_REQUEST);
         }
-        rule.setStatus("PAPER_LIVE");
+        rule.setRunStatus("RUNNING");
         TradingRule saved = ruleRepo.save(rule);
         paperLiveSymbolService.assignSymbols(saved.getId(), symbols);
         return toResponse(saved);
     }
 
-    /** PAPER_LIVE → PAUSED */
-    public RuleResponse pause(Long userId, Long ruleId) {
+    /** run축: ACTIVE/RUNNING → ACTIVE/STOPPED. config ACTIVE 유지 (PAUSED 없음). */
+    public RuleResponse stop(Long userId, Long ruleId) {
         TradingRule rule = findOwned(userId, ruleId);
-        if (!"PAPER_LIVE".equals(rule.getStatus())) {
-            throw new GraphifyException("ERR_LIFECYCLE_003",
-                "PAPER_LIVE 상태인 룰만 일시 정지할 수 있습니다.", HttpStatus.BAD_REQUEST);
+        if (!"RUNNING".equals(rule.getRunStatus())) {
+            throw new GraphifyException("ERR_LIFECYCLE_009",
+                "RUNNING 상태인 룰만 중지할 수 있습니다.", HttpStatus.BAD_REQUEST);
         }
-        rule.setStatus("PAUSED");
+        rule.setRunStatus("STOPPED");
         TradingRule saved = ruleRepo.save(rule);
         paperLiveSymbolService.deactivateRule(saved.getId());
         return toResponse(saved);
     }
 
-    /** PAUSED → PAPER_LIVE */
+    // ─── 기존 메서드 (deprecated — 신규 메서드로 위임) ──────────────────────────
+
+    /**
+     * @deprecated promote → activate 사용 권장.
+     */
+    @Deprecated
+    public RuleResponse promote(Long userId, Long ruleId) {
+        return activate(userId, ruleId);
+    }
+
+    /**
+     * @deprecated pause → stop 사용 권장.
+     */
+    @Deprecated
+    public RuleResponse pause(Long userId, Long ruleId) {
+        return stop(userId, ruleId);
+    }
+
+    /**
+     * @deprecated resume → start 사용 권장.
+     */
+    @Deprecated
     public RuleResponse resume(Long userId, Long ruleId) {
-        TradingRule rule = findOwned(userId, ruleId);
-        if (!"PAUSED".equals(rule.getStatus())) {
-            throw new GraphifyException("ERR_LIFECYCLE_004",
-                "PAUSED 상태인 룰만 재개할 수 있습니다.", HttpStatus.BAD_REQUEST);
-        }
-        List<String> symbols = resolveSymbols(rule);
-        if (symbols.isEmpty()) {
-            throw new GraphifyException("ERR_LIFECYCLE_005",
-                "승격할 룰의 유니버스 종목을 확인할 수 없습니다. 먼저 종목 데이터를 수집하세요.", HttpStatus.BAD_REQUEST);
-        }
-        rule.setStatus("PAPER_LIVE");
-        TradingRule saved = ruleRepo.save(rule);
-        paperLiveSymbolService.assignSymbols(saved.getId(), symbols);
-        return toResponse(saved);
+        return start(userId, ruleId);
     }
 
     /** 모든 상태 → DRAFT 복사본 생성. 원본 symbols는 유지 (copy는 비파괴적). */
@@ -112,7 +155,7 @@ public class PaperLifecycleService {
 
     /**
      * 룰의 유니버스 정의로부터 종목 목록을 결정한다. mode/status 무관 (SEAM 3).
-     * Phase 6 LIVE 승격도 이 메서드를 재사용한다.
+     * Phase 8 LIVE 승격도 이 메서드를 재사용한다.
      *
      * volume_top_n: symbolsByMarket(market) ∪ additionalSymbols 전체 후보군 반환
      * symbols/watchlist: u.symbols() 그대로 반환
@@ -153,7 +196,9 @@ public class PaperLifecycleService {
         }
         return new RuleResponse(
             rule.getId(), rule.getName(), rule.getMode(), rule.getStatus(),
-            rule.isBacktested(), definition, rule.getPromotedFrom(), rule.getCreatedAt(), rule.getUpdatedAt()
+            rule.isBacktested(), definition, rule.getPromotedFrom(),
+            rule.getCreatedAt(), rule.getUpdatedAt(),
+            rule.getConfigStatus(), rule.getRunStatus()
         );
     }
 }

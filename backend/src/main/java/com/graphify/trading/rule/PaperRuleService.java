@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaperRuleService {
 
     private static final String MODE = "PAPER";
-    private static final Set<String> STATUSES = Set.of("DRAFT", "ACTIVE", "PAUSED");
+    // config_status 허용 값만 포함. run_status는 lifecycle 엔드포인트에서만 변경 가능 (Pitfall 5).
+    private static final Set<String> STATUSES = Set.of("DRAFT", "ACTIVE");
 
     private final TradingRuleRepository ruleRepository;
     private final RuleDefinitionValidator validator;
@@ -65,9 +66,15 @@ public class PaperRuleService {
     @Transactional
     public ApiResponse<RuleResponse> update(Long id, RuleUpsertRequest request) {
         TradingRule rule = findOwned(id);
+        // RUNNING 중인 룰은 편집 차단 (RULE-08)
+        if ("RUNNING".equals(rule.getRunStatus())) {
+            throw new GraphifyException("ERR_RULE_006",
+                "RUNNING 중인 룰은 수정할 수 없습니다. 먼저 중지하세요.", HttpStatus.BAD_REQUEST);
+        }
         rule.setName(normalizeName(request.name()));
         rule.setStatus(normalizeStatus(request.status()));
         rule.setDefinition(validateAndSerialize(request.definition()));
+        // run_status는 CRUD에서 변경하지 않음 — lifecycle 엔드포인트 전용
         return ApiResponse.ok(toResponse(ruleRepository.save(rule)));
     }
 
@@ -144,7 +151,9 @@ public class PaperRuleService {
                 definition,
                 rule.getPromotedFrom(),
                 rule.getCreatedAt(),
-                rule.getUpdatedAt()
+                rule.getUpdatedAt(),
+                rule.getConfigStatus(),
+                rule.getRunStatus()
         );
     }
 }

@@ -12,6 +12,8 @@ public record RuleResponse(
         JsonNode definition,
         Long promotedFrom,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String configStatus,
+        String runStatus
 ) {
 }
