@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.5 Plan 05 완료 — 프론트엔드 2축 역할 분리 + 매매 근거 아코디언 (Task 4 육안 검증 대기)
-stopped_at: Completed 06.5-05-PLAN.md (checkpoint:human-verify Task 4 pending)
-last_updated: "2026-06-22T06:55:00Z"
+status: Phase 6.5 Plan 05 완료 — 프론트엔드 2축 역할 분리 + 매매 근거 아코디언
+stopped_at: Completed 06.5-04-PLAN.md
+last_updated: "2026-06-22T09:33:38.455Z"
 last_activity: "2026-06-22 — 06.5-05 완료: PaperRulesPage config축, TradingRulesPage run축, TradeRationaleRow 아코디언 (tsc+build 통과)"
 progress:
   total_phases: 11
