@@ -25,7 +25,8 @@ public record BacktestResult(
             String side,
             double qty,
             double price,
-            Double pnl
+            Double pnl,
+            String rationaleJson
     ) {}
 
     public record EquityPoint(LocalDateTime datetime, double equity) {}

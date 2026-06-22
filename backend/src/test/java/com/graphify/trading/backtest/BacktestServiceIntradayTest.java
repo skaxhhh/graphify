@@ -52,7 +52,7 @@ class BacktestServiceIntradayTest {
         // A single profitable SELL trade
         List<BacktestResult.TradeDto> trades = List.of(
             new BacktestResult.TradeDto(
-                    base.plusMinutes(5), "005930.KS", null, "SELL", 1.0, 75000.0, 5000.0)
+                    base.plusMinutes(5), "005930.KS", null, "SELL", 1.0, 75000.0, 5000.0, null)
         );
 
         double sharpe   = IntradayBacktestEngine.computeSharpeRatio(curve);

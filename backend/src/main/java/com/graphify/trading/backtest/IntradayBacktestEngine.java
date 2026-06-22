@@ -239,7 +239,7 @@ public class IntradayBacktestEngine {
         for (PaperLedger.TradeRecord t : ledger.trades()) {
             LocalDateTime dt = t.date().atStartOfDay(); // date-only → use start of day
             trades.add(new BacktestResult.TradeDto(dt, t.symbol(), nameBySymbol.get(t.symbol()),
-                    t.side(), t.qty(), t.price(), t.pnl()));
+                    t.side(), t.qty(), t.price(), t.pnl(), t.rationaleJson()));
             if ("SELL".equals(t.side())) {
                 sells++;
                 if (t.pnl() != null && t.pnl() > 0) {
