@@ -14,6 +14,7 @@
 - [x] **DATA-03**: `RuleDefinition.Universe`는 `"volume_top_n"` 타입과 선택적 `additionalSymbols`를 지원한다 (예: `{"type":"volume_top_n","market":"KOSPI","topN":10,"additionalSymbols":[]}`)
 - [x] **DATA-04**: 백테스트 시 `volume_top_n` 유니버스는 각 거래일별로 market_bars의 KOSPI 종목 중 거래량 상위 10종목을 동적으로 선정한다 (날짜마다 유니버스가 달라짐)
 - [x] **DATA-05**: `BacktestService`의 volume null 전달 버그를 수정한다 — 이미 DB에 저장된 volume 값이 `RuleEvaluator`에 올바르게 전달되어야 한다
+- [x] **DATA-06**: `volume_top_n` 룰이 "그날(현재 시점까지 누적) 거래량 상위 종목"을 실시간으로 동적 선정한다. KRX MDC 거래량 순위(JSON)를 횡단면 소스로 도입하고, 전체 KOSPI 보통주 중 거래량 상위 N을 선정하되 ETF/ETN/우선주/관리종목을 제외한다. 백테스트(DB 일봉)·라이브(인트라데이 누적)를 `VolumeRankingProvider` 포트로 통일하며, 라이브는 주기적 재선정하되 보유 포지션 청산 평가는 유지한다 (Phase 6.7)
 
 ### 백테스트 시각화 (CHART)
 
@@ -122,6 +123,7 @@
 | DATA-03 | Phase 0 | Complete |
 | DATA-04 | Phase 0 | Complete |
 | DATA-05 | Phase 0 | Complete |
+| DATA-06 | Phase 6.7 | Complete |
 | CHART-01 | Phase 1 | Complete |
 | CHART-02 | Phase 1 | Complete |
 | CHART-03 | Phase 1 | Complete |
