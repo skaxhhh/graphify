@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.6 Plan 01 완료 — 캔들 바 백엔드 엔드포인트 (GET /bars, CandleBarDto, BarQueryTest)
-stopped_at: Completed 06.6-03-PLAN.md
-last_updated: "2026-06-22T13:22:20.767Z"
-last_activity: "2026-06-22 — 06.6-01 완료: MarketBarIntraday OHLC getters, CandleBarDto, GET /bars endpoint, BarQueryTest 5/5 green"
+status: Phase 6.7 Plan 01 완료 — VolumeRankingProvider 포트 + DbVolumeRankingAdapter + V36 마이그레이션; KRX 스파이크: auth-wall → Plan 02 Yahoo fallback
+stopped_at: Completed 06.7-01-PLAN.md (checkpoint reached — KRX spike evidence recorded)
+last_updated: "2026-06-22T15:11:00Z"
+last_activity: "2026-06-22 — 06.7-01 완료: V36 instrument_type 마이그레이션, VolumeRankingProvider 포트, DbVolumeRankingAdapter TDD 3/3 green, KRX spike auth-wall 확인 → Yahoo fallback 권장"
 progress:
   total_phases: 11
   completed_phases: 9
-  total_plans: 31
-  completed_plans: 31
-  percent: 72
+  total_plans: 32
+  completed_plans: 32
+  percent: 74
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6.6 (캔들 차트 시각화)
-Plan: 06.6-01 완료 → 06.6-02 진행 예정
-Status: Phase 6.6 Plan 01 완료 — 캔들 바 백엔드 엔드포인트 (GET /bars, CandleBarDto, BarQueryTest)
-Last activity: 2026-06-22 — 06.6-01 완료: MarketBarIntraday OHLC getters, CandleBarDto, GET /bars endpoint, BarQueryTest 5/5 green
+Phase: 6.7 (실시간 거래량 상위 유니버스)
+Plan: 06.7-01 완료 (checkpoint) → 06.7-02 진행 예정 (Yahoo fallback live adapter)
+Status: Phase 6.7 Plan 01 완료 — VolumeRankingProvider 포트 + DbVolumeRankingAdapter + V36 마이그레이션; KRX 스파이크: auth-wall → Plan 02 Yahoo fallback
+Last activity: 2026-06-22 — 06.7-01 완료: V36 instrument_type 마이그레이션, VolumeRankingProvider 포트, DbVolumeRankingAdapter TDD 3/3 green, KRX spike auth-wall 확인
 
-Progress: [████████░░] 72% (8/11 phases complete, 29/29 plans complete)
+Progress: [████████░░] 74% (9/11 phases complete, 32/32 plans complete)
 
 ## Performance Metrics
 
@@ -73,6 +73,10 @@ Progress: [████████░░] 72% (8/11 phases complete, 29/29 plan
 | Phase 06.6 P03 | 4m | 4 tasks | 4 files |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 6.7 inserted after Phase 6 (effectively after 6.6): 실시간 거래량 상위 유니버스 (KRX 거래량 순위 연동) (URGENT). volume_top_n을 당일 인트라데이 누적 거래량으로 실시간 동적 선정 — 소스 KRX MDC JSON, 전체 KOSPI 보통주 −ETF/ETN, VolumeRankingProvider 포트. 신규 요건 DATA-06. (2026-06-22)
 
 ### Decisions
 
@@ -155,6 +159,9 @@ Recent decisions affecting current work:
 - [Phase 06.5, 06.5-05]: expandedId: 백테스트=배열인덱스(BacktestTrade에 id 없음), 모의이력=t.id
 - [Phase 06.5, 06.5-05]: 마지막 신호 시각 컬럼 생략 — listActive()가 max(signal_log.ts) JOIN 미반환; Phase 7에서 추가
 - [Phase 06.5, 06.5-05]: deactivate guard UI — runStatus=RUNNING 시 비활성화 + tooltip, 백엔드 ERR_LIFECYCLE_006과 동일 의미
+- [Phase 06.7, 06.7-01]: KRX getJsonData.cmd blocked (HTTP 400 LOGOUT) — requires KRX_ID/KRX_PW session; Plan 02 live adapter uses Yahoo 5m cumulative fallback (reachability/auth gate failed)
+- [Phase 06.7, 06.7-01]: DbVolumeRankingAdapter NOT @Primary — coexists with live adapter; findTopVolumeByMarketOnDate uses instrument_type='COMMON_STOCK' (no in_kospi200 restriction — Pitfall 4 fix)
+- [Phase 06.7, 06.7-01]: Intraday freshness verification (KRX ACC_TRDVOL update cadence) deferred to market-hours (09:00–15:30 KST) manual check — cannot verify off-hours
 - [Phase 06.6, 06.6-01]: CandleBarDto time = epoch seconds (getEpochSecond) not millis — lightweight-charts requirement (time < 1e11 for current-era dates)
 - [Phase 06.6, 06.6-01]: open/high/low fall back to close when null in CandleBarDto.from() — no null OHLC ever reaches the frontend
 - [Phase 06.6, 06.6-01]: GET /bars returns full KST day session (no trade-window slicing) — locked decision §2; findBySymbolAndRange orders ts ASC
@@ -175,6 +182,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-22T12:59:17.430Z
-Stopped at: Completed 06.6-03-PLAN.md
+Last session: 2026-06-22T15:11:00Z
+Stopped at: Completed 06.7-01-PLAN.md (checkpoint — KRX spike evidence recorded, awaiting Plan 02 strategy decision)
 Resume file: None
