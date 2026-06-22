@@ -2,7 +2,7 @@
 
 ## Overview
 
-부분 구현된 모의투자(백테스트 엔진 + 룰 CRUD)를 완전한 서비스로 고도화하고, 검증된 룰을 토스증권 Open API를 통해 실투자로 승격시키는 엔드-투-엔드 파이프라인을 완성한다. 핵심 설계: **거래량 상위 KOSPI 10종목**을 자동으로 유니버스로 선정하여 백테스트·모의투자를 실행한다. 데이터 인프라 & 동적 유니버스(Phase 0) → 백테스트 시각화(Phase 1) → 실시간 데이터 수집 인프라(Phase 2) → PAPER_LIVE 평가 엔진(Phase 3) → 대시보드·룰 생애주기·모니터·리포트 UI(Phase 4) → 토스증권 OAuth 연동(Phase 5) → 룰 빌더 UI(Phase 6) → 실투자 주문 실행(Phase 7) 순으로 의존성에 따라 빌드한다.
+부분 구현된 모의투자(백테스트 엔진 + 룰 CRUD)를 완전한 서비스로 고도화하고, 검증된 룰을 토스증권 Open API를 통해 실투자로 승격시키는 엔드-투-엔드 파이프라인을 완성한다. 핵심 설계: **거래량 상위 KOSPI 10종목**을 자동으로 유니버스로 선정하여 백테스트·모의투자를 실행하며, TradingView webhook으로 외부 지표 신호를 받아 모의/실투자에 활용한다. 데이터 인프라 & 동적 유니버스(Phase 0) → 백테스트 시각화(Phase 1) → 실시간 데이터 수집 인프라(Phase 2) → PAPER_LIVE 평가 엔진(Phase 3) → 대시보드·룰 생애주기·모니터·리포트 UI(Phase 4) → 토스증권 OAuth 연동(Phase 5) → 룰 빌더 UI(Phase 6) → 룰 설정/라이프사이클 역할 분리(Phase 6.5) → 5분봉 캔들 차트 시각화(Phase 6.6) → TradingView webhook 연동(Phase 7) → 실투자 주문 실행(Phase 8) 순으로 의존성에 따라 빌드한다.
 
 ## Phases
 
@@ -17,7 +17,10 @@
 - [x] **Phase 4: 대시보드·룰 생애주기·모니터·리포트 UI** - 모의 대시보드, 룰 상태 전환 UI, 실시간 모니터, 성과 리포트 페이지를 완성한다 (completed 2026-06-21)
 - [x] **Phase 5: 토스증권 OAuth & 자격증명 관리** - 토스증권 client_id/secret 암호화 저장, 토큰 자동 발급·갱신, 실계좌 잔고 조회를 구현한다 (completed 2026-06-21)
 - [ ] **Phase 6: 룰 빌더 UI** - JSON 직접 입력 대신 드롭다운/폼으로 유니버스·진입/청산 조건·사이징을 시각적으로 구성할 수 있는 룰 빌더 UI를 구현한다
-- [ ] **Phase 7: 실투자 주문 실행 & LIVE 승격** - LIVE 룰 평가에 따른 토스증권 실제 주문 발행, 시세 연동, 서킷 브레이커를 구현한다
+- [ ] **Phase 6.5: 룰 설정/라이프사이클 역할 분리 & 매매 근거** (INSERTED) - 모의 룰 설정(DRAFT↔ACTIVE 관리)과 룰 라이프사이클(ACTIVE 중 PAPER_LIVE 적용 여부 + 시작/중지)의 역할을 분리하고, 백테스트·매매 이력에 매수/매도 근거(트리거 조건·지표값)를 표시한다
+- [ ] **Phase 6.6: 5분봉 캔들 차트 시각화** (INSERTED) - lightweight-charts로 수익곡선 아래 5분봉 OHLCV 캔들 차트를 렌더링하고 진입/청산 시점을 마커로 표시한다
+- [ ] **Phase 7: TradingView webhook 연동** - 새 룰 타입(TRADINGVIEW)을 추가해 TradingView alert webhook을 비동기로 수신하고, JSON/LLM 파서로 매수/매도 신호를 해석하여 PAPER_LIVE 가상 체결에 활용한다. 사전 등록된 KOSPI 시총 상위 종목 풀에서 종목을 선택한다
+- [ ] **Phase 8: 실투자 주문 실행 & LIVE 승격** - LIVE 룰 평가에 따른 토스증권 실제 주문 발행, 시세 연동, 서킷 브레이커를 구현한다
 
 ## Phase Details
 
@@ -138,9 +141,57 @@ Plans:
 - [x] 06-01-PLAN.md — RuleBuilderPage (유니버스·진입·청산·사이징·쿨다운 섹션) + trading.ts 타입 확장 + toDefinition/fromDefinition 직렬화 로직
 - [x] 06-02-PLAN.md — router에 paper/rules/new·edit/:id 추가 + PaperRulesPage 모달 제거·navigate 전환 + 복제 버튼(RULE-06) + 쿨다운 컬럼(RULE-07)
 
-### Phase 7: 실투자 주문 실행 & LIVE 승격
-**Goal**: LIVE 룰 평가 결과에 따라 토스증권 REST API로 실제 매수/매도 주문을 발행하고, 실시간 시세를 LIVE 평가에 활용하며, API 연속 실패 시 서킷 브레이커로 주문을 안전하게 중단한다
+### Phase 6.5: 룰 설정/라이프사이클 역할 분리 & 매매 근거 (INSERTED)
+**Goal**: 모의 룰 설정 화면과 룰 라이프사이클 화면의 역할을 명확히 분리한다. 모의 룰 설정은 룰 CRUD와 DRAFT↔ACTIVE 상태 관리를 담당하고, 룰 라이프사이클은 ACTIVE 룰만 노출하되 각 룰이 현재 PAPER_LIVE로 적용 중인지(실행/중지) 여부를 구분해 보여주고 시작/중지를 제어한다. 추가로 백테스트·모의 매매 이력에 각 매수/매도가 어떤 조건(트리거 룰·지표값)으로 발생했는지 근거를 표시한다
 **Depends on**: Phase 6
+**Requirements**: RULE-08, RULE-09, MON-05
+**Success Criteria** (what must be TRUE):
+  1. 모의 룰 설정(PaperRulesPage)은 모든 상태의 룰을 나열하고 DRAFT↔ACTIVE 상태 전환을 관리하며, PAPER_LIVE 실행/중지 제어는 노출하지 않는다
+  2. 룰 라이프사이클 화면은 ACTIVE 상태 룰만 표시하고, 각 룰이 PAPER_LIVE 적용 중인지(실행 중/중지됨) 배지로 구분하며 시작/중지 버튼을 제공한다
+  3. 두 화면이 동일 상태를 중복 표시하지 않으며 역할 경계가 명확하다
+  4. 백테스트 매매 이력의 각 거래에 매수/매도 트리거 근거(충족된 진입/청산 조건 + 그 시점 지표값)가 표시된다
+  5. 모의(PAPER_LIVE) 매매 이력에도 동일하게 신호 근거가 표시된다
+**Plans**: 5 plans (3 waves)
+
+Plans:
+- [ ] 06.5-01-PLAN.md — 2축 상태 모델(V35) + PaperLifecycleService activate/start/stop 재구성 + RULE-08 전이 가드
+- [ ] 06.5-02-PLAN.md — RuleEvaluator EvalResult 리치 반환 타입 (조건별 값 + 청산 사유) [TDD]
+- [ ] 06.5-03-PLAN.md — 백테스트 엔진 근거 포착 + TradeDto rationaleJson 인라인 운반
+- [ ] 06.5-04-PLAN.md — 모의 근거 병합(LiveEvaluationService) + paper_trades↔signal_log JOIN + MON-05 PRICE_LIMIT_PENDING
+- [ ] 06.5-05-PLAN.md — 프론트 역할 분리(설정/운영) + TradeRationaleRow 아코디언(백테스트+모의)
+
+### Phase 6.6: 5분봉 캔들 차트 시각화 (INSERTED)
+**Goal**: 백테스트 결과 화면에서 기존 수익곡선 차트 아래에, 선택한 거래일의 5분봉 OHLCV를 캔들스틱 차트로 렌더링한다. x축은 세션 시작/종료 시간, y축은 가격이며, 룰이 진입/청산한 시점을 차트 위에 마커로 표시한다. 차트 라이브러리는 lightweight-charts(Apache 2.0)를 사용한다
+**Depends on**: Phase 6.5
+**Requirements**: CHART-04, CHART-05
+**Success Criteria** (what must be TRUE):
+  1. lightweight-charts가 프론트엔드에 도입되고 5분봉 캔들 차트 컴포넌트가 추가된다
+  2. 백테스트 결과의 일자별 5분봉(09:00–12:00 등 세션 구간)이 캔들스틱으로 렌더링된다 (x=시간, y=가격)
+  3. 백테스트에서 발생한 매수/매도 시점이 캔들 차트 위에 마커(매수=상향/매도=하향)로 표시된다
+  4. 캔들 차트가 기존 수익곡선 차트 아래에 배치된다
+  5. 거래일이 여러 날인 경우 날짜를 선택해 해당일 5분봉을 볼 수 있다
+**Plans**: TBD (plan-phase에서 분해)
+
+### Phase 7: TradingView webhook 연동
+**Goal**: TradingView를 외부 신호 소스로 연동한다. 새 룰 타입(TRADINGVIEW)을 추가해, TradingView alert가 호출하는 webhook을 비동기로 수신(3초 타임아웃 회피)하고, 페이로드를 JSON 우선·실패 시 LLM(Claude API) fallback으로 파싱해 매수/매도 신호를 해석한 뒤 PAPER_LIVE 가상 체결에 반영한다. 종목은 시스템에 사전 등록된 KOSPI 시총 상위 종목 풀에서 선택하며, TradingView alert 등록은 사용자가 수동으로 수행한다(공식 API 없음). 백테스트는 기존 CUSTOM 룰 엔진을 그대로 사용한다(TradingView Strategy Tester 결과는 fetch 불가)
+**Depends on**: Phase 6.6
+**Requirements**: TV-01, TV-02, TV-03, TV-04, TV-05
+**Constraints**:
+  - TradingView 공식 API 없음 — webhook push만 가능 (alert 생성/조회/지표값 pull 전부 불가)
+  - webhook은 TradingView Plus 이상에서만 동작, alert 개수 한도 15개 → multi-symbol Pine Script로 압축
+  - webhook 응답 3초 초과 시 드랍·재시도 없음 → 수신 즉시 큐잉 후 비동기 처리 필수
+**Success Criteria** (what must be TRUE):
+  1. trading_rules에 rule_type(CUSTOM/TRADINGVIEW)과 룰별 고유 webhook_token이 추가되고, TRADINGVIEW 룰은 룰 목록에 TV 배지로 구분된다
+  2. `POST /api/webhook/tv/{token}`이 페이로드를 즉시 큐에 넣고 100ms 내 HTTP 200을 반환하며, 파싱·체결은 비동기로 처리된다
+  3. 신호 파서가 JSON(`{"symbol","action"}`)을 먼저 파싱하고 실패 시 LLM fallback으로 BUY/SELL/UNKNOWN을 판정하며, UNKNOWN이면 체결하지 않고 로그만 남긴다
+  4. KOSPI 시총 상위 종목 풀(tv_supported_symbols)이 사전 등록되고, 룰 생성 시 이 풀에서 종목을 선택한다. webhook의 종목이 룰 종목 리스트에 없으면 무시된다
+  5. TRADINGVIEW 룰의 PAPER_LIVE 가상 체결이 기존 PaperExecutor 파이프라인으로 처리되고, 룰 빌더에 TradingView 연동 메모·webhook URL 복사·파싱 방식 선택 UI가 제공된다
+  6. TRADINGVIEW 룰은 자체 백테스트 대신 "TradingView에서 보기" 링크를 제공한다
+**Plans**: TBD (plan-phase에서 분해)
+
+### Phase 8: 실투자 주문 실행 & LIVE 승격
+**Goal**: LIVE 룰 평가 결과에 따라 토스증권 REST API로 실제 매수/매도 주문을 발행하고, 실시간 시세를 LIVE 평가에 활용하며, API 연속 실패 시 서킷 브레이커로 주문을 안전하게 중단한다
+**Depends on**: Phase 7
 **Requirements**: TOSS-04, TOSS-05, TOSS-06, RULE-04
 **Success Criteria** (what must be TRUE):
   1. LIVE 룰 평가에서 신호 발생 시 토스증권 REST API로 실제 매수/매도 주문이 발행된다
@@ -150,13 +201,13 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: TossOrderExecutor 구현 + live_accounts/live_trades 마이그레이션 + 서킷 브레이커
-- [ ] 07-02: LIVE 시세 어댑터(TossLiveIntradayAdapter) + PAPER_LIVE→LIVE 승격 게이트 UI/API
+- [ ] 08-01: TossOrderExecutor 구현 + live_accounts/live_trades 마이그레이션 + 서킷 브레이커
+- [ ] 08-02: LIVE 시세 어댑터(TossLiveIntradayAdapter) + PAPER_LIVE→LIVE 승격 게이트 UI/API
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 6.5 → 6.6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -167,4 +218,7 @@ Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. 대시보드·룰 생애주기·모니터·리포트 UI | 7/7 | Complete   | 2026-06-21 |
 | 5. 토스증권 OAuth & 자격증명 관리 | 2/2 | Complete   | 2026-06-21 |
 | 6. 룰 빌더 UI | 2/2 | Complete   | 2026-06-21 |
-| 7. 실투자 주문 실행 & LIVE 승격 | 0/2 | Not started | - |
+| 6.5. 룰 설정/라이프사이클 역할 분리 & 매매 근거 | 0/5 | Planned | - |
+| 6.6. 5분봉 캔들 차트 시각화 | 0/? | Not started | - |
+| 7. TradingView webhook 연동 | 0/? | Not started | - |
+| 8. 실투자 주문 실행 & LIVE 승격 | 0/2 | Not started | - |
