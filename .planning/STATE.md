@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: 로드맵 확장 완료 — Phase 6.5/6.6/7(TradingView)/8(Toss LIVE) 정의됨, 아직 계획 전
-stopped_at: Phase 6.5 context gathered
-last_updated: "2026-06-22T05:52:36.308Z"
-last_activity: 2026-06-22 — 로드맵에 Phase 6.5(역할분리+매매근거), 6.6(5분봉 캔들차트), 7(TradingView webhook) 추가; 기존 LIVE phase는 8로 이동
+status: Phase 6.5 Plan 01 완료 — 2축 상태 모델(config_status/run_status) DB + 서비스 + 테스트 구현
+stopped_at: Completed 06.5-02-PLAN.md
+last_updated: "2026-06-22T06:26:57.435Z"
+last_activity: "2026-06-22 — 06.5-01 완료: V35 마이그레이션 + activate/deactivate/start/stop 엔드포인트 + RUNNING 가드 + Wave 0 테스트"
 progress:
   total_phases: 11
   completed_phases: 7
-  total_plans: 23
-  completed_plans: 23
+  total_plans: 28
+  completed_plans: 25
   percent: 64
 ---
 
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6 complete → next 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
-Plan: Phase 6.5 미계획 (다음: /gsd:plan-phase 6.5)
-Status: 로드맵 확장 완료 — Phase 6.5/6.6/7(TradingView)/8(Toss LIVE) 정의됨, 아직 계획 전
-Last activity: 2026-06-22 — 로드맵에 Phase 6.5(역할분리+매매근거), 6.6(5분봉 캔들차트), 7(TradingView webhook) 추가; 기존 LIVE phase는 8로 이동
+Phase: 6.5 (룰 설정/라이프사이클 역할 분리 & 매매 근거)
+Plan: 06.5-01 완료 → 다음: 06.5-02 (프론트엔드 역할 분리 + 아코디언 UI)
+Status: Phase 6.5 Plan 01 완료 — 2축 상태 모델(config_status/run_status) DB + 서비스 + 테스트 구현
+Last activity: 2026-06-22 — 06.5-01 완료: V35 마이그레이션 + activate/deactivate/start/stop 엔드포인트 + RUNNING 가드 + Wave 0 테스트
 
-Progress: [██████░░░░] 64% (7/11 phases complete)
+Progress: [██████░░░░] 64% (7/11 phases complete, 25/28 plans complete)
 
 ## Performance Metrics
 
@@ -63,6 +63,8 @@ Progress: [██████░░░░] 64% (7/11 phases complete)
 | Phase 04 P05 | 4m | 3 tasks | 6 files |
 | Phase 06 P01 | 3m | 2 tasks | 2 files |
 | Phase 06 P02 | 2m | 2 tasks | 2 files |
+| Phase 06.5-role-split-trade-rationale P01 | 6m | 3 tasks | 9 files |
+| Phase 06.5 P02 | 8m | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -126,6 +128,12 @@ Recent decisions affecting current work:
 - [Phase 06, 06-02]: copyMutation uses per-rule id only — no optimistic update; invalidateQueries re-fetches list after copy
 - [Phase 06, 06-02]: cooldown display formula: cooldownBars * 5m (5-minute bar assumption, consistent with backtest engine)
 - [Phase 06, 06-02]: PaperRulesPage table column order: 이름 | 상태 | 쿨다운 | 수정일 | 관리 (5 columns, thead/tbody aligned)
+- [Phase 06.5, 06.5-01]: V35 신규 컬럼 방식 — status 문자열 파싱 대신 config_status/run_status 2축 컬럼 추가. WHERE run_status='RUNNING' 직접 쿼리 가능, RuleStatus 단일 편집 지점 유지
+- [Phase 06.5, 06.5-01]: status 컬럼 보존 (Phase 7에서 제거 옵션) — 기존 getStatus() 호출자 파손 방지
+- [Phase 06.5, 06.5-01]: promote/pause/resume @Deprecated 위임 — Wave 1에서 프론트 API 교체 전 브레이킹 변경 방지
+- [Phase 06.5, 06.5-01]: listActive() PaperLifecycleService 배치 — ACTIVE 필터는 lifecycle 서비스 책임, CRUD 서비스 아님
+- [Phase 06.5, 06.5-01]: STATUSES whitelist DRAFT|ACTIVE only — PAUSED 제거; run_status는 lifecycle 엔드포인트 전용
+- [Phase 06.5, 06.5-01]: RuleResponse에 configStatus/runStatus 추가 — 프론트가 두 화면 역할 분리에 즉시 소비 가능
 
 ### Pending Todos
 
@@ -139,6 +147,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-22T05:52:36.304Z
-Stopped at: Phase 6.5 context gathered
-Resume file: .planning/phases/06.5-role-split-trade-rationale/06.5-CONTEXT.md
+Last session: 2026-06-22T06:26:57.432Z
+Stopped at: Completed 06.5-02-PLAN.md
+Resume file: None
