@@ -77,6 +77,18 @@ public class MarketBarIntraday {
         return ts;
     }
 
+    public Double getOpen() {
+        return open;
+    }
+
+    public Double getHigh() {
+        return high;
+    }
+
+    public Double getLow() {
+        return low;
+    }
+
     public Double getClose() {
         return close;
     }
