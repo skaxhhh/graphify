@@ -10,4 +10,5 @@ public record PaperTradeHistoryItem(
         double qty,
         double price,
         Double fee,
-        Double pnl) {}
+        Double pnl,
+        String rationaleJson) {}

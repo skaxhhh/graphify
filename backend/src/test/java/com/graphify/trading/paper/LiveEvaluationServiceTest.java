@@ -3,6 +3,7 @@ package com.graphify.trading.paper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.graphify.market.MarketBarIntraday;
 import com.graphify.market.MarketBarIntradayRepository;
+import com.graphify.trading.engine.EvalResult;
 import com.graphify.trading.engine.MarketDataPort;
 import com.graphify.trading.engine.RuleEvaluator;
 import com.graphify.trading.engine.Signal;
@@ -114,7 +115,8 @@ class LiveEvaluationServiceTest {
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(2, ChronoUnit.MINUTES)));
         when(positionRepo.findByAccountIdAndSymbol(any(), eq(SYMBOL))).thenReturn(Optional.empty());
-        when(ruleEvaluator.entryTriggered(any(), any(), any(), anyInt())).thenReturn(true);
+        when(ruleEvaluator.evalEntry(any(), any(), any(), anyInt()))
+            .thenReturn(new EvalResult(true, List.of(), null, null));
         when(executor.supports(any())).thenReturn(true);
         when(executor.execute(eq(Signal.BUY), any(), eq(SYMBOL), anyDouble(), any(), any()))
             .thenReturn(TradeResult.filled("BUY", SYMBOL, 70000.0, 142.0, null));
@@ -139,7 +141,8 @@ class LiveEvaluationServiceTest {
         PaperPosition pos = new PaperPosition(1L, SYMBOL,
             BigDecimal.valueOf(100), BigDecimal.valueOf(70000));
         when(positionRepo.findByAccountIdAndSymbol(any(), eq(SYMBOL))).thenReturn(Optional.of(pos));
-        when(ruleEvaluator.exitTriggered(any(), any(), any(), anyInt(), anyDouble())).thenReturn(true);
+        when(ruleEvaluator.evalExit(any(), any(), any(), anyInt(), anyDouble()))
+            .thenReturn(new EvalResult(true, List.of(), EvalResult.ExitReason.TAKE_PROFIT, 2.86));
         when(executor.supports(any())).thenReturn(true);
         when(executor.execute(eq(Signal.SELL), any(), eq(SYMBOL), anyDouble(), any(), any()))
             .thenReturn(TradeResult.filled("SELL", SYMBOL, 72000.0, 100.0, 200000.0));
@@ -197,7 +200,8 @@ class LiveEvaluationServiceTest {
         when(marketDataPort.recentIntradayBars(SYMBOL)).thenReturn(makeBars(25, false));
         when(intradayRepo.findMaxTsBySymbolAndInterval(SYMBOL, "5m"))
             .thenReturn(Optional.of(NOW.minus(2, ChronoUnit.MINUTES)));
-        when(ruleEvaluator.entryTriggered(any(), any(), any(), anyInt())).thenReturn(false);
+        when(ruleEvaluator.evalEntry(any(), any(), any(), anyInt()))
+            .thenReturn(new EvalResult(false, List.of(), null, null));
         when(positionRepo.findByAccountIdAndSymbol(any(), eq(SYMBOL))).thenReturn(Optional.empty());
         PaperAccount acc = new PaperAccount(1L, BigDecimal.valueOf(10_000_000));
         when(accountRepo.findByUserId(1L)).thenReturn(Optional.of(acc));
