@@ -5,7 +5,7 @@ import { ApiRequestError } from "@/lib/apiClient";
 import type { BacktestResult, BacktestTrade } from "@/types/trading";
 import { EquityCurveChart } from "@/components/backtest/EquityCurveChart";
 import { CandleSection } from "@/components/backtest/CandleSection";
-import { extractIndicators } from "@/components/backtest/candleIndicators";
+import { extractIndicators, fmtTradeKst, toEpochSec } from "@/components/backtest/candleIndicators";
 import { TradeRationaleRow, parseRationale } from "@/components/trading/TradeRationaleRow";
 
 const fmtMoney = (n: number) =>
@@ -24,7 +24,7 @@ export function PaperBacktestPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<BacktestResult | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [selected, setSelected] = useState<{ symbol: string; date: string; time: number } | null>(null);
+  const [selected, setSelected] = useState<{ symbol: string; date: string; time: number; side: "BUY" | "SELL" } | null>(null);
 
   const { data: rules } = useQuery({
     queryKey: ["trading", "paper", "rules"],
@@ -56,7 +56,8 @@ export function PaperBacktestPage() {
         setSelected({
           symbol: t.symbol,
           date: t.datetime.slice(0, 10),
-          time: Math.floor(new Date(t.datetime).getTime() / 1000),
+          time: toEpochSec(t.datetime),
+          side: t.side,
         });
       } else {
         setSelected(null);
@@ -192,6 +193,7 @@ export function PaperBacktestPage() {
                 trades={result.trades}
                 indicators={indicators}
                 highlightTime={selected?.time}
+                highlightSide={selected?.side}
               />
             );
           })()}
@@ -225,7 +227,7 @@ export function PaperBacktestPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-white/10 text-left text-gray-400">
-                    <th className="px-4 py-3 font-medium">일시</th>
+                    <th className="px-4 py-3 font-medium">일시 (KST)</th>
                     <th className="px-4 py-3 font-medium">종목</th>
                     <th className="px-4 py-3 font-medium">구분</th>
                     <th className="px-4 py-3 text-right font-medium">수량</th>
@@ -251,7 +253,8 @@ export function PaperBacktestPage() {
                         setSelected({
                           symbol: t.symbol,
                           date: t.datetime.slice(0, 10),
-                          time: Math.floor(new Date(t.datetime).getTime() / 1000),
+                          time: toEpochSec(t.datetime),
+                          side: t.side,
                         });
                         // Toggle accordion only when rationale is available
                         if (hasRationale) {
@@ -265,7 +268,7 @@ export function PaperBacktestPage() {
                             onClick={handleRowClick}
                             className="cursor-pointer border-b border-white/5 last:border-0 hover:bg-white/5"
                           >
-                            <td className="px-4 py-2 text-gray-300">{t.datetime}</td>
+                            <td className="px-4 py-2 text-gray-300 whitespace-nowrap">{fmtTradeKst(t.datetime)}</td>
                             <td className="px-4 py-2 text-white">
                               {t.companyName ? `${t.companyName} (${t.symbol})` : t.symbol}
                             </td>

@@ -147,25 +147,45 @@ public class MarketDataIngestionService {
         return YahooSymbolResolver.resolve(symbol, market);
     }
 
-    /** 모든 룰 definition 의 universe.symbols 합집합. */
+    /**
+     * 모든 룰 definition 의 universe 합집합.
+     * - symbols 타입: universe.symbols 배열을 그대로 사용
+     * - volume_top_n 타입: universe.symbols 가 없으므로 KOSPI200 전체 종목을 후보로 추가
+     *   (거래일별 상위 N 선정은 백테스트/평가 단계에서 수행 — 수집은 후보 전체가 필요).
+     *   universe.additionalSymbols 도 함께 포함.
+     */
     private Set<String> activeSymbols() {
         Set<String> symbols = new LinkedHashSet<>();
         for (TradingRule rule : ruleRepository.findAll()) {
             try {
-                JsonNode arr = objectMapper.readTree(rule.getDefinition())
-                        .path("universe").path("symbols");
-                if (arr.isArray()) {
-                    arr.forEach(n -> {
-                        String s = n.asText(null);
-                        if (s != null && !s.isBlank()) {
-                            symbols.add(s.trim());
+                JsonNode universe = objectMapper.readTree(rule.getDefinition()).path("universe");
+                String type = universe.path("type").asText("");
+
+                if ("volume_top_n".equals(type)) {
+                    companyRepository.findByInKospi200True().forEach(c -> {
+                        if (c.getTicker() != null && !c.getTicker().isBlank()) {
+                            symbols.add(c.getTicker().trim());
                         }
                     });
+                    addSymbolsFrom(universe.path("additionalSymbols"), symbols);
+                } else {
+                    addSymbolsFrom(universe.path("symbols"), symbols);
                 }
             } catch (Exception e) {
                 log.debug("Skip rule {} symbol parse: {}", rule.getId(), e.getMessage());
             }
         }
         return symbols;
+    }
+
+    private static void addSymbolsFrom(JsonNode arr, Set<String> symbols) {
+        if (arr.isArray()) {
+            arr.forEach(n -> {
+                String s = n.asText(null);
+                if (s != null && !s.isBlank()) {
+                    symbols.add(s.trim());
+                }
+            });
+        }
     }
 }

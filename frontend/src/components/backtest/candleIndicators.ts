@@ -127,8 +127,90 @@ export function computeEMA(
 }
 
 // ---------------------------------------------------------------------------
+// Time helpers (KST-aware)
+// ---------------------------------------------------------------------------
+
+const KST_TZ = "Asia/Seoul";
+
+/**
+ * Convert a trade datetime string to Unix epoch seconds, aligned with the bar
+ * `time` field (which is the bar instant's epoch seconds from the backend).
+ *
+ * Backtest trades carry a zone-less KST wall-clock LocalDateTime
+ * (e.g. "2026-06-11T09:00:00"); paper-history trades carry a UTC instant with a
+ * zone ("...Z"). We trust an explicit zone when present and otherwise assume KST,
+ * so the resulting instant matches the bar's epoch regardless of browser timezone.
+ */
+export function toEpochSec(datetime: string): number {
+  const hasZone = /([zZ]|[+-]\d{2}:?\d{2})$/.test(datetime);
+  const iso = hasZone ? datetime : `${datetime}+09:00`;
+  return Math.floor(new Date(iso).getTime() / 1000);
+}
+
+/** Format epoch-seconds as KST "HH:mm" (axis ticks within a single session). */
+export function fmtKstTime(epochSec: number): string {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: KST_TZ,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(epochSec * 1000);
+}
+
+/** Format epoch-seconds as KST "MM-DD HH:mm" (crosshair label). */
+export function fmtKstDateTime(epochSec: number): string {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: KST_TZ,
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(epochSec * 1000);
+}
+
+/** Format a trade datetime string as a readable KST "YYYY-MM-DD HH:mm" for tables. */
+export function fmtTradeKst(datetime: string): string {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: KST_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+    .format(toEpochSec(datetime) * 1000)
+    .replace(/\. /g, "-")
+    .replace(/\.$/, "");
+}
+
+// ---------------------------------------------------------------------------
 // tradesToMarkers
 // ---------------------------------------------------------------------------
+
+/** Build a single lightweight-charts marker from one trade. */
+export function tradeToMarker(t: BacktestTrade): SeriesMarker<Time> {
+  const time = toEpochSec(t.datetime) as Time;
+  if (t.side === "BUY") {
+    return {
+      time,
+      position: "belowBar" as const,
+      shape: "arrowUp" as const,
+      color: "#10b981", // emerald-500
+      text: "B",
+      size: 1,
+    };
+  }
+  return {
+    time,
+    position: "aboveBar" as const,
+    shape: "arrowDown" as const,
+    color: "#ef4444", // red-500
+    text: "S",
+    size: 1,
+  };
+}
 
 /**
  * Convert BacktestTrade[] to lightweight-charts SeriesMarker objects.
@@ -143,26 +225,5 @@ export function tradesToMarkers(
 ): SeriesMarker<Time>[] {
   return trades
     .filter((t) => t.datetime.startsWith(filterDate))
-    .map((t) => {
-      const time = Math.floor(new Date(t.datetime).getTime() / 1000) as Time;
-      if (t.side === "BUY") {
-        return {
-          time,
-          position: "belowBar" as const,
-          shape: "arrowUp" as const,
-          color: "#10b981", // emerald-500
-          text: "B",
-          size: 1,
-        };
-      } else {
-        return {
-          time,
-          position: "aboveBar" as const,
-          shape: "arrowDown" as const,
-          color: "#ef4444", // red-500
-          text: "S",
-          size: 1,
-        };
-      }
-    });
+    .map(tradeToMarker);
 }

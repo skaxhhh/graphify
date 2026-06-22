@@ -29,6 +29,7 @@ interface CandleSectionProps {
   trades: BacktestTrade[];
   indicators: IndicatorSpec[];
   highlightTime?: number;
+  highlightSide?: "BUY" | "SELL";
 }
 
 export function CandleSection({
@@ -37,6 +38,7 @@ export function CandleSection({
   trades,
   indicators,
   highlightTime,
+  highlightSide,
 }: CandleSectionProps) {
   const {
     data: bars = [],
@@ -97,6 +99,7 @@ export function CandleSection({
             filterDate={date}
             indicatorLines={indicatorLines}
             highlightTime={highlightTime}
+            highlightSide={highlightSide}
           />
         </div>
       )}

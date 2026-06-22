@@ -4,11 +4,12 @@ import { fetchPaperHistory } from "@/lib/paperApi";
 import type { PaperTradeHistoryItem } from "@/types/paper";
 import { TradeRationaleRow, parseRationale } from "@/components/trading/TradeRationaleRow";
 import { CandleSection } from "@/components/backtest/CandleSection";
+import { toEpochSec } from "@/components/backtest/candleIndicators";
 import type { BacktestTrade } from "@/types/trading";
 
 export function PaperHistoryPage() {
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [selected, setSelected] = useState<{ symbol: string; date: string; time: number } | null>(null);
+  const [selected, setSelected] = useState<{ symbol: string; date: string; time: number; side: "BUY" | "SELL" } | null>(null);
 
   const { data, isLoading, isError } = useQuery<PaperTradeHistoryItem[]>({
     queryKey: ["trading", "paper", "history"],
@@ -26,7 +27,8 @@ export function PaperHistoryPage() {
       setSelected({
         symbol: t.symbol,
         date: t.tradedAt.slice(0, 10),
-        time: Math.floor(new Date(t.tradedAt).getTime() / 1000),
+        time: toEpochSec(t.tradedAt),
+        side: t.side,
       });
     }
     // Only run when data changes (not selected — intentional single-trigger on load)
@@ -80,6 +82,7 @@ export function PaperHistoryPage() {
                 trades={candleTrades}
                 indicators={[]}
                 highlightTime={selected?.time}
+                highlightSide={selected?.side}
               />
             );
           })()}
@@ -108,7 +111,8 @@ export function PaperHistoryPage() {
                     setSelected({
                       symbol: t.symbol,
                       date: t.tradedAt.slice(0, 10),
-                      time: Math.floor(new Date(t.tradedAt).getTime() / 1000),
+                      time: toEpochSec(t.tradedAt),
+                      side: t.side,
                     });
                     // Toggle accordion only when rationale is available
                     if (hasRationale) {

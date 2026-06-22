@@ -23,17 +23,23 @@ import {
   createSeriesMarkers,
 } from "lightweight-charts";
 import type { BacktestTrade, CandleBar } from "@/types/trading";
-import { tradesToMarkers } from "./candleIndicators";
+import {
+  fmtKstDateTime,
+  fmtKstTime,
+  toEpochSec,
+  tradeToMarker,
+} from "./candleIndicators";
 
 interface CandleChartProps {
   bars: CandleBar[];
   trades: BacktestTrade[];
-  filterDate: string; // YYYY-MM-DD — used by tradesToMarkers
+  filterDate: string; // YYYY-MM-DD — limits markers to the selected session
   indicatorLines: Array<{
     label: string;
     data: Array<{ time: number; value: number }>;
   }>;
-  highlightTime?: number; // epoch-seconds of the clicked trade marker to scroll to
+  highlightTime?: number; // epoch-seconds of the clicked trade marker
+  highlightSide?: "BUY" | "SELL"; // side of the clicked trade (disambiguates same-time BUY/SELL)
 }
 
 export default function CandleChart({
@@ -42,6 +48,7 @@ export default function CandleChart({
   filterDate,
   indicatorLines,
   highlightTime,
+  highlightSide,
 }: CandleChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +67,16 @@ export default function CandleChart({
       grid: {
         vertLines: { color: "rgba(255,255,255,0.05)" }, // white/5
         horzLines: { color: "rgba(255,255,255,0.05)" }, // white/5
+      },
+      // Bar `time` is the bar instant's UTC epoch seconds; lightweight-charts
+      // renders numeric time in UTC, so format ticks/crosshair explicitly in KST.
+      timeScale: {
+        timeVisible: true,
+        secondsVisible: false,
+        tickMarkFormatter: (time: unknown) => fmtKstTime(time as number),
+      },
+      localization: {
+        timeFormatter: (time: unknown) => fmtKstDateTime(time as number),
       },
       autoSize: true,
     });
@@ -111,20 +128,25 @@ export default function CandleChart({
     );
 
     // -----------------------------------------------------------------------
-    // 4. Trade markers (v5 API: createSeriesMarkers — NOT series.setMarkers)
+    // 4. Trade marker — show ONLY the selected trade (v5 createSeriesMarkers)
+    //    Matched by epoch-seconds AND side so a BUY and SELL at the same bar
+    //    don't both render when only one was clicked.
     // -----------------------------------------------------------------------
-    const markers = tradesToMarkers(trades, filterDate);
+    const selectedTrade =
+      highlightTime != null
+        ? trades.find(
+            (t) =>
+              t.datetime.startsWith(filterDate) &&
+              toEpochSec(t.datetime) === highlightTime &&
+              (highlightSide == null || t.side === highlightSide)
+          )
+        : undefined;
 
-    // Bump the matching marker's size when highlightTime is set
-    const markedMarkers = highlightTime
-      ? markers.map((m) =>
-          (m.time as unknown as number) === highlightTime
-            ? { ...m, size: 2 }
-            : m
-        )
-      : markers;
-
-    createSeriesMarkers(candleSeries, markedMarkers);
+    if (selectedTrade) {
+      createSeriesMarkers(candleSeries, [
+        { ...tradeToMarker(selectedTrade), size: 2 },
+      ]);
+    }
 
     // -----------------------------------------------------------------------
     // 5. Indicator line overlays (SMA / EMA from rule definition)
@@ -162,7 +184,7 @@ export default function CandleChart({
     return () => {
       chart.remove();
     };
-  }, [bars, trades, indicatorLines, highlightTime, filterDate]);
+  }, [bars, trades, indicatorLines, highlightTime, highlightSide, filterDate]);
 
   // Explicit height is required — lightweight-charts cannot infer height from 0px parent
   // (RESEARCH Pitfall 5). w-full + autoSize handles responsive width.
