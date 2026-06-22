@@ -92,7 +92,7 @@ public class LiveEvaluationService {
     @Transactional
     public void evaluateTick(Instant tickTime) {
         List<TradingRule> paperLiveRules = ruleRepo.findAll().stream()
-            .filter(r -> RuleStatus.isLiveActive(r.getStatus()))
+            .filter(RuleStatus::isLiveActive)
             .toList();
 
         if (paperLiveRules.isEmpty()) {

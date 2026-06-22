@@ -67,7 +67,10 @@ class LiveEvaluationServiceTest {
      * Rule must have runStatus="RUNNING" to be included in evaluation tick.
      */
     private TradingRule runningRule() {
-        TradingRule rule = new TradingRule(1L, "Test", "PAPER", "PAPER_LIVE", RULE_DEF);
+        // Legacy status intentionally DRAFT (post-V35 default) so this rule passes the
+        // live gate ONLY via run_status="RUNNING" — proving isLiveActive(TradingRule)
+        // keys on run_status, not the deprecated legacy status column.
+        TradingRule rule = new TradingRule(1L, "Test", "PAPER", "DRAFT", RULE_DEF);
         rule.setConfigStatus("ACTIVE");
         rule.setRunStatus("RUNNING");
         // Inject id via reflection (no-arg constructor is protected)
