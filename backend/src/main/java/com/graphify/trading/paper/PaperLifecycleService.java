@@ -114,6 +114,19 @@ public class PaperLifecycleService {
         return toResponse(saved);
     }
 
+    /**
+     * 전략 운영 화면용: configStatus=ACTIVE 룰만 반환 (DRAFT 제외).
+     * run 배지(RUNNING/STOPPED) + 시작/중지 버튼 노출을 위한 목록.
+     */
+    @Transactional(readOnly = true)
+    public List<RuleResponse> listActive(Long userId) {
+        return ruleRepo.findByUserIdAndModeOrderByUpdatedAtDesc(userId, "PAPER")
+            .stream()
+            .filter(r -> "ACTIVE".equals(r.getConfigStatus()))
+            .map(this::toResponse)
+            .toList();
+    }
+
     // ─── 기존 메서드 (deprecated — 신규 메서드로 위임) ──────────────────────────
 
     /**
