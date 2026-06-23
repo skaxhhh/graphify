@@ -2,6 +2,85 @@
 
 ---
 
+## 다음 계획 (Roadmap)
+
+**Phase 7 — TradingView webhook 연동** (예정)
+- 새 룰 타입 `TRADINGVIEW` + 룰별 `webhook_token`. `POST /api/webhook/tv/{token}`이 페이로드를 즉시 큐잉하고 100ms 내 200 반환(비동기 처리).
+- 신호 파서: JSON(`{symbol, action}`) 우선 → 실패 시 LLM(Claude API) fallback으로 BUY/SELL/UNKNOWN 판정. UNKNOWN은 로그만.
+- 종목은 사전 등록된 KOSPI 시총 상위 풀(`tv_supported_symbols`)에서 선택, 기존 `PaperExecutor`로 가상 체결. TRADINGVIEW 룰은 "TradingView에서 보기" 링크 제공.
+
+**Phase 8 — 실투자 주문 실행 & LIVE 승격** (예정)
+- 토스증권 REST 실주문 발행, 실시간 시세 LIVE 평가, API 연속 실패 시 서킷 브레이커.
+
+**기술 부채 / 후속 (백로그)**
+- **종목 마스터 동기화**: Naver 거래대금 상위로 선정된 종목이 `companies`에 없으면 RSI 평가용 분봉 적재(Yahoo 심볼 해석)가 막힘 → 마스터 자동 적재 필요.
+- **401 자동 토큰 갱신**: access token 15분 만료 시 refresh token으로 자동 재발급(현재는 재로그인 필요).
+- **우선주 제외**: Naver `stockEndType`이 우선주를 stock으로 분류 → 보통주 한정 필터 추가.
+- **미사용 정리**: `YahooCumulativeVolumeAdapter` + `in_kospi200` 광역 ingest 경로(현재 fallback 보존).
+
+---
+
+## v1.5.3 — 룰 중지 회귀 수정 & 백테스트 차트 매매 근거 (2026-06-24)
+
+### Overview
+사용자 UI 테스트 피드백 반영. 룰 중지가 화면에 반영되지 않던 회귀 버그를 Playwright로 재현·수정하고, 종목명 표시·백테스트 시간 정밀도·차트 매매 근거 표시를 보강했다.
+
+### 버그 수정
+- **룰 중지 미반영 (v1.5.1/BUG-1 회귀):** `PaperLiveSymbolRepository.deleteByRuleId`의 `@Modifying(clearAutomatically=true)`가 `stop()`에서 아직 flush되지 않은 `run_status=STOPPED` UPDATE를 영속성 컨텍스트 clear로 폐기 → HTTP 200·응답 STOPPED이지만 DB는 RUNNING 잔류. `flushAutomatically=true` 추가로 삭제 직전 flush 보장. Playwright로 배지("실행 중"→"중지됨")·버튼("중지"→"시작")·DB(STOPPED) 검증.
+
+### 종목명 표시 (#1)
+- `SymbolNameService`: `companies` 테이블 → 없으면 Naver 개별종목 API(`/api/stock/{code}/basic`) 폴백 → 인메모리 캐시. 대시보드·거래이력·백테스트에서 사용 → 마스터 미적재 종목(SK, LS ELECTRIC 등)도 종목명 표시.
+- `PaperPositionItem`/`PaperTradeHistoryItem` DTO에 `companyName` 추가, 프론트 렌더 `{명 ? "명 (코드)" : 코드}` 폴백.
+
+### 백테스트 시간 정밀도 & 차트 (#3)
+- `PaperLedger` 체결 타임스탬프 `LocalDate`→`LocalDateTime`, 엔진이 5분봉 시각(`barDt`) 전달 → 일자만(00:00)에서 5분봉 정밀도로 복원.
+- 차트: 클릭한 체결 봉을 중앙(±20봉)에 정렬(`setVisibleLogicalRange`, 기존 `scrollToRealTime` 제거).
+
+### 매매 근거 차트 표시 (#4)
+- 거래 클릭 시 rationale 기반 지표 렌더: RSI → 하단 서브차트(lightweight-charts v5 `addPane`, 30/70 기준선), SMA/EMA → 메인 오버레이.
+- rationale 파서가 백테스트(최상위 `conditions`)·라이브 이력(`rationale.conditions`) 두 구조 모두 지원.
+- 차트 위 **근거 패널**: 저장된 실제 지표값 명시 — `RSI(14) < 30 (실제 RSI(14) = 18.3) ✓`.
+
+---
+
+## v1.5.2 — 시장 전체 장중 거래대금 랭킹 소스 (Naver) (2026-06-23)
+
+### Overview
+거래량 상위 유니버스가 사전 적재 후보 풀(`in_kospi200`)에 갇혀 "시장 전체에서 거래대금 상위를 그때그때 발굴"하지 못하던 한계를 해소. Naver 모바일 증권 API로 시장 전체 장중 거래대금 랭킹을 직접 받아 후보 풀 의존을 제거했다.
+
+### 백엔드
+- `NaverStockRankingClient`: `m.stock.naver.com/api/stocks/marketValue/{market}` 페이징 조회 → 종목별 누적 거래대금(`accumulatedTradingValueRaw`)·ETF 구분 파싱(connect/read 타임아웃 적용).
+- `NaverTradingValueRankingAdapter` (`VolumeRankingProvider` 구현): ETF 제외 → 거래대금 DESC → topN, 시장별 1분 TTL 캐시.
+- 라이브 랭킹 주입을 Yahoo→Naver 어댑터로 교체(`VolumeRankRefresher`, `LiveEvaluationService`). 후보 풀 사전 적재 불필요 → 부트스트랩 의존성 해소. 선정 종목만 `paper_live_symbols`에 저장.
+
+### 검증
+- 라이브 13:50 틱에서 Naver 거래대금 top-10 정확 선정(보유 포지션 union 포함), DB 후보 풀 밖 종목 포함 확인.
+
+---
+
+## v1.5.1 — 라이브 유니버스 후속 수정 (2026-06-23)
+
+### 버그 수정
+- **BUG-1 매 틱 재선정 실패:** `assignSymbols`의 파생 삭제+insert가 Hibernate insert-before-delete flush 순서로 `uq_paper_live_symbols` 중복키 위반 → 첫 배정 후 유니버스 고정. `deleteByRuleId`를 벌크 `@Modifying` DELETE로 전환해 해결.
+
+### 변경
+- **랭킹 기준 거래량→거래대금:** 라이브/백테스트 랭킹 쿼리를 `SUM(volume×close)` 기준으로 통일(저가 대량거래주 왜곡 방지).
+- **staleness 10→25분:** Yahoo 5분봉 ~15분 지연 대응 — 장중 평가가 stale로 전면 스킵되던 문제 완화.
+
+---
+
+## v1.5.0 — 실시간 거래량 상위 유니버스 (Phase 6.7) (2026-06-23)
+
+### Overview
+`volume_top_n` 룰이 "그날 거래량 상위 종목"을 동적으로 선정하는 유니버스 타입을 도입. KRX MDC 인증 장벽으로 Yahoo 5분봉 누적 집계를 라이브 fallback으로 채택했다.
+
+### 백엔드
+- `VolumeRankingProvider` 포트 + 구현 2종: `DbVolumeRankingAdapter`(백테스트·일봉), `YahooCumulativeVolumeAdapter`(라이브·5분봉 누적).
+- `VolumeRankRefresher`: 매 틱 `volume_top_n` 룰 재선정 — 새 top-N ∪ 보유 포지션 → `paper_live_symbols` 갱신(진입은 top-N 멤버만, 청산은 보유 전체).
+- V36 Flyway: `companies.instrument_type` 컬럼(ETF/ETN/우선주 제외용 COMMON_STOCK 필터).
+
+---
+
 ## v1.4.0 — 룰 설정/운영 역할 분리 & 매매 근거 (2026-06-22)
 
 ### Overview
