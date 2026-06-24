@@ -17,6 +17,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -100,6 +101,15 @@ public class MarketDataIngestionService {
         return count;
     }
 
+    /**
+     * 단일 종목 일봉을 독립 트랜잭션(REQUIRES_NEW)으로 적재한다.
+     * {@link #ingestIntradayInNewTx}와 동일 목적 — 호출측 트랜잭션 격리.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int ingestDailyInNewTx(String symbol) {
+        return ingestDaily(symbol);
+    }
+
     /** 단일 종목 일봉 적재(없는 봉 insert, 있으면 update). 적재 행 수 반환. */
     @Transactional
     public int ingestDaily(String symbol) {
@@ -119,6 +129,17 @@ public class MarketDataIngestionService {
             n++;
         }
         return n;
+    }
+
+    /**
+     * 단일 종목 분봉을 독립 트랜잭션(REQUIRES_NEW)으로 적재한다.
+     * 호출측(예: PaperLifecycleService.start)이 자체 트랜잭션 안에서 여러 종목을 즉시 수집할 때,
+     * 한 종목의 실패가 호출측 트랜잭션을 rollback-only로 오염시키지 않도록 격리한다.
+     * 호출측은 예외를 catch해 다른 종목 수집을 계속할 수 있다.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public int ingestIntradayInNewTx(String symbol, String interval, String range) {
+        return ingestIntraday(symbol, interval, range);
     }
 
     @Transactional

@@ -1,7 +1,10 @@
 package com.graphify.trading.paper;
 
 import com.graphify.common.exception.GraphifyException;
-import com.graphify.trading.engine.MarketDataPort;
+import com.graphify.company.Company;
+import com.graphify.company.CompanyRepository;
+import com.graphify.market.MarketDataIngestionService;
+import com.graphify.market.volume.VolumeRankingProvider;
 import com.graphify.trading.rule.PaperLiveSymbolService;
 import com.graphify.trading.rule.TradingRule;
 import com.graphify.trading.rule.TradingRuleRepository;
@@ -9,10 +12,13 @@ import com.graphify.trading.rule.definition.RuleDefinition;
 import com.graphify.trading.rule.dto.RuleResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,21 +40,30 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaperLifecycleService {
 
     private static final Logger log = LoggerFactory.getLogger(PaperLifecycleService.class);
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    /** 시작 시 동기 수집 상한. 초과 시(예: KOSPI200 폴백) 스케줄러 틱에 위임. */
+    private static final int EAGER_INGEST_LIMIT = 30;
 
     private final TradingRuleRepository ruleRepo;
     private final ObjectMapper objectMapper;
     private final PaperLiveSymbolService paperLiveSymbolService;
-    private final MarketDataPort marketData;
+    private final CompanyRepository companyRepo;
+    private final VolumeRankingProvider liveRanking;
+    private final MarketDataIngestionService ingestionService;
 
     public PaperLifecycleService(
             TradingRuleRepository ruleRepo,
             ObjectMapper objectMapper,
             PaperLiveSymbolService paperLiveSymbolService,
-            MarketDataPort marketData) {
+            CompanyRepository companyRepo,
+            @Qualifier("naverTradingValueRankingAdapter") VolumeRankingProvider liveRanking,
+            MarketDataIngestionService ingestionService) {
         this.ruleRepo = ruleRepo;
         this.objectMapper = objectMapper;
         this.paperLiveSymbolService = paperLiveSymbolService;
-        this.marketData = marketData;
+        this.companyRepo = companyRepo;
+        this.liveRanking = liveRanking;
+        this.ingestionService = ingestionService;
     }
 
     // ─── 신규 2축 메서드 ────────────────────────────────────────────────────────
@@ -95,10 +110,33 @@ public class PaperLifecycleService {
             throw new GraphifyException("ERR_LIFECYCLE_005",
                 "룰의 유니버스 종목을 확인할 수 없습니다. 먼저 종목 데이터를 수집하세요.", HttpStatus.BAD_REQUEST);
         }
+        eagerIngest(symbols);
         rule.setRunStatus("RUNNING");
         TradingRule saved = ruleRepo.save(rule);
         paperLiveSymbolService.assignSymbols(saved.getId(), symbols);
         return toResponse(saved);
+    }
+
+    /**
+     * 시작 시점에 선정된 종목의 시세(일봉·5분봉)를 즉시 수집해 market_bars(_intraday)에 upsert한다.
+     * 첫 평가 틱이 즉시 가능하도록 동기 수집. 각 종목은 REQUIRES_NEW 트랜잭션으로 격리되어
+     * 한 종목 실패(예: 외부 API 오류)가 start() 트랜잭션을 오염시키지 않는다 — 실패는 로깅 후 continue.
+     * 후보 수가 많으면(예: KOSPI200 폴백) 동기 수집을 건너뛰고 스케줄러 틱의 self-healing에 맡긴다.
+     */
+    private void eagerIngest(List<String> symbols) {
+        if (symbols.size() > EAGER_INGEST_LIMIT) {
+            log.info("Eager ingest skipped: {} symbols exceed limit {} — deferring to scheduler tick",
+                symbols.size(), EAGER_INGEST_LIMIT);
+            return;
+        }
+        for (String symbol : symbols) {
+            try {
+                ingestionService.ingestDailyInNewTx(symbol);
+                ingestionService.ingestIntradayInNewTx(symbol, "5m", "1d");
+            } catch (Exception e) {
+                log.warn("Eager ingest failed for {}: {}", symbol, e.getMessage());
+            }
+        }
     }
 
     /** run축: ACTIVE/RUNNING → ACTIVE/STOPPED. config ACTIVE 유지 (PAUSED 없음). */
@@ -170,7 +208,10 @@ public class PaperLifecycleService {
      * 룰의 유니버스 정의로부터 종목 목록을 결정한다. mode/status 무관 (SEAM 3).
      * Phase 8 LIVE 승격도 이 메서드를 재사용한다.
      *
-     * volume_top_n: symbolsByMarket(market) ∪ additionalSymbols 전체 후보군 반환
+     * volume_top_n: 라이브 거래대금 상위 topN(VolumeRankingProvider) ∪ additionalSymbols 반환.
+     *   VolumeRankRefresher와 동일 소스(naver)로 선정해 start와 틱 재선정이 일관된다(SC5).
+     *   라이브 랭킹이 비면(장외/조회 실패) companies(in_kospi200) 후보군으로 폴백 —
+     *   장외에도 시작 가능하고, 실제 top-N 재선정은 다음 장중 틱에서 보정된다.
      * symbols/watchlist: u.symbols() 그대로 반환
      */
     private List<String> resolveSymbols(TradingRule rule) {
@@ -180,7 +221,8 @@ public class PaperLifecycleService {
             if (u == null) return List.of();
             if ("volume_top_n".equals(u.type())) {
                 String market = u.market() != null ? u.market() : "KOSPI";
-                LinkedHashSet<String> all = new LinkedHashSet<>(marketData.symbolsByMarket(market));
+                int topN = u.topN() != null ? u.topN() : 10;
+                LinkedHashSet<String> all = new LinkedHashSet<>(resolveLiveTopN(market, topN));
                 if (u.additionalSymbols() != null) {
                     all.addAll(u.additionalSymbols());
                 }
@@ -192,6 +234,35 @@ public class PaperLifecycleService {
             log.warn("Cannot parse rule definition for rule {}: {}", rule.getId(), e.getMessage());
             return List.of();
         }
+    }
+
+    /**
+     * 라이브 거래대금 상위 topN 티커를 반환한다. 조회 실패/빈 응답(장외 등) 시
+     * companies(in_kospi200=true) 후보군으로 폴백 — 장외에도 시작은 되게 하고
+     * 실제 top-N 재선정은 다음 장중 틱(VolumeRankRefresher)에서 보정한다.
+     */
+    private List<String> resolveLiveTopN(String market, int topN) {
+        try {
+            List<String> top = liveRanking.topVolume(market, LocalDate.now(KST), topN, true);
+            if (top != null && !top.isEmpty()) {
+                return top;
+            }
+        } catch (Exception e) {
+            log.warn("Live volume ranking failed for {} — falling back to KOSPI200 pool: {}",
+                market, e.getMessage());
+        }
+        return kospi200Pool();
+    }
+
+    /** companies 테이블의 in_kospi200=true 종목 티커 (폴백 후보군). */
+    private List<String> kospi200Pool() {
+        LinkedHashSet<String> pool = new LinkedHashSet<>();
+        for (Company c : companyRepo.findByInKospi200True()) {
+            if (c.getTicker() != null && !c.getTicker().isBlank()) {
+                pool.add(c.getTicker().trim());
+            }
+        }
+        return List.copyOf(pool);
     }
 
     private TradingRule findOwned(Long userId, Long ruleId) {

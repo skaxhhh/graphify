@@ -1,9 +1,13 @@
 package com.graphify.trading.rule;
 
 import com.graphify.common.exception.GraphifyException;
-import com.graphify.trading.engine.MarketDataPort;
+import com.graphify.company.Company;
+import com.graphify.company.CompanyRepository;
+import com.graphify.market.MarketDataIngestionService;
+import com.graphify.market.volume.VolumeRankingProvider;
 import com.graphify.trading.paper.PaperLifecycleService;
 import com.graphify.trading.rule.dto.RuleResponse;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +29,9 @@ class PaperLifecycleServiceTest {
 
     @Mock TradingRuleRepository ruleRepo;
     @Mock PaperLiveSymbolService paperLiveSymbolService;
-    @Mock MarketDataPort marketData;
+    @Mock CompanyRepository companyRepo;
+    @Mock VolumeRankingProvider liveRanking;
+    @Mock MarketDataIngestionService ingestionService;
     @Mock com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     PaperLifecycleService service;
@@ -42,7 +48,9 @@ class PaperLifecycleServiceTest {
             ruleRepo,
             new com.fasterxml.jackson.databind.ObjectMapper(),
             paperLiveSymbolService,
-            marketData
+            companyRepo,
+            liveRanking,
+            ingestionService
         );
     }
 
@@ -123,6 +131,70 @@ class PaperLifecycleServiceTest {
             .hasMessageContaining("ACTIVE");
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    void start_volume_top_n_resolves_live_topN_and_eager_ingests() {
+        // volume_top_n: 라이브 거래대금 상위 topN으로 선정 후 즉시 수집(upsert)하고 assign한다.
+        TradingRule rule = volumeTopNRule();
+        when(ruleRepo.findByIdAndUserId(RULE_ID, USER_ID)).thenReturn(Optional.of(rule));
+        when(ruleRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(liveRanking.topVolume(eq("KOSPI"), any(LocalDate.class), eq(10), eq(true)))
+            .thenReturn(List.of("005930", "000660"));
+
+        RuleResponse resp = service.start(USER_ID, RULE_ID);
+
+        assertThat(resp.runStatus()).isEqualTo("RUNNING");
+        // 즉시 수집(upsert) — 선정된 각 종목에 대해 일봉/분봉 적재 호출
+        verify(ingestionService).ingestDailyInNewTx("005930");
+        verify(ingestionService).ingestDailyInNewTx("000660");
+        verify(ingestionService).ingestIntradayInNewTx("005930", "5m", "1d");
+        verify(ingestionService).ingestIntradayInNewTx("000660", "5m", "1d");
+        // companies 폴백은 호출되지 않음 (라이브 랭킹 성공)
+        verify(companyRepo, never()).findByInKospi200True();
+        org.mockito.ArgumentCaptor<List<String>> captor =
+            org.mockito.ArgumentCaptor.forClass(List.class);
+        verify(paperLiveSymbolService).assignSymbols(eq(RULE_ID), captor.capture());
+        assertThat(captor.getValue()).containsExactly("005930", "000660");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void start_volume_top_n_falls_back_to_kospi200_when_live_ranking_empty() {
+        // 장외/조회 실패로 라이브 랭킹이 비면 companies(in_kospi200) 후보군으로 폴백해 시작은 가능.
+        TradingRule rule = volumeTopNRule();
+        when(ruleRepo.findByIdAndUserId(RULE_ID, USER_ID)).thenReturn(Optional.of(rule));
+        when(ruleRepo.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        Company c1 = company("005930");
+        Company c2 = company("000660");
+        when(liveRanking.topVolume(eq("KOSPI"), any(LocalDate.class), eq(10), eq(true)))
+            .thenReturn(List.of());
+        when(companyRepo.findByInKospi200True()).thenReturn(List.of(c1, c2));
+
+        RuleResponse resp = service.start(USER_ID, RULE_ID);
+
+        assertThat(resp.runStatus()).isEqualTo("RUNNING");
+        org.mockito.ArgumentCaptor<List<String>> captor =
+            org.mockito.ArgumentCaptor.forClass(List.class);
+        verify(paperLiveSymbolService).assignSymbols(eq(RULE_ID), captor.capture());
+        assertThat(captor.getValue()).containsExactlyInAnyOrder("005930", "000660");
+    }
+
+    @Test
+    void start_volume_top_n_throws_when_live_and_fallback_both_empty() {
+        // 라이브 랭킹도 비고 companies 시드도 없으면 명시적 가드로 차단.
+        TradingRule rule = volumeTopNRule();
+        when(ruleRepo.findByIdAndUserId(RULE_ID, USER_ID)).thenReturn(Optional.of(rule));
+        when(liveRanking.topVolume(eq("KOSPI"), any(LocalDate.class), eq(10), eq(true)))
+            .thenReturn(List.of());
+        when(companyRepo.findByInKospi200True()).thenReturn(List.of());
+
+        assertThatThrownBy(() -> service.start(USER_ID, RULE_ID))
+            .isInstanceOf(GraphifyException.class)
+            .hasMessageContaining("종목 데이터를 수집");
+        verify(paperLiveSymbolService, never()).assignSymbols(any(), any());
+        verify(ingestionService, never()).ingestDailyInNewTx(any());
+    }
+
     // ─── stop ───────────────────────────────────────────────────────────────────
 
     @Test
@@ -184,6 +256,23 @@ class PaperLifecycleServiceTest {
         rule.setConfigStatus("ACTIVE");
         rule.setRunStatus("STOPPED");
         return rule;
+    }
+
+    private TradingRule volumeTopNRule() {
+        String def = "{\"version\":1,\"universe\":{\"type\":\"volume_top_n\",\"market\":\"KOSPI\",\"topN\":10}," +
+            "\"entry\":{\"logic\":\"AND\",\"conditions\":[]},\"exit\":null," +
+            "\"sizing\":{\"type\":\"fixed_cash\",\"value\":10000000},\"constraints\":null}";
+        TradingRule rule = new TradingRule(USER_ID, "Volume Rule", "PAPER", "DRAFT", def);
+        setId(rule, RULE_ID);
+        rule.setConfigStatus("ACTIVE");
+        rule.setRunStatus("STOPPED");
+        return rule;
+    }
+
+    private Company company(String ticker) {
+        Company c = mock(Company.class);
+        when(c.getTicker()).thenReturn(ticker);
+        return c;
     }
 
     private void setId(TradingRule rule, Long id) {
