@@ -1,27 +1,23 @@
 // TradingRulesPage — 전략 운영: ACTIVE 룰만 표시, run축(STOPPED/RUNNING)만 제어 (06.5-05)
+// 06.8-02: Reskinned to Binance dark tokens; ACTIVE filter + start/stop handlers unchanged.
+// Shared by PAPER (/paper/rules-lifecycle) and LIVE (/rules) routes.
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPaperRules } from "@/lib/ruleApi";
 import { copyRule, startRule, stopRule } from "@/lib/paperApi";
 import { ApiRequestError } from "@/lib/apiClient";
-import { CompanyPickerModal } from "@/components/shared/CompanyPickerModal";
+import { TradingCompanyPickerModal } from "@/components/trading/TradingCompanyPickerModal";
 import type { TradingRule } from "@/types/trading";
+import {
+  TradeBadge,
+  TradeButton,
+  TradePageState,
+  TradeTable,
+  TradeTableHeader,
+  TradeTableRow,
+} from "@/components/trading/ui";
 
-// ---- run 상태 배지 ----
-function RunBadge({ runStatus }: { runStatus: "STOPPED" | "RUNNING" }) {
-  if (runStatus === "RUNNING") {
-    return (
-      <span className="rounded bg-emerald-700/60 px-2 py-0.5 text-xs font-medium text-emerald-300">
-        실행 중
-      </span>
-    );
-  }
-  return (
-    <span className="rounded bg-yellow-700/40 px-2 py-0.5 text-xs font-medium text-yellow-400">
-      중지됨
-    </span>
-  );
-}
+const COL = "grid grid-cols-[2.2fr_1.2fr_1fr_1.6fr] items-center";
 
 export function TradingRulesPage() {
   const queryClient = useQueryClient();
@@ -70,92 +66,113 @@ export function TradingRulesPage() {
 
   return (
     <div>
+      {/* Header — wireframe lines ~358–360 */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white">전략 운영</h2>
-        <p className="mt-1 text-sm text-gray-400">
-          ACTIVE 전략의 실행 상태를 관리합니다. 설정 변경은 "전략 설정" 화면에서 합니다.
+        <h2 className="text-xl font-semibold text-trade-on-dark">전략 운영</h2>
+        <p className="mt-1 text-sm text-trade-muted">
+          ACTIVE 룰만 표시 · 실행 축(STOPPED ↔ RUNNING)
         </p>
       </div>
 
+      {/* Mutation error banner */}
       {mutationError ? (
-        <div className="mb-4 rounded-md bg-red-900/40 px-4 py-2 text-sm text-red-300">
+        <div className="mb-4 rounded-lg border border-trade-down/30 bg-trade-down-soft px-4 py-2.5 text-sm text-trade-down">
           {mutationError instanceof Error ? mutationError.message : "작업에 실패했습니다."}
         </div>
       ) : null}
 
+      {/* Loading / Error / Empty / Table */}
       {isLoading ? (
-        <p className="text-sm text-gray-400">불러오는 중...</p>
+        <TradePageState variant="loading" />
       ) : isError ? (
-        <p className="text-sm text-red-400">룰 목록을 불러오지 못했습니다.</p>
+        <TradePageState
+          variant="error"
+          title="룰 목록 로드 실패"
+          message="룰 목록을 불러오지 못했습니다."
+        />
       ) : rules.length === 0 ? (
-        <p className="rounded-lg border border-white/10 bg-gray-900/50 p-6 text-sm text-gray-400">
-          ACTIVE 상태인 룰이 없습니다. 전략 설정 화면에서 룰을 활성화하세요.
-        </p>
+        <TradePageState
+          variant="empty"
+          title="ACTIVE 룰 없음"
+          message="ACTIVE 상태인 룰이 없습니다. 전략 설정에서 활성화하세요."
+        />
       ) : (
-        <div className="overflow-hidden rounded-lg border border-white/10 bg-gray-900/50">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 text-left text-gray-400">
-                <th className="px-4 py-3 font-medium">이름</th>
-                <th className="px-4 py-3 font-medium">실행 상태</th>
-                <th className="px-4 py-3 font-medium">수정일</th>
-                <th className="px-4 py-3 text-right font-medium">제어</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rules.map((rule: TradingRule) => {
-                const runStatus = rule.runStatus ?? "STOPPED";
-                const isRunning = runStatus === "RUNNING";
+        <TradeTable>
+          {/* Header — wireframe lines ~361–363 */}
+          <TradeTableHeader className={COL}>
+            <span>룰 이름</span>
+            <span>실행 상태</span>
+            <span>수정일</span>
+            <span className="text-right">제어</span>
+          </TradeTableHeader>
 
-                return (
-                  <tr key={rule.id} className="border-b border-white/5 last:border-0">
-                    <td className="px-4 py-3 font-medium text-white">{rule.name}</td>
-                    <td className="px-4 py-3">
-                      <RunBadge runStatus={runStatus} />
-                    </td>
-                    <td className="px-4 py-3 text-gray-400">
-                      {new Date(rule.updatedAt).toLocaleDateString("ko-KR")}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        {isRunning ? (
-                          <button
-                            type="button"
-                            disabled={anyPending}
-                            onClick={() => stopMutation.mutate(rule.id)}
-                            className="rounded bg-yellow-600 px-2 py-1 text-xs text-white hover:opacity-90 disabled:opacity-40"
-                          >
-                            중지
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            disabled={anyPending}
-                            onClick={() => startMutation.mutate({ id: rule.id })}
-                            className="rounded bg-emerald-600 px-2 py-1 text-xs text-white hover:opacity-90 disabled:opacity-40"
-                          >
-                            시작
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          disabled={anyPending}
-                          onClick={() => copyMutation.mutate(rule.id)}
-                          className="rounded border border-white/20 px-2 py-1 text-xs text-gray-300 hover:bg-white/5 disabled:opacity-40"
-                        >
-                          복사
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+          {/* Rows */}
+          {rules.map((rule: TradingRule) => {
+            const runStatus = rule.runStatus ?? "STOPPED";
+            const isRunning = runStatus === "RUNNING";
+
+            return (
+              <TradeTableRow key={rule.id} className={COL}>
+                {/* 이름 */}
+                <span className="text-sm font-medium text-trade-body">{rule.name}</span>
+
+                {/* 실행 상태 — TradeBadge running/stopped (wireframe lines ~365/369) */}
+                <span>
+                  <TradeBadge variant={isRunning ? "running" : "stopped"}>
+                    {isRunning ? "● 실행 중" : "중지됨"}
+                  </TradeBadge>
+                </span>
+
+                {/* 수정일 — font-trade-mono */}
+                <span className="font-trade-mono text-sm text-trade-muted">
+                  {new Date(rule.updatedAt).toLocaleDateString("ko-KR", {
+                    month: "2-digit",
+                    day: "2-digit",
+                  })}
+                </span>
+
+                {/* 제어 — start/stop + 복사 */}
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {isRunning ? (
+                    /* 중지 → TradeButton danger (wireframe line ~366: bg red) */
+                    <TradeButton
+                      variant="danger"
+                      size="sm"
+                      disabled={anyPending}
+                      onClick={() => stopMutation.mutate(rule.id)}
+                    >
+                      중지
+                    </TradeButton>
+                  ) : (
+                    /* 시작 → green button (bg-trade-up, text-trade-on-dark; wireframe line ~370) */
+                    <button
+                      type="button"
+                      disabled={anyPending}
+                      onClick={() => startMutation.mutate({ id: rule.id })}
+                      className="inline-flex h-7 items-center justify-center rounded bg-trade-up px-3 text-xs font-semibold text-trade-on-dark hover:opacity-90 disabled:opacity-40"
+                    >
+                      시작
+                    </button>
+                  )}
+
+                  {/* 복사 — ghost */}
+                  <TradeButton
+                    variant="ghost"
+                    size="sm"
+                    disabled={anyPending}
+                    onClick={() => copyMutation.mutate(rule.id)}
+                  >
+                    복사
+                  </TradeButton>
+                </div>
+              </TradeTableRow>
+            );
+          })}
+        </TradeTable>
       )}
 
-      <CompanyPickerModal
+      {/* Trade-themed stock picker (폴백 모달) — swapped from shared/CompanyPickerModal */}
+      <TradingCompanyPickerModal
         open={pickerRuleId !== null}
         title="실시간 종목 직접 선택"
         description="실시간 거래대금 순위를 가져오지 못했습니다. 거래할 종목을 직접 선택하세요."
