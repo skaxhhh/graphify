@@ -1,7 +1,10 @@
 // TradingRulesPage — 전략 운영: ACTIVE 룰만 표시, run축(STOPPED/RUNNING)만 제어 (06.5-05)
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPaperRules } from "@/lib/ruleApi";
 import { copyRule, startRule, stopRule } from "@/lib/paperApi";
+import { ApiRequestError } from "@/lib/apiClient";
+import { CompanyPickerModal } from "@/components/shared/CompanyPickerModal";
 import type { TradingRule } from "@/types/trading";
 
 // ---- run 상태 배지 ----
@@ -35,7 +38,27 @@ export function TradingRulesPage() {
     (r: TradingRule) => (r.configStatus ?? "DRAFT") === "ACTIVE"
   );
 
-  const startMutation = useMutation({ mutationFn: startRule, onSuccess: invalidate });
+  // v1.6.0: 빈 실시간 유니버스(ERR_LIFECYCLE_005) 폴백 — 종목 직접 선택 모달
+  const [pickerRuleId, setPickerRuleId] = useState<number | null>(null);
+
+  const startMutation = useMutation({
+    mutationFn: ({ id, overrideSymbols }: { id: number; overrideSymbols?: string[] }) =>
+      startRule(id, overrideSymbols),
+    onSuccess: () => {
+      setPickerRuleId(null);
+      invalidate();
+    },
+    onError: (err, variables) => {
+      // 실시간 거래대금 랭킹 조회 실패 → 종목 직접 선택으로 폴백
+      if (
+        err instanceof ApiRequestError &&
+        err.code === "ERR_LIFECYCLE_005" &&
+        !variables.overrideSymbols
+      ) {
+        setPickerRuleId(variables.id);
+      }
+    },
+  });
   const stopMutation  = useMutation({ mutationFn: stopRule,  onSuccess: invalidate });
   const copyMutation  = useMutation({ mutationFn: copyRule,  onSuccess: invalidate });
 
@@ -108,7 +131,7 @@ export function TradingRulesPage() {
                           <button
                             type="button"
                             disabled={anyPending}
-                            onClick={() => startMutation.mutate(rule.id)}
+                            onClick={() => startMutation.mutate({ id: rule.id })}
                             className="rounded bg-emerald-600 px-2 py-1 text-xs text-white hover:opacity-90 disabled:opacity-40"
                           >
                             시작
@@ -131,6 +154,19 @@ export function TradingRulesPage() {
           </table>
         </div>
       )}
+
+      <CompanyPickerModal
+        open={pickerRuleId !== null}
+        title="실시간 종목 직접 선택"
+        description="실시간 거래대금 순위를 가져오지 못했습니다. 거래할 종목을 직접 선택하세요."
+        confirmLabel="이 종목으로 시작"
+        onClose={() => setPickerRuleId(null)}
+        onConfirm={(symbols) => {
+          if (pickerRuleId !== null) {
+            startMutation.mutate({ id: pickerRuleId, overrideSymbols: symbols });
+          }
+        }}
+      />
     </div>
   );
 }

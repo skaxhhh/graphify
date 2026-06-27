@@ -190,7 +190,7 @@ class PaperLifecycleServiceTest {
 
         assertThatThrownBy(() -> service.start(USER_ID, RULE_ID))
             .isInstanceOf(GraphifyException.class)
-            .hasMessageContaining("종목 데이터를 수집");
+            .hasMessageContaining("종목을 직접 선택하세요");
         verify(paperLiveSymbolService, never()).assignSymbols(any(), any());
         verify(ingestionService, never()).ingestDailyInNewTx(any());
     }

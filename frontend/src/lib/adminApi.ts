@@ -28,3 +28,21 @@ export async function createAdminUser(data: {
 }) {
   return apiPost<AdminUser, typeof data>("/api/v1/admin/users", data);
 }
+
+// v1.6.0: KOSPI200 마스터 시드 / 일봉 적재 (ROLE_ADMIN, 멱등)
+// 반환은 카운트 맵 (예: { inserted, updated, flagged } / { ingested })
+export type Kospi200Counts = Record<string, number>;
+
+export async function seedKospi200() {
+  return apiPost<Kospi200Counts, void>(
+    "/api/v1/admin/market/seed-kospi200",
+    undefined
+  );
+}
+
+export async function ingestKospi200() {
+  return apiPost<Kospi200Counts, void>(
+    "/api/v1/admin/market/ingest-kospi200",
+    undefined
+  );
+}

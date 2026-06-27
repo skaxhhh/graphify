@@ -44,8 +44,12 @@ export async function deactivateRule(id: number) {
   return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/deactivate`, undefined);
 }
 
-export async function startRule(id: number) {
-  return apiPost<unknown, void>(`/api/v1/trading/paper/rules/${id}/start`, undefined);
+export async function startRule(id: number, overrideSymbols?: string[]) {
+  // v1.6.0: 빈 유니버스(ERR_LIFECYCLE_005) 폴백 시 직접 선택한 종목을 전달
+  return apiPost<unknown, { overrideSymbols?: string[] }>(
+    `/api/v1/trading/paper/rules/${id}/start`,
+    overrideSymbols && overrideSymbols.length > 0 ? { overrideSymbols } : {}
+  );
 }
 
 export async function stopRule(id: number) {

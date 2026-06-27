@@ -7,6 +7,7 @@ import { EquityCurveChart } from "@/components/backtest/EquityCurveChart";
 import { CandleSection } from "@/components/backtest/CandleSection";
 import { extractIndicators, fmtTradeKst, toEpochSec } from "@/components/backtest/candleIndicators";
 import { TradeRationaleRow, parseRationale } from "@/components/trading/TradeRationaleRow";
+import { CompanyPickerModal } from "@/components/shared/CompanyPickerModal";
 
 const fmtMoney = (n: number) =>
   n.toLocaleString("ko-KR", { maximumFractionDigits: 0 }) + "원";
@@ -25,6 +26,8 @@ export function PaperBacktestPage() {
   const [result, setResult] = useState<BacktestResult | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [selected, setSelected] = useState<{ symbol: string; date: string; time: number; side: "BUY" | "SELL" } | null>(null);
+  // v1.6.0: 빈 유니버스 폴백 — 종목 직접 선택 모달
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const { data: rules } = useQuery({
     queryKey: ["trading", "paper", "rules"],
@@ -32,7 +35,7 @@ export function PaperBacktestPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (overrideSymbols?: string[]) => {
       if (ruleId === "") {
         throw new ApiRequestError("ERR_FORM", "룰을 선택하세요.");
       }
@@ -43,6 +46,8 @@ export function PaperBacktestPage() {
         initialCash: initialCash ? Number(initialCash) : undefined,
         timeFrom,
         timeTo,
+        overrideSymbols:
+          overrideSymbols && overrideSymbols.length > 0 ? overrideSymbols : undefined,
       });
     },
     onSuccess: (res) => {
@@ -65,6 +70,12 @@ export function PaperBacktestPage() {
     },
     onError: (err) => {
       setResult(null);
+      // 빈 거래대금 유니버스 → 종목 직접 선택 모달로 폴백 (v1.6.0)
+      if (err instanceof ApiRequestError && err.code === "ERR_BACKTEST_UNIVERSE_EMPTY") {
+        setError(err.message);
+        setPickerOpen(true);
+        return;
+      }
       setError(
         err instanceof ApiRequestError ? err.message : "백테스트에 실패했습니다."
       );
@@ -149,7 +160,7 @@ export function PaperBacktestPage() {
         <button
           type="button"
           disabled={mutation.isPending || ruleId === ""}
-          onClick={() => mutation.mutate()}
+          onClick={() => mutation.mutate(undefined)}
           className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {mutation.isPending ? "실행 중..." : "백테스트 실행"}
@@ -317,6 +328,18 @@ export function PaperBacktestPage() {
           </div>
         </div>
       ) : null}
+
+      <CompanyPickerModal
+        open={pickerOpen}
+        title="백테스트 종목 직접 선택"
+        description="해당 기간 거래대금 데이터가 없습니다. 종목을 직접 선택하세요."
+        confirmLabel="이 종목으로 재실행"
+        onClose={() => setPickerOpen(false)}
+        onConfirm={(symbols) => {
+          setPickerOpen(false);
+          mutation.mutate(symbols);
+        }}
+      />
     </div>
   );
 }

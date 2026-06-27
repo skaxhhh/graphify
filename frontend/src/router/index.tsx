@@ -30,6 +30,7 @@ import { AdminMcpToolsPage } from "@/pages/AdminMcpToolsPage";
 import { AdminOpenAIConfigPage } from "@/pages/AdminOpenAIConfigPage";
 import { AdminPromptsPage } from "@/pages/AdminPromptsPage";
 import { AdminVectorDbPage } from "@/pages/AdminVectorDbPage";
+import { AdminMarketDataPage } from "@/pages/AdminMarketDataPage";
 import { CompanyDetailPage } from "@/pages/CompanyDetailPage";
 import { AnalysisHistoryDetailPage } from "@/pages/AnalysisHistoryDetailPage";
 import { WatchlistPage } from "@/pages/WatchlistPage";
@@ -234,6 +235,7 @@ export const router = createBrowserRouter([
       { path: "prompts", element: <AdminPromptsPage /> },
       { path: "openai", element: <AdminOpenAIConfigPage /> },
       { path: "vectordb", element: <AdminVectorDbPage /> },
+      { path: "market", element: <AdminMarketDataPage /> },
     ],
   },
 ]);

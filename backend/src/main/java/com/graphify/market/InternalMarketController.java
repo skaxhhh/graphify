@@ -39,6 +39,8 @@ public class InternalMarketController {
         int symbols;
         if ("MINUTE".equalsIgnoreCase(interval)) {
             symbols = ingestionService.ingestIntradayForActiveSymbols("5m", "1d");
+        } else if ("KOSPI200".equalsIgnoreCase(interval)) {
+            symbols = ingestionService.ingestDailyForKospi200();
         } else {
             symbols = ingestionService.ingestDailyForActiveSymbols();
         }

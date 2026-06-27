@@ -6,6 +6,57 @@
 
 ---
 
+## [v1.6.0] 운영 빈 DB 내성 — KOSPI200 마스터 시드 + 백테스트/모의 유니버스 폴백
+
+> Status: 구현 완료 · 2026-06-27 (backend `./gradlew test` 128 green, frontend `tsc -b && vite build` clean)
+> 계기: 운영(graphify-gules) 빈 DB에서 `volume_top_n` 백테스트가 "유니버스에 수집된 종목이 없습니다", 모의 start가 "유니버스 종목을 확인할 수 없습니다"로 실패. 로컬은 과거 수동 적재분이 남아 정상. 근인은 (a) 운영 `companies.in_kospi200=true` 미시드(V30 UPDATE가 사전 존재 행에만 적용), (b) KOSPI200 일봉 적재 경로 부재(`ingestDailyForKospi200()`가 dead code — 호출처 없음).
+
+### 1. 근본 원인 (확정)
+
+- **백테스트** `BacktestService.resolveInitialSymbols()` → `symbolsByMarket()` → `findDistinctKospi200Symbols()`는 `market_bars ⋈ companies(in_kospi200=true, market)` **INNER JOIN**. 두 테이블 중 하나라도 비면 빈 유니버스 → 하드 에러. 과거 거래대금 상위 계산(`resolveSymbolsForDate` → `topVolumeSymbols(date)` = `(volume*close)` 정렬)은 **이미 구현됨** — 데이터만 있으면 동작.
+- **모의(라이브)** `PaperLifecycleService.resolveSymbols()` → `resolveLiveTopN()`는 라이브 거래대금 랭킹(Naver 시장 전체, v1.5.2) 우선, 실패 시 `kospi200Pool()`(=`companies.in_kospi200=true`) 폴백. 둘 다 비면 하드 에러.
+- 운영엔 `ingestDailyForKospi200()`를 부르는 스케줄러·엔드포인트가 없음. EOD Cloud Scheduler(`/internal/market/ingest?interval=EOD`)는 `ingestDailyForActiveSymbols()`(룰 종목만) 호출.
+
+### 2. 설계 원칙
+
+- 백테스트의 1차는 **저장 일봉 기반 과거 거래대금 자동계산**(기존 로직) 유지. 데이터 없을 때만 수동 폴백.
+- 실패 사유를 **구분된 에러코드**로 노출 → 프론트가 원인별 메시지 + 회사목록 선택 폴백 제공.
+- KOSPI200 마스터/일봉을 채우는 **재실행 가능한 관리자 배치** 신설. 외부 KRX 구성종목 API가 없으므로 **정적 큐레이션 리스트**(단일 리소스 파일)를 SoT로 사용, 추후 확장 가능.
+
+### 3. 작업 (1+2+3) 및 계약 (프론트/백 공통)
+
+**Piece 1 — companies 마스터 시드 (관리자)**
+- 정적 리소스 `backend/src/main/resources/data/kospi200.csv`(ticker,name) 신설 — V30 주석의 큐레이션 종목에서 추출. SoT.
+- `Kospi200SeedService.seed()`: CSV 순회 → `CompanyUpsertService`/직접 upsert로 `ticker` 기준 UPSERT, `market="KOSPI"`, `instrumentType="COMMON_STOCK"`, `inKospi200=true` 설정. 반환: {inserted, updated, flagged}.
+- 엔드포인트: `POST /api/v1/admin/market/seed-kospi200` (ROLE_ADMIN). 멱등.
+
+**Piece 2 — KOSPI200 일봉 적재 경로**
+- 엔드포인트: `POST /api/v1/admin/market/ingest-kospi200` (ROLE_ADMIN) → `ingestionService.ingestDailyForKospi200()`. 반환 적재 종목 수.
+- (옵션) `InternalMarketController`에 `interval=KOSPI200` 분기 추가(외부 스케줄러용, X-Internal-Token). 일배치 자동화 훅.
+
+**Piece 3 — 유니버스 폴백 UX**
+- 백엔드:
+  - 백테스트 빈 유니버스 에러코드 분리: `ERR_BACKTEST_UNIVERSE_EMPTY`(volume_top_n 자동해석 불가). 메시지 "해당 기간 거래대금 데이터가 없습니다. 종목을 직접 선택하세요."
+  - `BacktestRequest`에 `overrideSymbols?: List<String>` 추가. 비어있지 않으면 유니버스 타입 무관하게 그 종목들을 `symbols`처럼 사용(`resolveInitialSymbols`/`resolveSymbolsForDate`가 override 우선, self-heal로 적재).
+  - 모의 start: `PaperLifecycleController POST /{id}/start`에 바디 `{ overrideSymbols?: string[] }` 허용 → `start(userId, id, overrideSymbols)`; override 있으면 `resolveSymbols` 대신 사용. 빈 유니버스 코드 `ERR_LIFECYCLE_005` 유지하되 메시지에 "실시간 거래대금 순위를 가져오지 못했습니다" 명시.
+- 프론트(`PaperBacktestPage`, 모의 룰 start 화면):
+  - 위 코드 감지 시 **회사 선택 모달** 오픈(`/api/v1/companies/search` 재사용, 다중선택+검색). 선택 종목으로 `overrideSymbols` 채워 재요청.
+  - 모달은 기존 패턴(`InsightEvidenceModal`/`ReliabilityCriteriaModal`) + `shared/`(PrimaryButton·GhostButton·TextField·EmptyState·InlineError·SkeletonBlock) 사용. 신규 공통 컴포넌트 `shared/CompanyPickerModal.tsx`로 추가(기능 폴더에 묻지 않음).
+  - 관리자 화면(`components/admin/`)에 "KOSPI200 시드/적재" 버튼 2개(`adminApi`).
+
+### 4. UI/UX
+
+- **화면 인벤토리:** (a) 백테스트 페이지 — 폴백 모달(빈/로딩/에러/성공), (b) 모의 룰 start 지점 — 동일 모달 재사용, (c) 관리자 시장데이터 패널 — 시드/적재 버튼 + 결과 토스트.
+- **shared 매핑:** 모달=신규 `CompanyPickerModal`(사유: 다중선택 회사검색 공통 컴포넌트 부재), 내부는 `TextField`(검색)·`SkeletonBlock`(로딩)·`EmptyState`(검색결과 없음)·`InlineError`(검색 실패)·`PrimaryButton`/`GhostButton`(확정/취소)·`Pagination`(결과 페이지). 토큰만 사용, 하드코딩 hex 금지.
+- **상태:** 빈(검색 전 안내), 로딩(SkeletonBlock), 에러(InlineError + 재시도), 성공(선택 칩 + 확정). 키보드: Esc 닫기, Enter 검색, 포커스 트랩.
+
+### 5. 검증
+
+- 백엔드: `Kospi200SeedService`/override 단위테스트, `./gradlew test` 그린. 빈 DB → seed → ingest-kospi200 → volume_top_n 백테스트 성공 경로 통합 확인.
+- 프론트: 빌드/타입체크 그린. 4상태(빈/로딩/에러/성공) 시각 확인 + 폴백 재요청 성공.
+
+---
+
 ## [v1.5.3] 룰 중지 미반영 회귀 수정 + 백테스트 차트 근거 표시
 
 > Status: 구현 완료 · 2026-06-24

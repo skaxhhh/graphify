@@ -94,8 +94,17 @@ public class PaperLifecycleService {
         return toResponse(ruleRepo.save(rule));
     }
 
-    /** run축: ACTIVE/STOPPED → ACTIVE/RUNNING. paperLiveSymbols 재할당. */
+    /** run축: ACTIVE/STOPPED → ACTIVE/RUNNING. paperLiveSymbols 재할당. (override 없음 호환용) */
     public RuleResponse start(Long userId, Long ruleId) {
+        return start(userId, ruleId, null);
+    }
+
+    /**
+     * run축: ACTIVE/STOPPED → ACTIVE/RUNNING. paperLiveSymbols 재할당.
+     * overrideSymbols가 비어있지 않으면 유니버스 해석(resolveSymbols) 대신 사용한다 —
+     * 실시간 거래대금 랭킹을 못 가져올 때 사용자가 직접 선택한 종목으로 시작.
+     */
+    public RuleResponse start(Long userId, Long ruleId, List<String> overrideSymbols) {
         TradingRule rule = findOwned(userId, ruleId);
         if (!"ACTIVE".equals(rule.getConfigStatus())) {
             throw new GraphifyException("ERR_LIFECYCLE_007",
@@ -105,10 +114,11 @@ public class PaperLifecycleService {
             throw new GraphifyException("ERR_LIFECYCLE_008",
                 "이미 RUNNING 상태인 룰입니다.", HttpStatus.BAD_REQUEST);
         }
-        List<String> symbols = resolveSymbols(rule);
+        List<String> override = normalizeOverride(overrideSymbols);
+        List<String> symbols = override != null ? override : resolveSymbols(rule);
         if (symbols.isEmpty()) {
             throw new GraphifyException("ERR_LIFECYCLE_005",
-                "룰의 유니버스 종목을 확인할 수 없습니다. 먼저 종목 데이터를 수집하세요.", HttpStatus.BAD_REQUEST);
+                "실시간 거래대금 순위를 가져오지 못했습니다. 종목을 직접 선택하세요.", HttpStatus.BAD_REQUEST);
         }
         eagerIngest(symbols);
         rule.setRunStatus("RUNNING");
@@ -214,6 +224,20 @@ public class PaperLifecycleService {
      *   장외에도 시작 가능하고, 실제 top-N 재선정은 다음 장중 틱에서 보정된다.
      * symbols/watchlist: u.symbols() 그대로 반환
      */
+    /** overrideSymbols를 정규화한다. 비어있으면 null(기존 유니버스 해석). */
+    private List<String> normalizeOverride(List<String> overrideSymbols) {
+        if (overrideSymbols == null || overrideSymbols.isEmpty()) {
+            return null;
+        }
+        LinkedHashSet<String> cleaned = new LinkedHashSet<>();
+        for (String s : overrideSymbols) {
+            if (s != null && !s.isBlank()) {
+                cleaned.add(s.trim());
+            }
+        }
+        return cleaned.isEmpty() ? null : List.copyOf(cleaned);
+    }
+
     private List<String> resolveSymbols(TradingRule rule) {
         try {
             RuleDefinition def = objectMapper.readValue(rule.getDefinition(), RuleDefinition.class);

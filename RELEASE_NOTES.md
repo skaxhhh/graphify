@@ -20,6 +20,31 @@
 
 ---
 
+## v1.6.0 — 운영 빈 DB 내성: KOSPI200 시드 + 유니버스 폴백 (2026-06-27)
+
+### Overview
+운영 빈 DB에서 `volume_top_n` 백테스트("유니버스에 수집된 종목이 없습니다")와 모의 start("유니버스 종목을 확인할 수 없습니다")가 실패하던 문제 해결. 근인은 운영 `companies.in_kospi200` 미시드(V30 UPDATE가 사전 존재 행에만 적용) + KOSPI200 일봉 적재 경로 부재(`ingestDailyForKospi200()`가 호출처 없는 dead code). 백테스트의 과거 거래대금 상위 선정 로직 자체는 이미 정상 — 데이터·부트스트랩만 빠져 있었음.
+
+### 관리자 부트스트랩 (Piece 1·2)
+- **KOSPI200 마스터 시드:** 정적 리소스 `resources/data/kospi200.csv`(99종목, SoT)를 ticker 기준 UPSERT — `market=KOSPI`, `instrumentType=COMMON_STOCK`, `in_kospi200=true`. 멱등. `POST /api/v1/admin/market/seed-kospi200` (ROLE_ADMIN).
+- **KOSPI200 일봉 적재:** `POST /api/v1/admin/market/ingest-kospi200` (ROLE_ADMIN) + 외부 스케줄러용 `POST /internal/market/ingest?interval=KOSPI200` (X-Internal-Token). dead code였던 `ingestDailyForKospi200()` 연결.
+- 관리자 UI: 시장데이터 패널(`AdminMarketDataPage`)에 시드/적재 버튼.
+
+### 유니버스 폴백 (Piece 3)
+- 빈 유니버스 에러를 사유별로 분리 — 백테스트 `ERR_BACKTEST_UNIVERSE_EMPTY`("거래대금 데이터 없음"), 모의 `ERR_LIFECYCLE_005`("실시간 랭킹 실패"). 둘 다 "종목을 직접 선택하세요" 안내.
+- 백테스트 `overrideSymbols`, 모의 start 바디 `{overrideSymbols}` 추가 — 비어있지 않으면 유니버스 자동해석을 우회해 선택 종목 사용(self-heal/eagerIngest로 적재). 기존 무바디 호출 호환.
+- 프론트 공통 `shared/CompanyPickerModal` — 회사 검색(다중선택·페이지네이션) 폴백 모달. 백테스트·모의 start 양쪽 재사용, 재시도 루프 가드 포함.
+
+### 검증
+- backend `./gradlew compileJava compileTestJava test` = BUILD SUCCESSFUL (128 tests). frontend `tsc -b && vite build` = clean.
+
+### 운영 적용 절차
+1. `POST /api/v1/admin/market/seed-kospi200` (또는 관리자 화면 버튼) → companies 플래그 복구.
+2. `POST /api/v1/admin/market/ingest-kospi200` → KOSPI200 일봉 적재.
+3. 이후 `volume_top_n` 백테스트/모의 start 정상화. (선택) `interval=KOSPI200` 일배치를 외부 스케줄러에 등록해 자동화.
+
+---
+
 ## v1.5.3 — 룰 중지 회귀 수정 & 백테스트 차트 매매 근거 (2026-06-24)
 
 ### Overview

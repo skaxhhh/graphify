@@ -9,6 +9,7 @@ const navItems = [
   { to: "/admin/prompts", label: "프롬프트" },
   { to: "/admin/openai", label: "OpenAI 설정" },
   { to: "/admin/vectordb", label: "Vector DB" },
+  { to: "/admin/market", label: "시장 데이터" },
 ];
 
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {

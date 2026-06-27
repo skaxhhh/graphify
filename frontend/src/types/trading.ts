@@ -92,6 +92,7 @@ export interface BacktestRequest {
   initialCash?: number;
   timeFrom?: string;   // HH:mm, e.g. "09:00"
   timeTo?: string;     // HH:mm, e.g. "12:00"
+  overrideSymbols?: string[]; // 빈 유니버스 폴백 — 직접 선택한 종목 (v1.6.0)
 }
 
 export interface BacktestTrade {

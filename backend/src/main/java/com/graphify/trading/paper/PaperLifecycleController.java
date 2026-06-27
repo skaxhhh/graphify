@@ -2,9 +2,12 @@ package com.graphify.trading.paper;
 
 import com.graphify.common.dto.ApiResponse;
 import com.graphify.history.HistoryService;
+import com.graphify.trading.paper.dto.StartRuleRequest;
 import com.graphify.trading.rule.dto.RuleResponse;
+import java.util.List;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,11 +37,18 @@ public class PaperLifecycleController {
         return ApiResponse.ok(lifecycleService.deactivate(userId, id));
     }
 
-    /** run축: ACTIVE/STOPPED → ACTIVE/RUNNING */
+    /**
+     * run축: ACTIVE/STOPPED → ACTIVE/RUNNING.
+     * 바디 {@code { "overrideSymbols": ["005930", ...] }}는 선택 — 있으면 유니버스 해석 대신 사용.
+     * 바디 없이도 동작(기존 호출 호환).
+     */
     @PostMapping("/{id}/start")
-    public ApiResponse<RuleResponse> start(@PathVariable Long id) {
+    public ApiResponse<RuleResponse> start(
+            @PathVariable Long id,
+            @RequestBody(required = false) StartRuleRequest request) {
         Long userId = HistoryService.requireCurrentUserId();
-        return ApiResponse.ok(lifecycleService.start(userId, id));
+        List<String> overrideSymbols = request != null ? request.overrideSymbols() : null;
+        return ApiResponse.ok(lifecycleService.start(userId, id, overrideSymbols));
     }
 
     /** run축: ACTIVE/RUNNING → ACTIVE/STOPPED */

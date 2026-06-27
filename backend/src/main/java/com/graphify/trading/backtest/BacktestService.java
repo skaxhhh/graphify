@@ -68,7 +68,10 @@ public class BacktestService {
                 ? request.initialCash()
                 : DEFAULT_CASH;
 
-        List<String> allSymbols = resolveInitialSymbols(def);
+        List<String> override = overrideSymbols(request);
+        List<String> allSymbols = override != null
+                ? override
+                : resolveInitialSymbols(def);
 
         // Load daily close data for volume_top_n symbol resolution
         Map<String, double[]> closesBySymbol = new LinkedHashMap<>();
@@ -96,7 +99,7 @@ public class BacktestService {
                 request,
                 def,
                 allSymbols,
-                (d, date) -> resolveSymbolsForDate(d, date, closesBySymbol, indexBySymbol),
+                (d, date) -> resolveSymbolsForDate(d, date, override, closesBySymbol, indexBySymbol),
                 ledger
         );
 
@@ -132,6 +135,22 @@ public class BacktestService {
     }
 
     /**
+     * 요청의 overrideSymbols를 정규화한다. 비어있지 않으면 유니버스 타입 무관하게
+     * 이 종목들을 사용한다(공백 제거·blank 필터). null/빈 리스트면 null 반환(기존 유니버스 해석).
+     */
+    private List<String> overrideSymbols(BacktestRequest request) {
+        if (request.overrideSymbols() == null || request.overrideSymbols().isEmpty()) {
+            return null;
+        }
+        List<String> cleaned = request.overrideSymbols().stream()
+                .filter(s -> s != null && !s.isBlank())
+                .map(String::trim)
+                .distinct()
+                .toList();
+        return cleaned.isEmpty() ? null : cleaned;
+    }
+
+    /**
      * 데이터 로드용 초기 종목 결정.
      * - symbols 타입: 유니버스 종목 목록 그대로
      * - volume_top_n 타입: 해당 시장의 KOSPI 200 전체 종목 + additionalSymbols
@@ -152,9 +171,8 @@ public class BacktestService {
             }
             if (all.isEmpty()) {
                 throw new GraphifyException(
-                        "ERR_BACKTEST_002",
-                        "volume_top_n 유니버스에 수집된 종목이 없습니다. "
-                        + "먼저 ingestDailyForKospi200()를 실행하세요.",
+                        "ERR_BACKTEST_UNIVERSE_EMPTY",
+                        "해당 기간 거래대금 데이터가 없습니다. 종목을 직접 선택하세요.",
                         HttpStatus.BAD_REQUEST);
             }
             return new ArrayList<>(all);
@@ -176,8 +194,17 @@ public class BacktestService {
      */
     private List<String> resolveSymbolsForDate(
             RuleDefinition def, LocalDate date,
+            List<String> override,
             Map<String, double[]> closesBySymbol,
             Map<String, Map<LocalDate, Integer>> indexBySymbol) {
+
+        // override 우선: 선택 종목 중 해당 날짜에 데이터가 있는 것만 평가
+        if (override != null) {
+            return override.stream()
+                    .filter(s -> closesBySymbol.containsKey(s)
+                            && indexBySymbol.get(s).containsKey(date))
+                    .toList();
+        }
 
         RuleDefinition.Universe u = def.universe();
         if ("volume_top_n".equals(u.type())) {
