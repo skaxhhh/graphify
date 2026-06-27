@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Phase 6.7 Plan 03 완료 — VolumeRankRefresher(매 틱 재선정+보유 포지션 union) + LiveEvaluationService 진입 게이팅 + DESIGN.md v1.5.0 일관성 방침 문서화. DATA-06 종결.
-stopped_at: Completed 06.7-03-PLAN.md — Phase 6.7 전체 완료 (DATA-06 종결)
-last_updated: "2026-06-22T15:42:02.752Z"
-last_activity: "2026-06-23 — 06.7-03 완료: VolumeRankRefresher 4/4 green(SC3/SC4), LiveEvaluationServiceVolumeTest 4/4 green(SC5b), DESIGN.md v1.5.0(SC5), 전체 테스트 BUILD SUCCESSFUL"
+status: Phase 6.8 IN PROGRESS — 06.8-01 완료 (Wave1 토대: trade primitives + TradingLayout shell + D3/D4/D8). 다음: 06.8-02/03/05 병렬.
+stopped_at: Completed 06.8-01-PLAN.md — trade primitive catalog + TradingLayout Binance shell + router IA
+last_updated: "2026-06-28T00:00:00.000Z"
+last_activity: "2026-06-28 — Phase 6.8 execute: 06.8-01 완료. 8 trade primitives (TradeButton/Badge/Card/StatCard/Table/PageState/Input/ModeIndicator) + TradingLayout 리빌드 (bg-trade-bg, D4 nav labels, TradeModeIndicator D8) + PaperTradingToggle segmented reskin + monitor ModeGuard LIVE→PAPER (D3). Build green, token guards clean."
 progress:
   total_phases: 12
   completed_phases: 10
-  total_plans: 34
-  completed_plans: 34
+  total_plans: 39
+  completed_plans: 35
   percent: 98
 ---
 
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6.7 (실시간 거래량 상위 유니버스) — 완료
-Plan: 06.7-03 완료 (Phase 6.7 전체 완료 — DATA-06 종결)
-Status: Phase 6.7 Plan 03 완료 — VolumeRankRefresher(매 틱 재선정+보유 포지션 union) + LiveEvaluationService 진입 게이팅 + DESIGN.md v1.5.0 일관성 방침 문서화. DATA-06 종결.
-Last activity: 2026-06-23 — 06.7-03 완료: VolumeRankRefresher 4/4 green(SC3/SC4), LiveEvaluationServiceVolumeTest 4/4 green(SC5b), DESIGN.md v1.5.0(SC5), 전체 테스트 BUILD SUCCESSFUL
+Phase: 6.8 (Trading 콘솔 UI 개편) — IN PROGRESS (Plan 1/5 완료)
+Plan: 06.8-01 완료 (Wave1 토대). 다음: 06.8-02(룰 클러스터) / 06.8-03(데이터 클러스터) / 06.8-05(공통+슬롯) 병렬, 06.8-04(백테스트) 마지막.
+Status: execute-phase 진행 중 — 01 완료: trade primitives 8종 + TradingLayout Binance shell (D3/D4/D8).
+Last activity: 2026-06-28 — 06.8-01 execute: trade primitive catalog + TradingLayout shell + PaperTradingToggle reskin + router D3 IA
 
-Progress: [██████████] 98% (Phase 6.7 완료, 전체 3 plans 완료)
+Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLANNED)
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [██████████] 98% (Phase 6.7 완료, 전체 3 plans
 | Phase 04 P07 | 5m | 2 tasks | 6 files |
 | Phase 04 P05 | 4m | 3 tasks | 6 files |
 | Phase 06 P01 | 3m | 2 tasks | 2 files |
+| Phase 06.8 P01 | 4m | 2 tasks | 12 files |
 | Phase 06 P02 | 2m | 2 tasks | 2 files |
 | Phase 06.5-role-split-trade-rationale P01 | 6m | 3 tasks | 9 files |
 | Phase 06.5 P02 | 8m | 2 tasks | 7 files |
@@ -179,6 +180,11 @@ Recent decisions affecting current work:
 - [Phase 06.6]: noUncheckedIndexedAccess: bars[i]! non-null assertions for bounds-checked loop access in candleIndicators
 - [Phase 06.6]: CandleSection 4 dark inline states instead of shared/ EmptyState/ErrorBanner — light cream/charcoal tokens incompatible with dark gray-900 page theme (RESEARCH Pitfall 7)
 - [Phase 06.6]: PaperHistoryPage useEffect auto-select triggers on data only (not selected) — single first-load trigger without re-triggering on user row clicks
+- [Phase 06.8, 06.8-01]: components/trading/ui/ primitive catalog (8종) — trade-only, shared/ 비파괴 (D6)
+- [Phase 06.8, 06.8-01]: monitor ModeGuard LIVE→PAPER (D3) + nav entry moved into PAPER group + liveItems에서 제거
+- [Phase 06.8, 06.8-01]: paperItems 라벨 "전략 설정"/"전략 운영" 통일 (D4); liveItems "전략 운영" (replaces "현재 룰"); "룰 수정" 엔트리 제거
+- [Phase 06.8, 06.8-01]: PaperTradingToggle segmented control 리스킨 (모의/실거래 버튼) — 기존 pill toggle 대체; LIVE 확인 CTA = bg-trade-primary (yellow, D8); applyMode/rollback 보존
+- [Phase 06.8, 06.8-01]: TradeModeIndicator 사이드바 헤더 하단 삽입 (D8); TradingLayout 루트 bg-trade-bg font-trade-sans
 
 ### Pending Todos
 
