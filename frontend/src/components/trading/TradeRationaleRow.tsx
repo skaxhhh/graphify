@@ -1,5 +1,6 @@
 // TradeRationaleRow — 백테스트/모의 거래 공유 근거 확장 행 컴포넌트 (06.5-05)
 // 필드명 출처: 06.5-03-SUMMARY.md (side, exitReason, exitPct, conditions[].{expr,leftLabel,leftValue,op,rightLabel,rightValue,passed})
+// 06.8-02: Reskinned to Binance dark tokens (no logic change, no string change)
 
 export interface ConditionResult {
   expr: string;
@@ -57,7 +58,7 @@ function exitLabel(rationale: TradeRationale): string | null {
 export function TradeRationaleRow({ rationale }: { rationale: TradeRationale | null }) {
   if (!rationale) {
     return (
-      <div className="py-2 text-xs text-gray-500">근거 정보 없음</div>
+      <div className="py-2 text-xs text-trade-muted">근거 정보 없음</div>
     );
   }
 
@@ -71,27 +72,28 @@ export function TradeRationaleRow({ rationale }: { rationale: TradeRationale | n
         <div
           className={
             isProfit
-              ? "font-medium text-emerald-400"
+              ? "font-medium text-trade-up"
               : isLoss
-              ? "font-medium text-red-400"
-              : "font-medium text-gray-300"
+              ? "font-medium text-trade-down"
+              : "font-medium text-trade-body"
           }
         >
           청산 사유: {label}
         </div>
       )}
       {rationale.conditions.length === 0 && !label && (
-        <div className="text-gray-500">조건 정보 없음</div>
+        <div className="text-trade-muted">조건 정보 없음</div>
       )}
       {rationale.conditions.map((c, i) => (
         <div key={i} className="flex items-center gap-2">
-          <span className={c.passed ? "text-emerald-400" : "text-red-400"}>
+          {/* ✓/✗ trigger markers — trade-up / trade-down */}
+          <span className={c.passed ? "text-trade-up" : "text-trade-down"}>
             {c.passed ? "✓" : "✗"}
           </span>
-          <span className="text-gray-300">
+          <span className="text-trade-body">
             {c.leftLabel}={c.leftValue.toFixed(2)} {c.op} {c.rightValue.toFixed(2)}
           </span>
-          <span className="text-gray-500 text-xs">({c.expr})</span>
+          <span className="text-xs text-trade-muted">({c.expr})</span>
         </div>
       ))}
     </div>
