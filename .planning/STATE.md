@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 6.8 IN PROGRESS — 06.8-01/02/03/05 완료. 06.8-04(백테스트) 미실행."
-stopped_at: Completed 06.8-05-PLAN.md — DDS Agent chat + 토스 설정 reskin + LIVE stub placeholders + Phase 7/8 disabled slots (D5/D7)
-last_updated: "2026-06-28T16:10:00.000Z"
-last_activity: "2026-06-28 — 06.8-05 execute: TradingChatPage Binance dark (setTimeout D5) + TossSettingsPage TradeBadge 3-way + TradingDashboardPage 서킷브레이커/Phase7/8 slots + TradingHistoryPage 준비중. Build green, token guards clean."
+status: "Phase 6.8 COMPLETE — 06.8-01/02/03/04/05 모두 완료. Phase 6.8 fully shipped."
+stopped_at: Completed 06.8-04-PLAN.md — PaperBacktestPage Binance dark reskin (form + 5 metrics + equity + candle + trade table + TradingCompanyPickerModal)
+last_updated: "2026-06-28T16:25:00.000Z"
+last_activity: "2026-06-28 — 06.8-04 execute: PaperBacktestPage full reskin — TradeInput form, TradeStatCard metrics, TradeCard equity/candle wrappers, native trade-token table, TradingCompanyPickerModal swap. Build green, token guards clean, D2 diff=0."
 progress:
   total_phases: 13
   completed_phases: 10
   total_plans: 39
-  completed_plans: 38
-  percent: 98
+  completed_plans: 39
+  percent: 100
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6.8 (Trading 콘솔 UI 개편) — IN PROGRESS (Plan 4/5 완료: 01/02/03/05)
-Plan: 06.8-05 완료 (공통 스크린 + LIVE/Phase7/8 슬롯). 미실행: 06.8-04(백테스트).
-Status: execute-phase 진행 중 — 05 완료: TradingChatPage + TossSettingsPage reskin (D5) + LIVE stubs + Phase 7 TV slot + Phase 8 승격 gate (D7).
-Last activity: 2026-06-28 — 06.8-05 execute: TradingChatPage + TossSettingsPage + TradingDashboardPage + TradingHistoryPage themed
+Phase: 6.8 (Trading 콘솔 UI 개편) — COMPLETE (모든 5개 플랜 완료: 01/02/03/04/05)
+Plan: 06.8-04 완료 (백테스트 페이지 Binance dark reskin). Phase 6.8 fully shipped.
+Status: execute-phase 완료 — 04 완료: PaperBacktestPage form + 5 metrics + equity + candle + trade table + TradingCompanyPickerModal.
+Last activity: 2026-06-28 — 06.8-04 execute: PaperBacktestPage fully reskinned (Binance dark). Build green, 0 token violations, D2 diff=0.
 
 Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLANNED)
 
@@ -76,6 +76,7 @@ Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLA
 | Phase 06.7 P03 | 8m | 3 tasks | 8 files |
 | Phase 06.8 P02 | 8m | 3 tasks | 5 files |
 | Phase 06.8 P05 | 3m | 2 tasks | 4 files |
+| Phase 06.8 P04 | 2m | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -195,6 +196,11 @@ Recent decisions affecting current work:
 - [Phase 06.8, 06.8-05]: LIVE/Phase7/8 stubs static-only (D7) — no useQuery/fetch/axios; all Phase 8 buttons disabled; 서킷 브레이커 배너 slot is placeholder text only
 - [Phase 06.8, 06.8-05]: Chat input uses themed textarea (not TradeInput) — TradeInput renders <input>, textarea needed for auto-height; trade tokens applied inline
 - [Phase 06.8]: 시작 button uses inline bg-trade-up rather than TradeButton variant — TradeButton has no green variant; avoids polluting primitive catalog
+- [Phase 06.8, 06.8-04]: Select (rule drop-down) styled inline with trade tokens (bg-trade-bg border-trade-hairline h-10) — TradeInput wraps <input> only, not <select>
+- [Phase 06.8, 06.8-04]: TradeButton primary without loading prop — children text conditional (실행 중.../백테스트 실행) preserves original Korean string byte-identical
+- [Phase 06.8, 06.8-04]: TradeCard used as plain wrapper (no title prop) for equity curve — custom flex header inside children provides title-left/sub-right layout matching wireframe
+- [Phase 06.8, 06.8-04]: CandleSection wrapped in TradeCard for trade-surface backdrop — CandleSection internals untouched (D2 diff = 0); first-trade auto-select preserved
+- [Phase 06.8, 06.8-04]: CompanyPickerModal (shared/) → TradingCompanyPickerModal (06.8-02) import path swap only; props byte-identical; shared/ untouched (D6)
 
 ### Pending Todos
 

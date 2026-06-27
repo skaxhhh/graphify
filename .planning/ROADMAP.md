@@ -20,7 +20,7 @@
 - [x] **Phase 6.5: 룰 설정/라이프사이클 역할 분리 & 매매 근거** (INSERTED) - 모의 룰 설정(DRAFT↔ACTIVE 관리)과 룰 라이프사이클(ACTIVE 중 PAPER_LIVE 적용 여부 + 시작/중지)의 역할을 분리하고, 백테스트·매매 이력에 매수/매도 근거(트리거 조건·지표값)를 표시한다 (completed 2026-06-22)
 - [x] **Phase 6.6: 5분봉 캔들 차트 시각화** (INSERTED) - lightweight-charts로 수익곡선 아래 5분봉 OHLCV 캔들 차트를 렌더링하고 진입/청산 시점을 마커로 표시한다 (completed 2026-06-22)
 - [x] **Phase 6.7: 실시간 거래량 상위 유니버스 (KRX 거래량 순위 연동)** (INSERTED) - volume_top_n 룰이 그날(현재까지 누적) 거래량 상위 종목을 실시간 동적 선정한다 (전체 KOSPI 보통주, ETF/ETN 제외, VolumeRankingProvider 포트; KRX auth-wall로 라이브 소스는 Yahoo 5분봉 누적 fallback) (completed 2026-06-23)
-- [ ] **Phase 6.8: Trading 콘솔 UI 개편 (Binance 테마 리스킨 + IA 재배치)** (INSERTED) - `/trading/**` 전 화면을 wireframe.html 기준 Binance 다크 트레이딩 테마로 리스킨하고 IA를 재배치한다. 백엔드·API·차트 엔진 불변(프론트 전용). tailwind에 `trade-*` 토큰 추가 완료, 화면 단위 상세 기획으로 빅뱅 통제. 상세: `phases/06.8-trading-ui-redesign/06.8-CONTEXT.md`
+- [x] **Phase 6.8: Trading 콘솔 UI 개편 (Binance 테마 리스킨 + IA 재배치)** (INSERTED) - `/trading/**` 전 화면을 wireframe.html 기준 Binance 다크 트레이딩 테마로 리스킨하고 IA를 재배치한다. 백엔드·API·차트 엔진 불변(프론트 전용). tailwind에 `trade-*` 토큰 추가 완료, 화면 단위 상세 기획으로 빅뱅 통제. 상세: `phases/06.8-trading-ui-redesign/06.8-CONTEXT.md` (completed 2026-06-27)
 - [ ] **Phase 7: TradingView webhook 연동** - 새 룰 타입(TRADINGVIEW)을 추가해 TradingView alert webhook을 비동기로 수신하고, JSON/LLM 파서로 매수/매도 신호를 해석하여 PAPER_LIVE 가상 체결에 활용한다. 사전 등록된 KOSPI 시총 상위 종목 풀에서 종목을 선택한다
 - [ ] **Phase 8: 실투자 주문 실행 & LIVE 승격** - LIVE 룰 평가에 따른 토스증권 실제 주문 발행, 시세 연동, 서킷 브레이커를 구현한다
 
