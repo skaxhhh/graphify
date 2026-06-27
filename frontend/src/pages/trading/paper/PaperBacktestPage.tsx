@@ -8,6 +8,12 @@ import { CandleSection } from "@/components/backtest/CandleSection";
 import { extractIndicators, fmtTradeKst, toEpochSec } from "@/components/backtest/candleIndicators";
 import { TradeRationaleRow, parseRationale } from "@/components/trading/TradeRationaleRow";
 import { CompanyPickerModal } from "@/components/shared/CompanyPickerModal";
+import {
+  TradeButton,
+  TradeCard,
+  TradeInput,
+  TradeStatCard,
+} from "@/components/trading/ui";
 
 const fmtMoney = (n: number) =>
   n.toLocaleString("ko-KR", { maximumFractionDigits: 0 }) + "원";
@@ -25,7 +31,12 @@ export function PaperBacktestPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<BacktestResult | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [selected, setSelected] = useState<{ symbol: string; date: string; time: number; side: "BUY" | "SELL" } | null>(null);
+  const [selected, setSelected] = useState<{
+    symbol: string;
+    date: string;
+    time: number;
+    side: "BUY" | "SELL";
+  } | null>(null);
   // v1.6.0: 빈 유니버스 폴백 — 종목 직접 선택 모달
   const [pickerOpen, setPickerOpen] = useState(false);
 
@@ -71,131 +82,168 @@ export function PaperBacktestPage() {
     onError: (err) => {
       setResult(null);
       // 빈 거래대금 유니버스 → 종목 직접 선택 모달로 폴백 (v1.6.0)
-      if (err instanceof ApiRequestError && err.code === "ERR_BACKTEST_UNIVERSE_EMPTY") {
+      if (
+        err instanceof ApiRequestError &&
+        err.code === "ERR_BACKTEST_UNIVERSE_EMPTY"
+      ) {
         setError(err.message);
         setPickerOpen(true);
         return;
       }
       setError(
-        err instanceof ApiRequestError ? err.message : "백테스트에 실패했습니다."
+        err instanceof ApiRequestError
+          ? err.message
+          : "백테스트에 실패했습니다."
       );
     },
   });
 
   return (
     <div>
+      {/* Page header */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white">백테스트</h2>
-        <p className="mt-1 text-sm text-gray-400">
-          저장된 모의 룰을 5분봉 인트라데이 데이터(09:00–12:00 KST, 최대 60일)로 검증합니다.
+        <h2 className="text-xl font-semibold text-trade-on-dark">백테스트</h2>
+        <p className="mt-1 text-sm text-trade-muted">
+          5분봉 인트라데이 (09:00–12:00 KST · 최대 60일) 검증
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
-        <div className="lg:col-span-1">
-          <label className="mb-1 block text-xs font-medium text-gray-300">룰</label>
-          <select
-            value={ruleId}
-            onChange={(e) =>
-              setRuleId(e.target.value === "" ? "" : Number(e.target.value))
-            }
-            className="w-full rounded-md border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-          >
-            <option value="">룰 선택…</option>
-            {(rules ?? []).map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name}
-              </option>
-            ))}
-          </select>
+      {/* Input card */}
+      <div className="rounded-lg border border-trade-hairline bg-trade-surface p-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-trade-muted">
+              룰
+            </label>
+            <select
+              value={ruleId}
+              onChange={(e) =>
+                setRuleId(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              className="h-10 w-full rounded-md border border-trade-hairline bg-trade-bg px-3 text-sm text-trade-on-dark font-trade-sans focus:outline-none focus:ring-2 focus:ring-trade-info"
+            >
+              <option value="">룰 선택…</option>
+              {(rules ?? []).map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-trade-muted">
+              시작일
+            </label>
+            <TradeInput
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-trade-muted">
+              종료일
+            </label>
+            <TradeInput
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-trade-muted">
+              시간대
+            </label>
+            <div className="flex items-center gap-2">
+              <TradeInput
+                type="time"
+                value={timeFrom}
+                onChange={(e) => setTimeFrom(e.target.value)}
+              />
+              <span className="shrink-0 text-sm text-trade-muted">–</span>
+              <TradeInput
+                type="time"
+                value={timeTo}
+                onChange={(e) => setTimeTo(e.target.value)}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-trade-muted">
+              초기 자본
+            </label>
+            <TradeInput
+              mono
+              type="number"
+              value={initialCash}
+              onChange={(e) => setInitialCash(e.target.value)}
+            />
+          </div>
+          <div className="flex items-end">
+            <TradeButton
+              variant="primary"
+              disabled={mutation.isPending || ruleId === ""}
+              onClick={() => mutation.mutate(undefined)}
+              className="w-full"
+            >
+              {mutation.isPending ? "실행 중..." : "백테스트 실행"}
+            </TradeButton>
+          </div>
         </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-300">시작일</label>
-          <input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            className="w-full rounded-md border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-300">종료일</label>
-          <input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            className="w-full rounded-md border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-300">시작 시각</label>
-          <input
-            type="time"
-            value={timeFrom}
-            onChange={(e) => setTimeFrom(e.target.value)}
-            className="w-full rounded-md border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-300">종료 시각</label>
-          <input
-            type="time"
-            value={timeTo}
-            onChange={(e) => setTimeTo(e.target.value)}
-            className="w-full rounded-md border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-xs font-medium text-gray-300">초기 자본</label>
-          <input
-            type="number"
-            value={initialCash}
-            onChange={(e) => setInitialCash(e.target.value)}
-            className="w-full rounded-md border border-white/10 bg-gray-800 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-          />
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-3">
-        <button
-          type="button"
-          disabled={mutation.isPending || ruleId === ""}
-          onClick={() => mutation.mutate(undefined)}
-          className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-50"
-        >
-          {mutation.isPending ? "실행 중..." : "백테스트 실행"}
-        </button>
-        {error ? <span className="text-xs text-red-400">{error}</span> : null}
+        {error ? (
+          <p className="mt-3 text-xs text-trade-down">{error}</p>
+        ) : null}
       </div>
 
       {result ? (
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-4">
           {/* Summary metrics — 5 cards */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            <Metric label="최종 평가액" value={fmtMoney(result.finalEquity)} />
-            <Metric
+            <TradeStatCard
+              label="최종 평가액"
+              value={fmtMoney(result.finalEquity)}
+            />
+            <TradeStatCard
               label="수익률"
               value={fmtPct(result.returnPct)}
-              positive={result.returnPct >= 0}
+              valueColor={result.returnPct >= 0 ? "up" : "down"}
             />
-            <Metric label="최대 낙폭(MDD)" value={`-${result.maxDrawdownPct.toFixed(2)}%`} />
-            <Metric label="승률" value={`${result.winRate.toFixed(1)}%`} />
-            <Metric label="거래 횟수" value={`${result.tradeCount}회`} />
+            <TradeStatCard
+              label="MDD"
+              value={`-${result.maxDrawdownPct.toFixed(2)}%`}
+              valueColor="down"
+            />
+            <TradeStatCard
+              label="승률"
+              value={`${result.winRate.toFixed(1)}%`}
+            />
+            <TradeStatCard
+              label="거래수"
+              value={`${result.tradeCount}회`}
+            />
           </div>
 
           {/* Equity curve chart with drawdown overlays */}
-          <div className="rounded-lg border border-white/10 bg-gray-900/50 p-4">
-            <h3 className="mb-4 text-sm font-medium text-gray-300">수익 곡선</h3>
+          <TradeCard>
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-semibold text-trade-on-dark font-trade-sans">
+                수익 곡선
+              </span>
+              <span className="text-xs text-trade-muted">
+                드로우다운 음영 오버레이
+              </span>
+            </div>
             <EquityCurveChart
               data={result.equityCurve}
               drawdownSegments={result.drawdownSegments ?? []}
               initialCash={result.initialCash}
             />
-          </div>
+          </TradeCard>
 
           {/* Candle chart section — below equity curve (SC-4) */}
           {(() => {
-            const ruleDef = (rules ?? []).find((r) => r.id === ruleId)?.definition;
+            const ruleDef = (rules ?? []).find((r) => r.id === ruleId)
+              ?.definition;
             const indicators = ruleDef ? extractIndicators(ruleDef) : [];
             return (
               <CandleSection
@@ -211,119 +259,153 @@ export function PaperBacktestPage() {
 
           {/* Advanced statistics — 3 cards */}
           <div>
-            <h3 className="mb-3 text-sm font-medium text-gray-300">고급 통계</h3>
+            <p className="mb-3 text-sm font-semibold text-trade-on-dark font-trade-sans">
+              고급 통계
+            </p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <StatCard
+              <TradeStatCard
                 label="Sharpe Ratio"
                 value={fmtStat(result.sharpeRatio)}
-                description="연환산 샤프 비율 (무위험수익률 0%, √9000 연환산)"
+                sub="연환산 샤프 비율 (무위험수익률 0%, √9000 연환산)"
               />
-              <StatCard
+              <TradeStatCard
                 label="Sortino Ratio"
                 value={fmtStat(result.sortinoRatio)}
-                description="하방 변동성만 반영한 위험 조정 수익률"
+                sub="하방 변동성만 반영한 위험 조정 수익률"
               />
-              <StatCard
+              <TradeStatCard
                 label="Profit Factor"
                 value={fmtStat(result.profitFactor)}
-                description="총 이익 / 총 손실 (1.0 초과 시 수익 우위)"
+                sub="총 이익 / 총 손실 (1.0 초과 시 수익 우위)"
               />
             </div>
           </div>
 
-          {/* Trade history table with rationale accordion */}
+          {/* Trade history table with rationale accordion — Task 2 theming */}
           <div>
-            <p className="mb-2 text-xs text-gray-500">행을 클릭하면 매매 근거를 확인할 수 있습니다.</p>
-            <div className="overflow-hidden rounded-lg border border-white/10 bg-gray-900/50">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/10 text-left text-gray-400">
-                    <th className="px-4 py-3 font-medium">일시 (KST)</th>
-                    <th className="px-4 py-3 font-medium">종목</th>
-                    <th className="px-4 py-3 font-medium">구분</th>
-                    <th className="px-4 py-3 text-right font-medium">수량</th>
-                    <th className="px-4 py-3 text-right font-medium">가격</th>
-                    <th className="px-4 py-3 text-right font-medium">손익</th>
-                    <th className="px-4 py-3 text-right font-medium w-8"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.trades.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} className="px-4 py-6 text-center text-gray-400">
-                        체결된 거래가 없습니다.
-                      </td>
+            <p className="mb-2 text-xs text-trade-muted">
+              행을 클릭하면 매매 근거를 확인할 수 있습니다.
+            </p>
+            <div className="overflow-hidden rounded-lg border border-trade-hairline bg-trade-surface">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-trade-hairline text-left text-trade-muted">
+                      <th className="px-4 py-3 font-medium font-trade-sans">
+                        일시 (KST)
+                      </th>
+                      <th className="px-4 py-3 font-medium font-trade-sans">
+                        종목
+                      </th>
+                      <th className="px-4 py-3 font-medium font-trade-sans">
+                        구분
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium font-trade-sans">
+                        수량
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium font-trade-sans">
+                        가격
+                      </th>
+                      <th className="px-4 py-3 text-right font-medium font-trade-sans">
+                        손익
+                      </th>
+                      <th className="w-8 px-4 py-3 text-right font-medium font-trade-sans"></th>
                     </tr>
-                  ) : (
-                    result.trades.map((t, i) => {
-                      const isExpanded = expandedId === i;
-                      const rationale = parseRationale(t.rationaleJson ?? null);
-                      const hasRationale = rationale !== null;
-                      const handleRowClick = () => {
-                        // Always load chart for this trade (locked §1 + RESEARCH Pattern 7)
-                        setSelected({
-                          symbol: t.symbol,
-                          date: t.datetime.slice(0, 10),
-                          time: toEpochSec(t.datetime),
-                          side: t.side,
-                        });
-                        // Toggle accordion only when rationale is available
-                        if (hasRationale) {
-                          setExpandedId(isExpanded ? null : i);
-                        }
-                      };
-                      return (
-                        <>
-                          <tr
-                            key={`row-${i}`}
-                            onClick={handleRowClick}
-                            className="cursor-pointer border-b border-white/5 last:border-0 hover:bg-white/5"
-                          >
-                            <td className="px-4 py-2 text-gray-300 whitespace-nowrap">{fmtTradeKst(t.datetime)}</td>
-                            <td className="px-4 py-2 text-white">
-                              {t.companyName ? `${t.companyName} (${t.symbol})` : t.symbol}
-                            </td>
-                            <td className="px-4 py-2">
-                              <span
-                                className={
-                                  t.side === "BUY" ? "text-emerald-400" : "text-red-400"
-                                }
-                              >
-                                {t.side === "BUY" ? "매수" : "매도"}
-                              </span>
-                            </td>
-                            <td className="px-4 py-2 text-right text-gray-300">{t.qty}</td>
-                            <td className="px-4 py-2 text-right text-gray-300">
-                              {t.price.toLocaleString("ko-KR")}
-                            </td>
-                            <td
-                              className={`px-4 py-2 text-right ${
-                                t.pnl == null
-                                  ? "text-gray-500"
-                                  : t.pnl >= 0
-                                  ? "text-emerald-400"
-                                  : "text-red-400"
-                              }`}
+                  </thead>
+                  <tbody>
+                    {result.trades.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={7}
+                          className="px-4 py-6 text-center text-trade-muted"
+                        >
+                          체결된 거래가 없습니다.
+                        </td>
+                      </tr>
+                    ) : (
+                      result.trades.map((t, i) => {
+                        const isExpanded = expandedId === i;
+                        const rationale = parseRationale(
+                          t.rationaleJson ?? null
+                        );
+                        const hasRationale = rationale !== null;
+                        const handleRowClick = () => {
+                          // Always load chart for this trade (locked §1 + RESEARCH Pattern 7)
+                          setSelected({
+                            symbol: t.symbol,
+                            date: t.datetime.slice(0, 10),
+                            time: toEpochSec(t.datetime),
+                            side: t.side,
+                          });
+                          // Toggle accordion only when rationale is available
+                          if (hasRationale) {
+                            setExpandedId(isExpanded ? null : i);
+                          }
+                        };
+                        return (
+                          <>
+                            <tr
+                              key={`row-${i}`}
+                              onClick={handleRowClick}
+                              className="cursor-pointer border-b border-trade-hairline/50 last:border-0 hover:bg-trade-elevated transition-colors"
                             >
-                              {t.pnl == null ? "—" : fmtMoney(t.pnl)}
-                            </td>
-                            <td className="px-4 py-2 text-right text-gray-400 text-xs">
-                              {hasRationale ? (isExpanded ? "▲" : "▼") : ""}
-                            </td>
-                          </tr>
-                          {isExpanded && (
-                            <tr key={`rationale-${i}`} className="bg-gray-800/40">
-                              <td colSpan={7} className="px-6 py-3">
-                                <TradeRationaleRow rationale={rationale} />
+                              <td className="px-4 py-2 text-trade-muted font-trade-mono whitespace-nowrap">
+                                {fmtTradeKst(t.datetime)}
+                              </td>
+                              <td className="px-4 py-2 text-trade-on-dark">
+                                {t.companyName
+                                  ? `${t.companyName} (${t.symbol})`
+                                  : t.symbol}
+                              </td>
+                              <td className="px-4 py-2">
+                                <span
+                                  className={
+                                    t.side === "BUY"
+                                      ? "text-trade-up"
+                                      : "text-trade-down"
+                                  }
+                                >
+                                  {t.side === "BUY" ? "매수" : "매도"}
+                                </span>
+                              </td>
+                              <td className="px-4 py-2 text-right text-trade-muted font-trade-mono">
+                                {t.qty}
+                              </td>
+                              <td className="px-4 py-2 text-right text-trade-muted font-trade-mono">
+                                {t.price.toLocaleString("ko-KR")}
+                              </td>
+                              <td
+                                className={`px-4 py-2 text-right font-trade-mono ${
+                                  t.pnl == null
+                                    ? "text-trade-muted"
+                                    : t.pnl >= 0
+                                    ? "text-trade-up"
+                                    : "text-trade-down"
+                                }`}
+                              >
+                                {t.pnl == null ? "—" : fmtMoney(t.pnl)}
+                              </td>
+                              <td className="px-4 py-2 text-right text-trade-muted text-xs">
+                                {hasRationale ? (isExpanded ? "▲" : "▼") : ""}
                               </td>
                             </tr>
-                          )}
-                        </>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
+                            {isExpanded && (
+                              <tr
+                                key={`rationale-${i}`}
+                                className="bg-trade-elevated/40"
+                              >
+                                <td colSpan={7} className="px-6 py-3">
+                                  <TradeRationaleRow rationale={rationale} />
+                                </td>
+                              </tr>
+                            )}
+                          </>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -340,51 +422,6 @@ export function PaperBacktestPage() {
           mutation.mutate(symbols);
         }}
       />
-    </div>
-  );
-}
-
-function Metric({
-  label,
-  value,
-  positive,
-}: {
-  label: string;
-  value: string;
-  positive?: boolean;
-}) {
-  return (
-    <div className="rounded-lg border border-white/10 bg-gray-900/50 p-4">
-      <p className="text-xs text-gray-400">{label}</p>
-      <p
-        className={`mt-1 text-lg font-semibold ${
-          positive === undefined
-            ? "text-white"
-            : positive
-            ? "text-emerald-400"
-            : "text-red-400"
-        }`}
-      >
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  description,
-}: {
-  label: string;
-  value: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-lg border border-white/10 bg-gray-800 p-4">
-      <p className="text-sm text-gray-400">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-white">{value}</p>
-      <p className="mt-1 text-xs text-gray-500">{description}</p>
     </div>
   );
 }
