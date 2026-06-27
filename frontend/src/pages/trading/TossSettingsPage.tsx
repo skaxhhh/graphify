@@ -6,6 +6,7 @@ import {
   saveTossCredentials,
   type TossCredentialStatus,
 } from "@/lib/tossApi";
+import { TradeBadge, TradeButton, TradeCard, TradeInput } from "@/components/trading/ui";
 
 function fmtKst(iso: string | null): string {
   if (!iso) return "-";
@@ -19,25 +20,21 @@ function fmtKst(iso: string | null): string {
   });
 }
 
+function statusDotColor(status: TossCredentialStatus | undefined): string {
+  if (!status || !status.configured) return "bg-trade-muted";
+  if (status.tokenValid) return "bg-trade-up";
+  return "bg-trade-down";
+}
+
 function StatusBadge({ status }: { status: TossCredentialStatus | undefined }) {
   if (!status) return null;
   if (!status.configured) {
-    return (
-      <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300">미설정</span>
-    );
+    return <TradeBadge variant="draft">미설정</TradeBadge>;
   }
   if (status.tokenValid) {
-    return (
-      <span className="rounded bg-emerald-700 px-2 py-1 text-xs text-white">
-        설정됨 · 토큰 유효
-      </span>
-    );
+    return <TradeBadge variant="up">설정됨 · 토큰 유효</TradeBadge>;
   }
-  return (
-    <span className="rounded bg-yellow-700 px-2 py-1 text-xs text-white">
-      설정됨 · 토큰 만료
-    </span>
-  );
+  return <TradeBadge variant="down">설정됨 · 토큰 만료</TradeBadge>;
 }
 
 export function TossSettingsPage() {
@@ -89,95 +86,107 @@ export function TossSettingsPage() {
   return (
     <div className="max-w-lg space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-white">토스 설정</h2>
-        <p className="mt-1 text-sm text-gray-400">
+        <h2 className="font-trade-sans text-xl font-semibold text-trade-on-dark">토스 설정</h2>
+        <p className="mt-1 font-trade-sans text-sm text-trade-muted">
           토스증권 Open API 자격증명을 등록합니다. 입력 정보는 AES-256-GCM으로 암호화되어
           저장됩니다.
         </p>
       </div>
 
       {/* Status card */}
-      <div className="rounded-lg border border-white/10 bg-gray-900/50 p-4">
+      <TradeCard>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-gray-400">연결 상태</p>
-            <div className="mt-2">
+            <p className="font-trade-sans text-xs text-trade-muted">연결 상태</p>
+            <div className="mt-2 flex items-center gap-2">
+              <span className={`h-2 w-2 rounded-full ${statusDotColor(status)}`} />
               {isLoading ? (
-                <span className="text-sm text-gray-500">확인 중...</span>
+                <span className="font-trade-sans text-sm text-trade-muted">확인 중…</span>
               ) : (
                 <StatusBadge status={status} />
               )}
             </div>
             {status?.tokenExpiresAt && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 font-trade-mono text-xs text-trade-muted">
                 토큰 만료: {fmtKst(status.tokenExpiresAt)}
               </p>
             )}
           </div>
           {status?.configured && (
-            <button
-              type="button"
+            <TradeButton
+              variant="secondary"
+              size="sm"
               disabled={refreshMutation.isPending}
-              onClick={() => { setMessage(null); refreshMutation.mutate(); }}
-              className="rounded border border-white/20 px-3 py-1.5 text-xs text-gray-300 hover:bg-white/5 disabled:opacity-40"
+              onClick={() => {
+                setMessage(null);
+                refreshMutation.mutate();
+              }}
             >
               {refreshMutation.isPending ? "갱신 중..." : "토큰 수동 갱신"}
-            </button>
+            </TradeButton>
           )}
         </div>
-      </div>
+      </TradeCard>
 
       {/* Credentials form */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="clientId" className="block text-sm font-medium text-gray-300">
+          <label
+            htmlFor="clientId"
+            className="block font-trade-sans text-sm font-medium text-trade-body"
+          >
             Client ID
           </label>
-          <input
+          <TradeInput
             id="clientId"
             type="password"
             autoComplete="off"
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             placeholder="토스증권 client_id"
-            className="mt-1 w-full rounded-md border border-white/20 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none"
+            mono
+            className="mt-1"
           />
         </div>
         <div>
-          <label htmlFor="clientSecret" className="block text-sm font-medium text-gray-300">
+          <label
+            htmlFor="clientSecret"
+            className="block font-trade-sans text-sm font-medium text-trade-body"
+          >
             Client Secret
           </label>
-          <input
+          <TradeInput
             id="clientSecret"
             type="password"
             autoComplete="off"
             value={clientSecret}
             onChange={(e) => setClientSecret(e.target.value)}
             placeholder="토스증권 client_secret"
-            className="mt-1 w-full rounded-md border border-white/20 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-emerald-500 focus:outline-none"
+            mono
+            className="mt-1"
           />
         </div>
 
         {message && (
           <p
-            className={`text-sm ${
-              message.type === "success" ? "text-emerald-400" : "text-red-400"
+            className={`font-trade-sans text-sm ${
+              message.type === "success" ? "text-trade-up" : "text-trade-down"
             }`}
           >
             {message.text}
           </p>
         )}
 
-        <button
+        <TradeButton
           type="submit"
+          variant="primary"
           disabled={!clientId.trim() || !clientSecret.trim() || saveMutation.isPending}
-          className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {saveMutation.isPending ? "저장 중..." : "자격증명 저장"}
-        </button>
+        </TradeButton>
       </form>
 
-      <p className="text-xs text-gray-600">
+      <p className="font-trade-sans text-xs text-trade-muted">
         토스증권 Open API는 토스증권 앱 → 서비스 → Open API에서 발급받을 수 있습니다.
       </p>
     </div>

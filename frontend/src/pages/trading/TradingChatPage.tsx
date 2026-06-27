@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { TradeButton } from "@/components/trading/ui";
 
 interface Message {
   id: string;
@@ -10,13 +11,13 @@ interface Message {
 function TypingIndicator() {
   return (
     <div className="flex items-end gap-2">
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-400">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-trade-elevated font-trade-mono text-xs font-bold text-trade-primary">
         D
       </div>
-      <div className="flex items-center gap-1 rounded-2xl rounded-bl-sm bg-gray-800 px-4 py-3">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.3s]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.15s]" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-gray-400" />
+      <div className="flex items-center gap-1 rounded-2xl rounded-bl-sm bg-trade-surface px-4 py-3">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-trade-muted [animation-delay:-0.3s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-trade-muted [animation-delay:-0.15s]" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-trade-muted" />
       </div>
     </div>
   );
@@ -24,25 +25,31 @@ function TypingIndicator() {
 
 function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === "user";
+  const ts = message.createdAt.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
   return (
     <div className={`flex items-end gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
       {!isUser ? (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-400">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-trade-elevated font-trade-mono text-xs font-bold text-trade-primary">
           D
         </div>
       ) : (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-600 text-xs font-bold text-gray-300">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-trade-elevated font-trade-mono text-xs font-bold text-trade-muted-strong">
           나
         </div>
       )}
-      <div
-        className={`max-w-[70%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-          isUser
-            ? "rounded-br-sm bg-emerald-600 text-white"
-            : "rounded-bl-sm bg-gray-800 text-gray-100"
-        }`}
-      >
-        {message.content}
+      <div className={`flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
+        <div
+          className={`max-w-[70%] whitespace-pre-wrap rounded-2xl px-4 py-3 text-sm leading-relaxed font-trade-sans text-trade-body ${
+            isUser ? "rounded-br-sm bg-trade-elevated" : "rounded-bl-sm bg-trade-surface"
+          }`}
+        >
+          {message.content}
+        </div>
+        <span className="text-xs font-trade-mono text-trade-muted">{ts}</span>
       </div>
     </div>
   );
@@ -108,21 +115,24 @@ export function TradingChatPage() {
     <div className="flex h-[calc(100vh-3.5rem-2rem)] flex-col">
       {/* 헤더 */}
       <div className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-          <span className="text-sm font-bold text-emerald-400">D</span>
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-trade-elevated">
+          <span className="font-trade-mono text-sm font-bold text-trade-primary">D</span>
         </div>
         <div>
-          <p className="font-semibold text-white">DDS Agent</p>
-          <p className="text-xs text-gray-400">모니터링 · 설명 · 리포팅</p>
+          <p className="font-trade-sans font-semibold text-trade-on-dark">DDS Agent</p>
+          <p className="font-trade-sans text-xs text-trade-muted">모니터링 · 설명 · 리포팅</p>
         </div>
-        <span className="ml-auto flex items-center gap-1.5 text-xs text-emerald-400">
-          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+        <span className="ml-auto flex items-center gap-1.5 font-trade-sans text-xs text-trade-up">
+          <span className="h-2 w-2 rounded-full bg-trade-up" />
           대기 중
+        </span>
+        <span className="rounded border border-trade-hairline bg-trade-surface px-2 py-0.5 font-trade-mono text-xs text-trade-muted">
+          STATE
         </span>
       </div>
 
       {/* 메시지 영역 */}
-      <div className="flex-1 space-y-4 overflow-y-auto rounded-xl border border-white/10 bg-gray-900/50 p-4">
+      <div className="flex-1 space-y-4 overflow-y-auto rounded-xl border border-trade-hairline bg-trade-surface p-4">
         {messages.map((msg) => (
           <ChatMessage key={msg.id} message={msg} />
         ))}
@@ -139,7 +149,7 @@ export function TradingChatPage() {
           onKeyDown={handleKeyDown}
           placeholder="메시지를 입력하세요... (Enter로 전송, Shift+Enter 줄바꿈)"
           rows={1}
-          className="flex-1 resize-none rounded-xl border border-white/10 bg-gray-800 px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          className="flex-1 resize-none rounded-xl border border-trade-hairline bg-trade-surface px-4 py-3 font-trade-sans text-sm text-trade-body placeholder:text-trade-muted focus:outline-none focus:ring-2 focus:ring-trade-info"
           style={{ maxHeight: "8rem", overflowY: "auto" }}
           onInput={(e) => {
             const el = e.currentTarget;
@@ -147,16 +157,16 @@ export function TradingChatPage() {
             el.style.height = `${Math.min(el.scrollHeight, 128)}px`;
           }}
         />
-        <button
+        <TradeButton
           type="submit"
+          variant="primary"
           disabled={!input.trim() || isTyping}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-600 text-white transition-opacity hover:bg-emerald-500 disabled:opacity-40"
-          aria-label="전송"
+          className="h-11 w-11 shrink-0 rounded-xl px-0"
         >
           <svg className="h-4 w-4 rotate-90" fill="currentColor" viewBox="0 0 24 24">
             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
           </svg>
-        </button>
+        </TradeButton>
       </form>
     </div>
   );
