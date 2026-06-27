@@ -7,7 +7,7 @@ import { EquityCurveChart } from "@/components/backtest/EquityCurveChart";
 import { CandleSection } from "@/components/backtest/CandleSection";
 import { extractIndicators, fmtTradeKst, toEpochSec } from "@/components/backtest/candleIndicators";
 import { TradeRationaleRow, parseRationale } from "@/components/trading/TradeRationaleRow";
-import { CompanyPickerModal } from "@/components/shared/CompanyPickerModal";
+import { TradingCompanyPickerModal } from "@/components/trading/TradingCompanyPickerModal";
 import {
   TradeButton,
   TradeCard,
@@ -240,20 +240,22 @@ export function PaperBacktestPage() {
             />
           </TradeCard>
 
-          {/* Candle chart section — below equity curve (SC-4) */}
+          {/* Candle chart section — reused D2, wrapped in TradeCard (SC-4) */}
           {(() => {
             const ruleDef = (rules ?? []).find((r) => r.id === ruleId)
               ?.definition;
             const indicators = ruleDef ? extractIndicators(ruleDef) : [];
             return (
-              <CandleSection
-                symbol={selected?.symbol ?? null}
-                date={selected?.date ?? null}
-                trades={result.trades}
-                indicators={indicators}
-                highlightTime={selected?.time}
-                highlightSide={selected?.side}
-              />
+              <TradeCard>
+                <CandleSection
+                  symbol={selected?.symbol ?? null}
+                  date={selected?.date ?? null}
+                  trades={result.trades}
+                  indicators={indicators}
+                  highlightTime={selected?.time}
+                  highlightSide={selected?.side}
+                />
+              </TradeCard>
             );
           })()}
 
@@ -411,7 +413,7 @@ export function PaperBacktestPage() {
         </div>
       ) : null}
 
-      <CompanyPickerModal
+      <TradingCompanyPickerModal
         open={pickerOpen}
         title="백테스트 종목 직접 선택"
         description="해당 기간 거래대금 데이터가 없습니다. 종목을 직접 선택하세요."
