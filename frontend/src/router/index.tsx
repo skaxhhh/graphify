@@ -146,7 +146,7 @@ export const router = createBrowserRouter([
       {
         path: "monitor",
         element: (
-          <ModeGuard mode="LIVE">
+          <ModeGuard mode="PAPER">
             <TradingMonitorPage />
           </ModeGuard>
         ),

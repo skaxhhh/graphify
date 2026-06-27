@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useTradingStore } from "@/stores/tradingStore";
 import { updateTradingMode } from "@/lib/tradingApi";
 import type { TradingMode } from "@/types/user";
+import { TradeButton } from "@/components/trading/ui/TradeButton";
 
+// RESKIN ONLY — applyMode / optimistic-update / rollback / confirmLive flow preserved exactly
 export function PaperTradingToggle() {
   const mode = useTradingStore((s) => s.mode);
   const setMode = useTradingStore((s) => s.setMode);
@@ -36,33 +38,42 @@ export function PaperTradingToggle() {
   };
 
   return (
-    <div className="border-t border-white/10 p-3">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-col">
-          <span className="text-sm text-gray-300">모의투자</span>
-          <span
-            className={`text-xs ${isPaper ? "text-emerald-400" : "text-red-400"}`}
-          >
-            {isPaper ? "모의투자 모드" : "실거래 중"}
-          </span>
-        </div>
+    <div className="px-3 py-3 font-trade-sans">
+      {/* D8: 세그먼트 토글 — 모의/실거래 */}
+      <div className="bg-trade-bg rounded-lg p-1 flex gap-1 mb-3">
+        <button
+          type="button"
+          onClick={() => !isPaper && !pending && void applyMode("PAPER")}
+          disabled={pending}
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition-colors disabled:opacity-50 ${
+            isPaper
+              ? "bg-trade-primary text-trade-ink"
+              : "bg-transparent text-trade-muted hover:text-trade-body"
+          }`}
+        >
+          모의
+        </button>
         <button
           type="button"
           onClick={handleToggle}
           disabled={pending}
-          aria-label={isPaper ? "실거래 모드로 전환" : "모의투자 모드로 전환"}
-          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${
-            isPaper ? "bg-emerald-500" : "bg-white/20"
+          aria-label="실거래 모드로 전환"
+          className={`flex-1 rounded-md py-1.5 text-sm font-semibold transition-colors disabled:opacity-50 ${
+            !isPaper
+              ? "bg-trade-primary text-trade-ink"
+              : "bg-transparent text-trade-muted hover:text-trade-body"
           }`}
         >
-          <span
-            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-              isPaper ? "translate-x-6" : "translate-x-1"
-            }`}
-          />
+          실거래
         </button>
       </div>
 
+      {/* 현재 모드 상태 텍스트 */}
+      <p className={`text-xs text-center ${isPaper ? "text-trade-up" : "text-trade-down"}`}>
+        {isPaper ? "모의투자 모드" : "실거래 중"}
+      </p>
+
+      {/* PAPER → LIVE 위험 확인 모달 (D8: 옐로우 확인 CTA) */}
       {confirmLive ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <button
@@ -71,30 +82,39 @@ export function PaperTradingToggle() {
             aria-label="닫기"
             onClick={() => setConfirmLive(false)}
           />
-          <div className="relative w-full max-w-sm rounded-lg border border-white/10 bg-gray-900 p-6 shadow-xl">
-            <h2 className="text-base font-semibold text-white">실거래 모드 전환</h2>
-            <p className="mt-2 text-sm text-gray-400">
-              실거래 모드로 전환합니다. 실제 자금이 사용될 수 있습니다. 계속하시겠습니까?
+          <div className="relative w-full max-w-sm rounded-xl border border-trade-hairline bg-trade-surface p-6 shadow-2xl">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-trade-down-soft">
+                <span className="text-trade-down font-bold text-base">!</span>
+              </span>
+              <h2 className="text-base font-semibold text-trade-on-dark font-trade-sans">
+                실거래 모드로 전환
+              </h2>
+            </div>
+            <p className="text-sm text-trade-muted font-trade-sans leading-relaxed">
+              실거래(LIVE) 모드에서는 토스증권 실계좌로{" "}
+              <span className="text-trade-down font-semibold">실제 주문이 발행</span>됩니다.
+              검증된 룰만 운영하세요. 계속하시겠습니까?
             </p>
             <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
+              <TradeButton
+                variant="secondary"
+                size="sm"
                 onClick={() => setConfirmLive(false)}
-                className="rounded-md border border-white/20 px-4 py-2 text-sm text-gray-300 hover:bg-white/5"
               >
                 취소
-              </button>
-              <button
-                type="button"
+              </TradeButton>
+              <TradeButton
+                variant="primary"
+                size="sm"
                 disabled={pending}
                 onClick={() => {
                   setConfirmLive(false);
                   void applyMode("LIVE");
                 }}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm text-white transition-opacity hover:opacity-90 disabled:opacity-50"
               >
                 실거래로 전환
-              </button>
+              </TradeButton>
             </div>
           </div>
         </div>
