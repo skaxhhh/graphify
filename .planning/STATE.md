@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "execute-phase 완료 — 06.9-03: GET /runs + GET /runs/{runId}/dashboard|history|report (2-mode). Full suite green."
-stopped_at: Completed 06.9-03-PLAN.md — PaperRunListController + PaperRunDetailController (dashboard/history/report 2-mode)
-last_updated: "2026-06-28T02:44:45.326Z"
+status: "execute-phase 완료 — 06.9-04: nav 3그룹 + 토스 PAPER 숨김 + 폐기 페이지 4종 제거 + run API/타입 + 전략운영 위젯. Build green, hex 0. 시각 UAT는 Wave 5 후 통합 검증으로 연기."
+stopped_at: Completed 06.9-04-PLAN.md — nav 3그룹 재편 + 토스 PAPER 숨김 + 폐기 페이지 제거 + run API/타입 + 전략운영 위젯
+last_updated: "2026-06-28T02:58:11.096Z"
 last_activity: "2026-06-28 — 06.8-04 execute: PaperBacktestPage fully reskinned (Binance dark). Build green, 0 token violations, D2 diff=0."
 progress:
   total_phases: 14
   completed_phases: 11
   total_plans: 44
-  completed_plans: 42
+  completed_plans: 43
   percent: 98
 ---
 
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6.9 (모의 운영 IA 재구조화 & 전략별 실행 이력) — Backend Wave 3 완료 (03/05)
-Plan: 06.9-03 완료 (Run-Scoped REST API). Wave 1(DB/Entity)+Wave 2(Executor tagging+Services)+Wave 3(REST API) shipped.
-Status: execute-phase 완료 — 06.9-03: GET /runs + GET /runs/{runId}/dashboard|history|report (2-mode). Full suite green.
+Phase: 6.9 (모의 운영 IA 재구조화 & 전략별 실행 이력) — Frontend Wave 4 완료 (04/05)
+Plan: 06.9-04 완료 (프론트 IA 재구조화). Wave 1(DB/Entity)+Wave 2(Executor tagging+Services)+Wave 3(REST API)+Wave 4(nav/router/위젯/run API) shipped. Wave 5(신규 페이지) 남음.
+Status: execute-phase 완료 — 06.9-04: nav 3그룹 + 토스 PAPER 숨김 + 폐기 페이지 4종 제거 + run API/타입 + 전략운영 위젯. Build green, hex 0. 시각 UAT는 Wave 5 후 통합 검증으로 연기.
 Last activity: 2026-06-28 — 06.8-04 execute: PaperBacktestPage fully reskinned (Binance dark). Build green, 0 token violations, D2 diff=0.
 
 Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLANNED)
@@ -80,6 +80,7 @@ Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLA
 | Phase 06.9 P01 | 6m | 2 tasks | 8 files |
 | Phase 06.9 P02 | 11m | 2 tasks | 7 files |
 | Phase 06.9 P03 | 7m | 2 tasks | 9 files |
+| Phase 06.9 P04 | 9m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -211,6 +212,9 @@ Recent decisions affecting current work:
 - [Phase 06.9]: RunSummaryDto mapped inline in controller from RunListItem; no reshape in service needed
 - [Phase 06.9]: RULE_AGGREGATE date params as YYYY-MM-DD strings parsed to Instant in controller — avoids Spring Instant binding complexity
 - [Phase 06.9]: PaperRunContributionService throws GraphifyException NOT_FOUND (ERR_PAPER_RUN_001) for proper HTTP 404 via GlobalExceptionHandler
+- [Phase 06.9]: [06.9-04]: PAPER nav NavGroup[] 3그룹(전략/운영 결과) + 공통 별도 렌더; LIVE 단일 그룹 유지, mode 분기로 토스 설정 포함/제외 (D4)
+- [Phase 06.9]: [06.9-04]: 실행 이력 nav 엔트리는 /trading/paper/runs를 가리킴 — Wave 5에서 라우트 추가 (의도된 dangling)
+- [Phase 06.9]: [06.9-04]: monitor useQuery 실패 시 throw 안 함 → undefined '—' graceful; 전략 운영 화면이 모니터 장애로 깨지지 않음
 
 ### Pending Todos
 
@@ -224,6 +228,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-28T02:44:45.323Z
-Stopped at: Completed 06.9-03-PLAN.md — PaperRunListController + PaperRunDetailController (dashboard/history/report 2-mode)
+Last session: 2026-06-28T02:57:38.769Z
+Stopped at: Completed 06.9-04-PLAN.md — nav 3그룹 재편 + 토스 PAPER 숨김 + 폐기 페이지 제거 + run API/타입 + 전략운영 위젯
 Resume file: None
