@@ -28,6 +28,7 @@ class PaperExecutorTest {
     @Mock PaperTradeRepository tradeRepo;
     @Mock PaperSignalLogRepository signalLogRepo;
     @Mock MarketBarRepository marketBarRepo;
+    @Mock PaperRunRepository runRepo;
     FillSimulator fillSimulator = new FillSimulator();
 
     PaperExecutor executor;
@@ -38,10 +39,12 @@ class PaperExecutorTest {
 
     @BeforeEach
     void setUp() {
-        executor = new PaperExecutor(accountRepo, positionRepo, tradeRepo, signalLogRepo, fillSimulator, marketBarRepo);
+        executor = new PaperExecutor(accountRepo, positionRepo, tradeRepo, signalLogRepo, fillSimulator, marketBarRepo, runRepo);
         // Default: no prev-close data → price limit check returns false (conservative)
         // lenient() because HOLD path never reaches the price limit check
         lenient().when(marketBarRepo.findBySymbolAndTradingDate(any(), any())).thenReturn(Optional.empty());
+        // Default: no active run → runId=null (backward compat). lenient() — not all tests verify run stamping.
+        lenient().when(runRepo.findFirstByRuleIdAndStatus(any(), any())).thenReturn(Optional.empty());
         rule = new TradingRule(1L, "Test Rule", "PAPER", "PAPER_LIVE",
             "{\"version\":1,\"universe\":{\"type\":\"symbols\",\"symbols\":[\"A005930\"]}," +
             "\"entry\":{\"logic\":\"AND\",\"conditions\":[]},\"exit\":null," +

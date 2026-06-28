@@ -35,6 +35,7 @@ public class PaperExecutor implements OrderExecutorPort {
     private final PaperSignalLogRepository signalLogRepo;
     private final FillSimulator fillSimulator;
     private final MarketBarRepository marketBarRepository;
+    private final PaperRunRepository runRepo;
 
     public PaperExecutor(
             PaperAccountRepository accountRepo,
@@ -42,13 +43,28 @@ public class PaperExecutor implements OrderExecutorPort {
             PaperTradeRepository tradeRepo,
             PaperSignalLogRepository signalLogRepo,
             FillSimulator fillSimulator,
-            MarketBarRepository marketBarRepository) {
+            MarketBarRepository marketBarRepository,
+            PaperRunRepository runRepo) {
         this.accountRepo = accountRepo;
         this.positionRepo = positionRepo;
         this.tradeRepo = tradeRepo;
         this.signalLogRepo = signalLogRepo;
         this.fillSimulator = fillSimulator;
         this.marketBarRepository = marketBarRepository;
+        this.runRepo = runRepo;
+    }
+
+    /**
+     * 현재 룰의 active(RUNNING) run id를 조회한다.
+     * run이 없으면 null 반환(backward compat — 구형 거래는 run_id=NULL 허용).
+     *
+     * Pitfall 3 주의: 틱당 룰별 1회 lookup. 성능 이슈 발생 시
+     * OrderExecutorPort에 runId 파라미터화하는 리팩토링으로 이동.
+     */
+    private Long resolveActiveRunId(Long ruleId) {
+        return runRepo.findFirstByRuleIdAndStatus(ruleId, "RUNNING")
+                .map(PaperRun::getId)
+                .orElse(null);
     }
 
     @Override
@@ -104,8 +120,9 @@ public class PaperExecutor implements OrderExecutorPort {
         // Persist
         BigDecimal bdQty   = BigDecimal.valueOf(qty).setScale(4, RoundingMode.HALF_UP);
         BigDecimal bdPrice = BigDecimal.valueOf(fillPrice).setScale(4, RoundingMode.HALF_UP);
+        Long runId = resolveActiveRunId(rule.getId());
         positionRepo.save(new PaperPosition(account.getId(), symbol, bdQty, bdPrice));
-        tradeRepo.save(new PaperTrade(account.getId(), rule.getId(), symbol, "BUY",
+        tradeRepo.save(new PaperTrade(account.getId(), rule.getId(), runId, symbol, "BUY",
             bdQty, bdPrice, null, ts));
         account.setCash(BigDecimal.valueOf(account.getCash().doubleValue() - cost)
             .setScale(4, RoundingMode.HALF_UP));
@@ -132,8 +149,9 @@ public class PaperExecutor implements OrderExecutorPort {
         BigDecimal bdQty   = BigDecimal.valueOf(qty).setScale(4, RoundingMode.HALF_UP);
         BigDecimal bdPrice = BigDecimal.valueOf(fillPrice).setScale(4, RoundingMode.HALF_UP);
         BigDecimal bdPnl   = BigDecimal.valueOf(pnl).setScale(4, RoundingMode.HALF_UP);
+        Long runId = resolveActiveRunId(rule.getId());
         positionRepo.deleteByAccountIdAndSymbol(account.getId(), symbol);
-        tradeRepo.save(new PaperTrade(account.getId(), rule.getId(), symbol, "SELL",
+        tradeRepo.save(new PaperTrade(account.getId(), rule.getId(), runId, symbol, "SELL",
             bdQty, bdPrice, bdPnl, ts));
         account.setCash(BigDecimal.valueOf(account.getCash().doubleValue() + proceeds)
             .setScale(4, RoundingMode.HALF_UP));
