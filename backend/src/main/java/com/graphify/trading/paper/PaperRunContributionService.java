@@ -1,5 +1,6 @@
 package com.graphify.trading.paper;
 
+import com.graphify.common.exception.GraphifyException;
 import com.graphify.market.MarketBarIntraday;
 import com.graphify.market.MarketBarIntradayRepository;
 import com.graphify.market.SymbolNameService;
@@ -11,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,7 +89,8 @@ public class PaperRunContributionService {
      */
     public RunDashboardContribution dashboardContribution(Long userId, Long runId) {
         runRepo.findById(runId)
-                .orElseThrow(() -> new IllegalArgumentException("PaperRun not found: " + runId));
+                .orElseThrow(() -> new GraphifyException(
+                        "ERR_PAPER_RUN_001", "Run not found: " + runId, HttpStatus.NOT_FOUND));
 
         PaperAccount account = accountRepo.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("PaperAccount not found for user: " + userId));
