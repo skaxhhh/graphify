@@ -14,6 +14,7 @@ import { TossSettingsPage } from "@/pages/trading/TossSettingsPage";
 import { PaperRulesPage } from "@/pages/trading/paper/PaperRulesPage";
 import { PaperBacktestPage } from "@/pages/trading/paper/PaperBacktestPage";
 import { PaperRunsListPage } from "@/pages/trading/paper/PaperRunsListPage";
+import { PaperRunDetailPage } from "@/pages/trading/paper/PaperRunDetailPage";
 import { ModeGuard } from "@/components/trading/ModeGuard";
 import { AdminUsersPage } from "@/pages/AdminUsersPage";
 import { BootstrapStatusPage } from "@/pages/BootstrapStatusPage";
@@ -189,6 +190,14 @@ export const router = createBrowserRouter([
         element: (
           <ModeGuard mode="PAPER">
             <PaperRunsListPage />
+          </ModeGuard>
+        ),
+      },
+      {
+        path: "paper/runs/:runId",
+        element: (
+          <ModeGuard mode="PAPER">
+            <PaperRunDetailPage />
           </ModeGuard>
         ),
       },
