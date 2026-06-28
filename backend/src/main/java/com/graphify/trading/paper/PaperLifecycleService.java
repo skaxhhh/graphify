@@ -12,6 +12,7 @@ import com.graphify.trading.rule.definition.RuleDefinition;
 import com.graphify.trading.rule.dto.RuleResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.LinkedHashSet;
@@ -50,6 +51,7 @@ public class PaperLifecycleService {
     private final CompanyRepository companyRepo;
     private final VolumeRankingProvider liveRanking;
     private final MarketDataIngestionService ingestionService;
+    private final PaperRunRepository runRepo;
 
     public PaperLifecycleService(
             TradingRuleRepository ruleRepo,
@@ -57,13 +59,15 @@ public class PaperLifecycleService {
             PaperLiveSymbolService paperLiveSymbolService,
             CompanyRepository companyRepo,
             @Qualifier("naverTradingValueRankingAdapter") VolumeRankingProvider liveRanking,
-            MarketDataIngestionService ingestionService) {
+            MarketDataIngestionService ingestionService,
+            PaperRunRepository runRepo) {
         this.ruleRepo = ruleRepo;
         this.objectMapper = objectMapper;
         this.paperLiveSymbolService = paperLiveSymbolService;
         this.companyRepo = companyRepo;
         this.liveRanking = liveRanking;
         this.ingestionService = ingestionService;
+        this.runRepo = runRepo;
     }
 
     // ─── 신규 2축 메서드 ────────────────────────────────────────────────────────
@@ -124,6 +128,8 @@ public class PaperLifecycleService {
         rule.setRunStatus("RUNNING");
         TradingRule saved = ruleRepo.save(rule);
         paperLiveSymbolService.assignSymbols(saved.getId(), symbols);
+        String universeJson = serializeSymbols(symbols);
+        runRepo.save(new PaperRun(saved.getId(), userId, Instant.now(), universeJson));
         return toResponse(saved);
     }
 
@@ -159,6 +165,8 @@ public class PaperLifecycleService {
         rule.setRunStatus("STOPPED");
         TradingRule saved = ruleRepo.save(rule);
         paperLiveSymbolService.deactivateRule(saved.getId());
+        runRepo.findFirstByRuleIdAndStatus(saved.getId(), "RUNNING")
+            .ifPresent(run -> { run.stop(Instant.now()); runRepo.save(run); });
         return toResponse(saved);
     }
 
@@ -224,6 +232,16 @@ public class PaperLifecycleService {
      *   장외에도 시작 가능하고, 실제 top-N 재선정은 다음 장중 틱에서 보정된다.
      * symbols/watchlist: u.symbols() 그대로 반환
      */
+    /** symbols 목록을 JSON 문자열로 직렬화한다. 실패 시 null 반환(universe_snapshot 컬럼은 nullable). */
+    private String serializeSymbols(List<String> symbols) {
+        try {
+            return objectMapper.writeValueAsString(symbols);
+        } catch (JsonProcessingException e) {
+            log.warn("Failed to serialize universe snapshot: {}", e.getMessage());
+            return null;
+        }
+    }
+
     /** overrideSymbols를 정규화한다. 비어있으면 null(기존 유니버스 해석). */
     private List<String> normalizeOverride(List<String> overrideSymbols) {
         if (overrideSymbols == null || overrideSymbols.isEmpty()) {

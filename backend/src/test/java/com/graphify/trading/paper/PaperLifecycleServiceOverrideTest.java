@@ -49,6 +49,9 @@ class PaperLifecycleServiceOverrideTest {
     @Mock
     private MarketDataIngestionService ingestionService;
 
+    @Mock
+    private PaperRunRepository runRepo;
+
     private PaperLifecycleService service;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -63,7 +66,7 @@ class PaperLifecycleServiceOverrideTest {
     void setUp() {
         service = new PaperLifecycleService(
                 ruleRepo, objectMapper, paperLiveSymbolService, companyRepo,
-                liveRanking, ingestionService);
+                liveRanking, ingestionService, runRepo);
     }
 
     private TradingRule activeStoppedRule() {

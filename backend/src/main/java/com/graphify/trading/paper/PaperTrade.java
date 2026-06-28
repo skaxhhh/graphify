@@ -38,15 +38,20 @@ public class PaperTrade {
     @Column(precision = 20, scale = 4)
     private BigDecimal pnl;
 
+    @Column(name = "run_id")
+    private Long runId;  // nullable — legacy rows and no-active-run fallback
+
     @Column(name = "traded_at", nullable = false)
     private Instant tradedAt;
 
     protected PaperTrade() {}
 
-    public PaperTrade(Long accountId, Long ruleId, String symbol, String side,
+    /** 9-arg constructor: includes runId (nullable). Primary constructor. */
+    public PaperTrade(Long accountId, Long ruleId, Long runId, String symbol, String side,
                       BigDecimal qty, BigDecimal price, BigDecimal pnl, Instant tradedAt) {
         this.accountId = accountId;
         this.ruleId = ruleId;
+        this.runId = runId;
         this.symbol = symbol;
         this.side = side;
         this.qty = qty;
@@ -55,9 +60,16 @@ public class PaperTrade {
         this.tradedAt = tradedAt;
     }
 
+    /** 8-arg backward-compat constructor: delegates with runId=null. */
+    public PaperTrade(Long accountId, Long ruleId, String symbol, String side,
+                      BigDecimal qty, BigDecimal price, BigDecimal pnl, Instant tradedAt) {
+        this(accountId, ruleId, null, symbol, side, qty, price, pnl, tradedAt);
+    }
+
     public Long getId()          { return id; }
     public Long getAccountId()   { return accountId; }
     public Long getRuleId()      { return ruleId; }
+    public Long getRunId()       { return runId; }
     public String getSymbol()    { return symbol; }
     public String getSide()      { return side; }
     public BigDecimal getQty()   { return qty; }

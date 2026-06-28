@@ -6,6 +6,7 @@ import com.graphify.company.CompanyRepository;
 import com.graphify.market.MarketDataIngestionService;
 import com.graphify.market.volume.VolumeRankingProvider;
 import com.graphify.trading.paper.PaperLifecycleService;
+import com.graphify.trading.paper.PaperRunRepository;
 import com.graphify.trading.rule.dto.RuleResponse;
 import java.time.LocalDate;
 import java.util.List;
@@ -33,6 +34,7 @@ class PaperLifecycleServiceTest {
     @Mock VolumeRankingProvider liveRanking;
     @Mock MarketDataIngestionService ingestionService;
     @Mock com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    @Mock PaperRunRepository runRepo;
 
     PaperLifecycleService service;
 
@@ -50,7 +52,8 @@ class PaperLifecycleServiceTest {
             paperLiveSymbolService,
             companyRepo,
             liveRanking,
-            ingestionService
+            ingestionService,
+            runRepo
         );
     }
 
