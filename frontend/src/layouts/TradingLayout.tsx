@@ -11,34 +11,46 @@ interface NavItem {
   end?: boolean;
 }
 
-// D4: 메뉴 명칭 통일 — "전략 설정 / 전략 운영" 채택
-// D3: 동작 모니터링 → PAPER 그룹으로 이동
-const paperItems: NavItem[] = [
-  { to: "/trading/paper/dashboard", label: "모의 대시보드" },
-  { to: "/trading/paper/rules", label: "전략 설정" },
-  { to: "/trading/paper/rules-lifecycle", label: "전략 운영" },
-  { to: "/trading/paper/backtest", label: "백테스트" },
-  { to: "/trading/monitor", label: "동작 모니터링" }, // D3: PAPER 그룹
-  { to: "/trading/paper/history", label: "모의 거래 이력" },
-  { to: "/trading/paper/report", label: "모의 성과 리포트" },
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+// 6.9-04: PAPER nav 3그룹 재편 — 전략 / 운영 결과 / 공통
+// D3: 동작 모니터링·모의 대시보드·모의 거래 이력·모의 성과 리포트 제거
+// D8: 실행 이력 /trading/paper/runs 추가
+const paperGroups: NavGroup[] = [
+  {
+    label: "전략",
+    items: [
+      { to: "/trading/paper/rules", label: "전략 설정" },
+      { to: "/trading/paper/rules-lifecycle", label: "전략 운영" },
+      { to: "/trading/paper/backtest", label: "백테스트" },
+    ],
+  },
+  {
+    label: "운영 결과",
+    items: [
+      { to: "/trading/paper/runs", label: "실행 이력" },
+    ],
+  },
 ];
 
-// D4: "현재 룰" → "전략 운영"; REMOVE monitor + 룰 수정
+// D4: "현재 룰" → "전략 운영"; monitor + 룰 수정 제거
 const liveItems: NavItem[] = [
   { to: "/trading/dashboard", label: "대시보드" },
   { to: "/trading/history", label: "거래 이력" },
   { to: "/trading/rules", label: "전략 운영" },
 ];
 
-const commonItems: NavItem[] = [
+// D4: 토스 설정은 LIVE 모드에서만 노출 (라우트는 유지)
+const commonBaseItems: NavItem[] = [
   { to: "/trading", label: "DDS Agent", end: true },
-  { to: "/trading/settings", label: "토스 설정" },
 ];
+const tossSettingItem: NavItem = { to: "/trading/settings", label: "토스 설정" };
 
 function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   const mode = useTradingStore((s) => s.mode);
-  const modeItems = mode === "PAPER" ? paperItems : liveItems;
-  const modeGroupLabel = mode === "PAPER" ? "PAPER" : "LIVE";
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition-colors font-trade-sans ${
@@ -47,37 +59,61 @@ function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
         : "text-trade-muted hover:bg-trade-elevated hover:text-trade-body"
     }`;
 
+  const groupLabel = (label: string, first?: boolean) => (
+    <p
+      className={`px-3 pb-2 text-xs font-semibold text-trade-muted tracking-wider font-trade-sans ${
+        first ? "" : "pt-4"
+      }`}
+    >
+      {label}
+    </p>
+  );
+
+  const renderItems = (items: NavItem[]) =>
+    items.map((item) => (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        end={item.end ?? false}
+        onClick={onNavigate}
+        className={navLinkClass}
+      >
+        {item.label}
+      </NavLink>
+    ));
+
+  // PAPER 모드: 3그룹 (전략 / 운영 결과 / 공통)
+  if (mode === "PAPER") {
+    const commonItems: NavItem[] = [...commonBaseItems];
+    // D4: 토스 설정은 PAPER 모드에서 숨김
+    return (
+      <nav className="flex flex-1 flex-col gap-1">
+        {paperGroups.map((group, idx) => (
+          <div key={group.label}>
+            {groupLabel(group.label, idx === 0)}
+            {renderItems(group.items)}
+          </div>
+        ))}
+        <div>
+          {groupLabel("공통")}
+          {renderItems(commonItems)}
+        </div>
+      </nav>
+    );
+  }
+
+  // LIVE 모드: 단일 그룹 + 공통(토스 설정 포함)
+  const commonItems: NavItem[] = [...commonBaseItems, tossSettingItem];
   return (
     <nav className="flex flex-1 flex-col gap-1">
-      <p className="px-3 pb-2 text-xs font-semibold text-trade-muted tracking-wider font-trade-sans">
-        {modeGroupLabel}
-      </p>
-      {modeItems.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.end ?? false}
-          onClick={onNavigate}
-          className={navLinkClass}
-        >
-          {item.label}
-        </NavLink>
-      ))}
-
-      <p className="px-3 pb-2 pt-4 text-xs font-semibold text-trade-muted tracking-wider font-trade-sans">
-        공통
-      </p>
-      {commonItems.map((item) => (
-        <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.end ?? false}
-          onClick={onNavigate}
-          className={navLinkClass}
-        >
-          {item.label}
-        </NavLink>
-      ))}
+      <div>
+        {groupLabel("LIVE", true)}
+        {renderItems(liveItems)}
+      </div>
+      <div>
+        {groupLabel("공통")}
+        {renderItems(commonItems)}
+      </div>
     </nav>
   );
 }

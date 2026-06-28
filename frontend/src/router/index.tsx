@@ -10,13 +10,9 @@ import { TradingDashboardPage } from "@/pages/trading/TradingDashboardPage";
 import { TradingHistoryPage } from "@/pages/trading/TradingHistoryPage";
 import { TradingRulesPage } from "@/pages/trading/TradingRulesPage";
 import { TradingRulesEditPage } from "@/pages/trading/TradingRulesEditPage";
-import { TradingMonitorPage } from "@/pages/trading/TradingMonitorPage";
 import { TossSettingsPage } from "@/pages/trading/TossSettingsPage";
-import { PaperDashboardPage } from "@/pages/trading/paper/PaperDashboardPage";
-import { PaperHistoryPage } from "@/pages/trading/paper/PaperHistoryPage";
 import { PaperRulesPage } from "@/pages/trading/paper/PaperRulesPage";
 import { PaperBacktestPage } from "@/pages/trading/paper/PaperBacktestPage";
-import { PaperReportPage } from "@/pages/trading/paper/PaperReportPage";
 import { ModeGuard } from "@/components/trading/ModeGuard";
 import { AdminUsersPage } from "@/pages/AdminUsersPage";
 import { BootstrapStatusPage } from "@/pages/BootstrapStatusPage";
@@ -144,32 +140,8 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "monitor",
-        element: (
-          <ModeGuard mode="PAPER">
-            <TradingMonitorPage />
-          </ModeGuard>
-        ),
-      },
-      {
         path: "settings",
         element: <TossSettingsPage />,
-      },
-      {
-        path: "paper/dashboard",
-        element: (
-          <ModeGuard mode="PAPER">
-            <PaperDashboardPage />
-          </ModeGuard>
-        ),
-      },
-      {
-        path: "paper/history",
-        element: (
-          <ModeGuard mode="PAPER">
-            <PaperHistoryPage />
-          </ModeGuard>
-        ),
       },
       {
         path: "paper/rules",
@@ -200,14 +172,6 @@ export const router = createBrowserRouter([
         element: (
           <ModeGuard mode="PAPER">
             <PaperBacktestPage />
-          </ModeGuard>
-        ),
-      },
-      {
-        path: "paper/report",
-        element: (
-          <ModeGuard mode="PAPER">
-            <PaperReportPage />
           </ModeGuard>
         ),
       },

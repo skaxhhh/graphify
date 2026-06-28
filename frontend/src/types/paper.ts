@@ -77,3 +77,32 @@ export interface ReportData {
   periodFrom: string | null;
   periodTo: string | null;
 }
+
+// 6.9 Wave 4: run-scoped types (Wave 5 pages consume these)
+export interface RunSummary {
+  runId: number;
+  ruleId: number;
+  ruleName: string;
+  runIndex: number;
+  status: "RUNNING" | "STOPPED";
+  startedAt: string;
+  endedAt: string | null;
+  universe: string[];
+  realizedPnl: number;
+  returnPct: number;
+  tradeCount: number;
+  finalEquity: number;
+}
+
+export interface RunDashboard {
+  runId: number;
+  runIndex: number;
+  ruleName: string;
+  status: "RUNNING" | "STOPPED";
+  totalEquity: number;
+  availableCash: number;
+  realizedPnl: number;
+  unrealizedPnl: number;
+  tradeCount: number;
+  positions: PaperPositionItem[];
+}
