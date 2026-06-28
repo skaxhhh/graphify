@@ -4,14 +4,16 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPaperRules } from "@/lib/ruleApi";
-import { copyRule, startRule, stopRule } from "@/lib/paperApi";
+import { copyRule, fetchPaperMonitor, startRule, stopRule } from "@/lib/paperApi";
 import { ApiRequestError } from "@/lib/apiClient";
 import { TradingCompanyPickerModal } from "@/components/trading/TradingCompanyPickerModal";
 import type { TradingRule } from "@/types/trading";
 import {
   TradeBadge,
   TradeButton,
+  TradeCard,
   TradePageState,
+  TradeStatCard,
   TradeTable,
   TradeTableHeader,
   TradeTableRow,
@@ -27,6 +29,14 @@ export function TradingRulesPage() {
   const { data: allRules, isLoading, isError } = useQuery({
     queryKey: ["trading", "paper", "rules"],
     queryFn: async () => (await fetchPaperRules()).data ?? [],
+  });
+
+  // D3: 동작 모니터링 삭제 → 시장 상태·스케줄러만 상단 위젯으로 이동
+  // 신호로그·오늘 거래는 렌더하지 않음
+  const { data: monitorData } = useQuery({
+    queryKey: ["trading", "paper", "monitor"],
+    queryFn: async () => (await fetchPaperMonitor()).data ?? null,
+    // graceful: 실패 시 undefined → "—" 표시
   });
 
   // 전략 운영 화면: ACTIVE 룰만 표시 (DRAFT는 전략 설정에서만 보임)
@@ -72,6 +82,40 @@ export function TradingRulesPage() {
         <p className="mt-1 text-sm text-trade-muted">
           ACTIVE 룰만 표시 · 실행 축(STOPPED ↔ RUNNING)
         </p>
+      </div>
+
+      {/* D3 위젯: 시장 상태 + 스케줄러 최근 실행 (신호로그·오늘 거래 미노출) */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* 시장 상태 카드 */}
+        <TradeCard title="시장 상태">
+          <div className="flex items-center gap-2">
+            <span
+              className={`h-2 w-2 shrink-0 rounded-full ${
+                monitorData?.marketStatus === "OPEN"
+                  ? "bg-trade-up"
+                  : "bg-trade-muted"
+              }`}
+            />
+            <span className="text-sm font-semibold text-trade-body font-trade-sans">
+              {monitorData?.marketStatus === "OPEN" ? "개장" : "폐장"}
+            </span>
+          </div>
+        </TradeCard>
+
+        {/* 스케줄러 최근 실행 카드 */}
+        <TradeStatCard
+          label="스케줄러 최근 실행"
+          value={
+            monitorData?.schedulerLastRun
+              ? new Date(monitorData.schedulerLastRun).toLocaleString("ko-KR", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "—"
+          }
+        />
       </div>
 
       {/* Mutation error banner */}
