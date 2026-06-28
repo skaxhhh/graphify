@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: "execute-phase 완료 — 04 완료: PaperBacktestPage form + 5 metrics + equity + candle + trade table + TradingCompanyPickerModal."
-stopped_at: Completed 06.8-02-PLAN.md — rule cluster reskin (TradingCompanyPickerModal + PaperRulesPage + TradingRulesPage + TradingRulesEditPage + TradeRationaleRow)
-last_updated: "2026-06-27T17:02:29.233Z"
+stopped_at: Completed 06.9-01-PLAN.md — V37 migration + PaperRun entity + start/stop lifecycle
+last_updated: "2026-06-28T02:10:37.337Z"
 last_activity: "2026-06-28 — 06.8-04 execute: PaperBacktestPage fully reskinned (Binance dark). Build green, 0 token violations, D2 diff=0."
 progress:
-  total_phases: 13
+  total_phases: 14
   completed_phases: 11
-  total_plans: 39
-  completed_plans: 39
+  total_plans: 44
+  completed_plans: 40
   percent: 98
 ---
 
@@ -77,6 +77,7 @@ Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLA
 | Phase 06.8 P02 | 8m | 3 tasks | 5 files |
 | Phase 06.8 P05 | 3m | 2 tasks | 4 files |
 | Phase 06.8 P04 | 2m | 2 tasks | 1 files |
+| Phase 06.9 P01 | 6m | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -201,6 +202,8 @@ Recent decisions affecting current work:
 - [Phase 06.8, 06.8-04]: TradeCard used as plain wrapper (no title prop) for equity curve — custom flex header inside children provides title-left/sub-right layout matching wireframe
 - [Phase 06.8, 06.8-04]: CandleSection wrapped in TradeCard for trade-surface backdrop — CandleSection internals untouched (D2 diff = 0); first-trade auto-select preserved
 - [Phase 06.8, 06.8-04]: CompanyPickerModal (shared/) → TradingCompanyPickerModal (06.8-02) import path swap only; props byte-identical; shared/ untouched (D6)
+- [Phase 06.9]: V37 Flyway migration: paper_runs table (RUNNING/STOPPED) + paper_trades.run_id nullable + orphaned-RUNNING backfill from trading_rules.run_status
+- [Phase 06.9]: 8-arg PaperTrade delegates to 9-arg with runId=null — backward compat until Wave 2 PaperExecutor edit
 
 ### Pending Todos
 
@@ -214,6 +217,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-27T16:15:33.201Z
-Stopped at: Completed 06.8-02-PLAN.md — rule cluster reskin (TradingCompanyPickerModal + PaperRulesPage + TradingRulesPage + TradingRulesEditPage + TradeRationaleRow)
+Last session: 2026-06-28T02:10:37.334Z
+Stopped at: Completed 06.9-01-PLAN.md — V37 migration + PaperRun entity + start/stop lifecycle
 Resume file: None
