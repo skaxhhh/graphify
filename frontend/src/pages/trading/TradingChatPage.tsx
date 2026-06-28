@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { TradeButton } from "@/components/trading/ui";
+import { ApiRequestError } from "@/lib/apiClient";
+import { sendTradingChat, type TradingChatTurn } from "@/lib/tradingChatApi";
 
 interface Message {
   id: string;
@@ -74,7 +76,7 @@ export function TradingChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = input.trim();
     if (!trimmed || isTyping) return;
@@ -86,22 +88,43 @@ export function TradingChatPage() {
       createdAt: new Date(),
     };
 
+    // 직전 대화 맥락 (welcome 안내 메시지는 제외)
+    const history: TradingChatTurn[] = messages
+      .filter((m) => m.id !== "welcome")
+      .map((m) => ({ role: m.role, content: m.content }));
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setIsTyping(true);
 
-    // TODO: 실제 Agent API 연동 시 교체
-    setTimeout(() => {
+    try {
+      const res = await sendTradingChat({ message: trimmed, history });
+      const reply = res.data?.reply?.trim();
       const assistantMsg: Message = {
         id: crypto.randomUUID(),
         role: "assistant",
         content:
-          "현재 Agent 백엔드 연동 준비 중입니다.\n곧 실제 트레이딩 데이터 조회 및 분석 기능이 제공될 예정입니다.",
+          reply && reply.length > 0
+            ? reply
+            : "응답을 생성하지 못했습니다. 잠시 후 다시 시도해 주세요.",
         createdAt: new Date(),
       };
       setMessages((prev) => [...prev, assistantMsg]);
+    } catch (err) {
+      const message =
+        err instanceof ApiRequestError
+          ? err.message
+          : "Agent 연결에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+      const errorMsg: Message = {
+        id: crypto.randomUUID(),
+        role: "assistant",
+        content: message,
+        createdAt: new Date(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1200);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

@@ -73,7 +73,7 @@ create_window_orchestrator() {
     tmux send-keys -t "$s:0.0" "echo '╔══════════════════════════════════════╗'" C-m
     tmux send-keys -t "$s:0.0" "echo '║   OMC Orchestrator — Agent Commander ║'" C-m
     tmux send-keys -t "$s:0.0" "echo '╚══════════════════════════════════════╝'" C-m
-    tmux send-keys -t "$s:0.0" "claude" C-m
+    tmux send-keys -t "$s:0.0" "claude --dangerously-skip-permissions" C-m
 
     # pane 1: Agent Activity Log
     tmux send-keys -t "$s:0.1" "cd $(pwd)" C-m
@@ -123,7 +123,7 @@ create_window_project_mgmt() {
     tmux send-keys -t "$s:1.2" "echo '║  cc-sessions         : mek: / finito     ║'" C-m
     tmux send-keys -t "$s:1.2" "echo '║  claude-historian    : 자연어 이력 검색  ║'" C-m
     tmux send-keys -t "$s:1.2" "echo '╚══════════════════════════════════════════╝'" C-m
-    tmux send-keys -t "$s:1.2" "claude" C-m
+    tmux send-keys -t "$s:1.2" "claude --dangerously-skip-permissions" C-m
 
     tmux select-pane -t "$s:1.0"
 }

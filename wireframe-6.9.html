@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phase 6.9 Wireframe · 모의 운영 IA 재구조화</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0e11; --panel:#181a20; --surface:#1e2329; --border:#2b3139;
+    --yellow:#fcd535; --up:#0ecb81; --up-bg:#0e1f1a; --down:#f6465d; --down-bg:#21141a;
+    --text:#eaecef; --muted:#707a8a; --muted2:#929aa5;
+  }
+  *{box-sizing:border-box;}
+  body{background:#05070a; margin:0; padding:40px 28px 80px; color:var(--text);}
+  .nova{font-family:'Inter','-apple-system',sans-serif;}
+  .plex{font-family:'JetBrains Mono','ui-monospace',monospace;}
+  .wrap{max-width:1340px; margin:0 auto;}
+  .seclabel{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); margin:46px 0 10px; letter-spacing:.5px;}
+  .frame{background:var(--bg); border:1px solid var(--border); border-radius:12px; overflow:hidden; display:flex;}
+  /* sidebar */
+  .sb{width:230px; flex:none; border-right:1px solid var(--border); display:flex; flex-direction:column; padding:16px 11px;}
+  .brand{display:flex; align-items:center; gap:8px; padding:0 8px 16px;}
+  .brand b{font-family:'Inter'; font-size:18px; font-weight:700; color:var(--yellow);}
+  .mode{background:var(--surface); border-radius:8px; padding:10px 12px; margin-bottom:16px;}
+  .grp{font-family:'Inter'; font-size:11px; font-weight:600; color:var(--muted); padding:14px 8px 7px; letter-spacing:.4px;}
+  .nav{display:flex; flex-direction:column; gap:2px;}
+  .ni{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:6px; color:var(--muted); font-family:'Inter'; font-size:13.5px; font-weight:500;}
+  .ni.on{background:var(--surface); border-left:3px solid var(--yellow); color:var(--yellow); font-weight:600;}
+  .ni .ic{width:15px; display:inline-block; text-align:center;}
+  .ni.del{color:#5a3030; text-decoration:line-through; opacity:.55;}
+  .ni.hide{opacity:.35;}
+  /* main */
+  .main{flex:1; padding:22px 24px; min-width:0;}
+  .h1{font-family:'Inter'; font-size:22px; font-weight:700; color:var(--text);}
+  .sub{font-family:'Inter'; font-size:13px; color:var(--muted2); margin-top:4px;}
+  .row{display:flex; gap:12px;}
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px;}
+  .stat{flex:1;}
+  .stat .lab{font-family:'Inter'; font-size:12px; color:var(--muted); margin-bottom:8px;}
+  .stat .val{font-family:'JetBrains Mono'; font-size:22px; font-weight:700;}
+  .up{color:var(--up);} .down{color:var(--down);} .yel{color:var(--yellow);}
+  table{width:100%; border-collapse:collapse; font-family:'Inter'; font-size:13px;}
+  th{text-align:left; color:var(--muted); font-weight:500; font-size:11.5px; padding:10px 12px; border-bottom:1px solid var(--border); letter-spacing:.3px;}
+  td{padding:12px; border-bottom:1px solid #21262d; color:var(--text);}
+  .mono{font-family:'JetBrains Mono';}
+  .badge{display:inline-block; font-family:'Inter'; font-size:11px; font-weight:600; border-radius:4px; padding:3px 9px;}
+  .b-run{color:var(--up); background:var(--up-bg);}
+  .b-stop{color:var(--muted); background:var(--surface);}
+  .b-paper{color:var(--yellow); background:#2a2410;}
+  .pill{display:inline-flex; gap:6px; align-items:center; font-family:'Inter'; font-size:12px; font-weight:500; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 12px;}
+  .pill.act{color:var(--yellow); border-color:#5a4d12;}
+  .tabs{display:flex; gap:4px; background:var(--surface); border-radius:8px; padding:4px; width:fit-content; margin:16px 0;}
+  .tab{font-family:'Inter'; font-size:13px; font-weight:600; color:var(--muted); padding:8px 18px; border-radius:6px;}
+  .tab.on{background:var(--yellow); color:#181a20;}
+  .note{font-family:'JetBrains Mono'; font-size:11px; color:#181a20; background:var(--yellow); border-radius:4px; padding:4px 9px; display:inline-block;}
+  .qnote{font-family:'JetBrains Mono'; font-size:11.5px; color:var(--yellow); border:1px dashed #5a4d12; border-radius:6px; padding:8px 12px; margin-top:10px; line-height:1.5;}
+  .dot{width:8px;height:8px;border-radius:9999px;display:inline-block;}
+  .btn{font-family:'Inter'; font-size:13px; font-weight:600; border-radius:6px; padding:8px 16px; display:inline-block;}
+  .btn-y{background:var(--yellow); color:#181a20;}
+  .btn-g{background:var(--surface); color:var(--text); border:1px solid var(--border);}
+  .chev{color:var(--muted); font-size:11px;}
+  .equity{height:150px; background:linear-gradient(180deg, rgba(14,203,129,.12), transparent); border:1px solid var(--border); border-bottom:2px solid var(--up); border-radius:8px; position:relative; overflow:hidden;}
+  .equity svg{position:absolute; inset:0; width:100%; height:100%;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div style="border:1px solid var(--border); border-radius:12px; padding:24px 26px; background:var(--bg);">
+    <div class="plex" style="font-size:11px; color:var(--muted); letter-spacing:.5px;">PHASE 6.9 WIREFRAME · 모의 운영 IA 재구조화 & 전략별 실행 이력</div>
+    <div class="nova" style="font-size:30px; font-weight:700; margin-top:12px; letter-spacing:-.5px;">전략별 <span class="yel">실행(run) 중심</span> 모의 운영 콘솔</div>
+    <div class="nova" style="font-size:14px; color:var(--muted2); margin-top:12px; line-height:1.6; max-width:920px;">
+      D1 전략별 분리+실행 이력(백엔드 포함) · D2 대시보드+이력+리포트 통합(리스트→상세 3탭) · D3 동작 모니터링 삭제(시장/스케줄러→전략 운영 상단) · D4 토스 설정 PAPER 숨김.
+      Binance 다크 토큰 · 단일 옐로우 액센트 · 그린/레드 방향 시그널. <b class="yel">노란 점선 박스 = 확인 필요한 가정</b>.
+    </div>
+  </div>
+
+  <!-- ============ SCREEN A : 운영 결과 (실행 이력 리스트) ============ -->
+  <div class="seclabel">화면 A · 운영 결과 — 전략 실행 이력 리스트 (통합 메뉴 진입 / master)  ·  /trading/paper/runs</div>
+  <div class="frame">
+    <!-- sidebar (updated IA) -->
+    <div class="sb">
+      <div class="brand"><b>graphify</b><span class="nova" style="font-size:10px;font-weight:600;color:var(--yellow);border:1px solid #5a4d12;border-radius:4px;padding:1px 6px;">BETA</span></div>
+      <div class="mode">
+        <div style="display:flex;align-items:center;gap:7px;"><span class="dot" style="background:var(--yellow);"></span><span class="nova" style="font-size:13px;font-weight:600;">PAPER 모드</span></div>
+        <div class="nova" style="font-size:11px;color:var(--muted);margin-top:4px;">모의 투자 · 가상 체결</div>
+      </div>
+      <div class="grp">전략</div>
+      <div class="nav">
+        <div class="ni"><span class="ic">▦</span>전략 설정</div>
+        <div class="ni"><span class="ic">▶</span>전략 운영</div>
+        <div class="ni"><span class="ic">◷</span>백테스트</div>
+      </div>
+      <div class="grp">운영 결과</div>
+      <div class="nav">
+        <div class="ni on"><span class="ic">▤</span>실행 이력</div>
+      </div>
+      <div class="grp">공통</div>
+      <div class="nav">
+        <div class="ni"><span class="ic">✦</span>DDS Agent</div>
+        <div class="ni hide"><span class="ic">⚙</span>토스 설정 <span class="note" style="margin-left:auto;font-size:9px;">LIVE만</span></div>
+      </div>
+      <div class="nav" style="margin-top:14px;">
+        <div class="ni del"><span class="ic">◉</span>동작 모니터링</div>
+        <div class="ni del"><span class="ic">≡</span>모의 거래 이력</div>
+        <div class="ni del"><span class="ic">▨</span>모의 성과 리포트</div>
+        <div class="ni del"><span class="ic">▤</span>모의 대시보드</div>
+      </div>
+      <div class="qnote">통합: 대시보드·거래이력·리포트 3개 → "실행 이력" 1개로. 메뉴명 "운영 결과 > 실행 이력" 확정 필요.</div>
+    </div>
+    <!-- content -->
+    <div class="main">
+      <div style="display:flex; align-items:flex-start;">
+        <div><div class="h1">실행 이력</div><div class="sub">전략을 실행(start)한 기록. 실행 중 · 종료 모두 표시. 행을 누르면 상세(3탭)로 이동.</div></div>
+      </div>
+      <!-- filter bar -->
+      <div class="row" style="margin:16px 0; align-items:center;">
+        <span class="pill act">전략: 전체 ▾</span>
+        <span class="pill">상태: 전체 ▾</span>
+        <span class="pill">기간: 최근 30일 ▾</span>
+        <span style="margin-left:auto;" class="plex" style="font-size:11px;color:var(--muted);">총 5건</span>
+      </div>
+      <div class="card" style="padding:0;">
+        <table>
+          <thead><tr>
+            <th>전략명</th><th>상태</th><th>실행 기간</th><th>유니버스</th>
+            <th style="text-align:right;">수익률</th><th style="text-align:right;">실현손익</th><th style="text-align:right;">거래</th><th style="text-align:right;">최종 자산</th><th></th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><b>RSI 과매도 반등</b></td>
+              <td><span class="badge b-run"><span class="dot" style="background:var(--up);margin-right:5px;"></span>실행중</span></td>
+              <td class="mono" style="color:var(--muted2);">06-25 09:00 ~ <span class="up">진행중</span></td>
+              <td style="color:var(--muted2);">거래량 상위 10</td>
+              <td class="mono up" style="text-align:right;">+4.82%</td>
+              <td class="mono up" style="text-align:right;">+241,800</td>
+              <td class="mono" style="text-align:right;">37</td>
+              <td class="mono" style="text-align:right;">5,241,800</td>
+              <td style="text-align:right;"><span class="chev">›</span></td>
+            </tr>
+            <tr>
+              <td><b>골든크로스 추세</b></td>
+              <td><span class="badge b-stop">종료</span></td>
+              <td class="mono" style="color:var(--muted2);">06-18 09:00 ~ 06-24 15:30</td>
+              <td style="color:var(--muted2);">삼성전자 외 4</td>
+              <td class="mono down" style="text-align:right;">−1.37%</td>
+              <td class="mono down" style="text-align:right;">−68,400</td>
+              <td class="mono" style="text-align:right;">22</td>
+              <td class="mono" style="text-align:right;">4,931,600</td>
+              <td style="text-align:right;"><span class="chev">›</span></td>
+            </tr>
+            <tr>
+              <td><b>RSI 과매도 반등</b> <span class="plex" style="font-size:10px;color:var(--muted);">#2회차</span></td>
+              <td><span class="badge b-stop">종료</span></td>
+              <td class="mono" style="color:var(--muted2);">06-10 09:00 ~ 06-17 15:30</td>
+              <td style="color:var(--muted2);">거래량 상위 10</td>
+              <td class="mono up" style="text-align:right;">+2.11%</td>
+              <td class="mono up" style="text-align:right;">+102,500</td>
+              <td class="mono" style="text-align:right;">29</td>
+              <td class="mono" style="text-align:right;">5,102,500</td>
+              <td style="text-align:right;"><span class="chev">›</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="qnote">가정 ① "run" = start→stop 1회. 같은 전략 재실행 = 새 행(#회차). 상세에서 "이 실행만 / 전략 전체 통합" 토글 제공.<br>
+      가정 ② 컬럼: 전략명·상태·기간·유니버스·수익률·실현손익·거래수·최종자산. 추가/제외할 컬럼 확인 필요.<br>
+      상태(state): 빈 — "아직 실행한 전략이 없어요 → 전략 운영에서 시작" / 로딩 스켈레톤 / 에러 배너.</div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN B : 실행 상세 (3탭) ============ -->
+  <div class="seclabel">화면 B · 실행 상세 — 3탭(대시보드·거래 이력·성과 리포트) + 기간 필터  ·  /trading/paper/runs/:runId</div>
+  <div class="frame">
+    <div class="sb">
+      <div class="brand"><b>graphify</b></div>
+      <div class="mode"><div style="display:flex;align-items:center;gap:7px;"><span class="dot" style="background:var(--yellow);"></span><span class="nova" style="font-size:13px;font-weight:600;">PAPER 모드</span></div></div>
+      <div class="grp">전략</div>
+      <div class="nav">
+        <div class="ni"><span class="ic">▦</span>전략 설정</div>
+        <div class="ni"><span class="ic">▶</span>전략 운영</div>
+        <div class="ni"><span class="ic">◷</span>백테스트</div>
+      </div>
+      <div class="grp">운영 결과</div>
+      <div class="nav"><div class="ni on"><span class="ic">▤</span>실행 이력</div></div>
+      <div class="grp">공통</div>
+      <div class="nav"><div class="ni"><span class="ic">✦</span>DDS Agent</div></div>
+    </div>
+    <div class="main">
+      <div class="plex" style="font-size:11px;color:var(--muted);"><span style="color:var(--yellow);">‹ 실행 이력</span>  /  RSI 과매도 반등 #3회차</div>
+      <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+        <div class="h1">RSI 과매도 반등</div>
+        <span class="badge b-run"><span class="dot" style="background:var(--up);margin-right:5px;"></span>실행중</span>
+      </div>
+      <div class="sub mono">06-25 09:00 ~ 진행중 · 거래량 상위 10 · 초기자본 5,000,000원</div>
+
+      <!-- period filter -->
+      <div class="row" style="margin-top:14px; align-items:center;">
+        <div class="tabs" style="margin:0;">
+          <span class="tab on">이 실행만</span>
+          <span class="tab">전략 전체 통합</span>
+        </div>
+        <span class="pill">기간: 06-25 ~ 오늘 ▾</span>
+        <span class="qnote" style="margin:0 0 0 auto;">가정 ③ 기간 토글: 단일 run vs 동일 전략 전체 run 합산.</span>
+      </div>
+
+      <!-- 3 tabs -->
+      <div class="tabs"><span class="tab on">대시보드</span><span class="tab">거래 이력</span><span class="tab">성과 리포트</span></div>
+
+      <!-- TAB 1: dashboard -->
+      <div class="row" style="margin-bottom:12px;">
+        <div class="card stat"><div class="lab">총 자산</div><div class="val">5,241,800<span style="font-size:13px;color:var(--muted);">원</span></div></div>
+        <div class="card stat"><div class="lab">가용 현금</div><div class="val">1,820,400<span style="font-size:13px;color:var(--muted);">원</span></div></div>
+        <div class="card stat"><div class="lab">실현 손익</div><div class="val up">+241,800</div></div>
+        <div class="card stat"><div class="lab">미실현 손익</div><div class="val up">+58,300</div></div>
+      </div>
+      <div class="card" style="padding:0;">
+        <div class="nova" style="font-size:13px;font-weight:600;padding:14px 16px;border-bottom:1px solid var(--border);">보유 포지션 (3)</div>
+        <table>
+          <thead><tr><th>종목</th><th style="text-align:right;">수량</th><th style="text-align:right;">평단</th><th style="text-align:right;">현재가</th><th style="text-align:right;">평가손익</th></tr></thead>
+          <tbody>
+            <tr><td>삼성전자</td><td class="mono" style="text-align:right;">120</td><td class="mono" style="text-align:right;">71,200</td><td class="mono" style="text-align:right;">73,100</td><td class="mono up" style="text-align:right;">+228,000 (+2.7%)</td></tr>
+            <tr><td>SK하이닉스</td><td class="mono" style="text-align:right;">15</td><td class="mono" style="text-align:right;">182,000</td><td class="mono" style="text-align:right;">179,500</td><td class="mono down" style="text-align:right;">−37,500 (−1.4%)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="qnote" style="color:var(--up); border-color:#1f5a3a;">확정 ④ 단일 계좌 공유 — 총자산·가용현금은 계좌 전체. 이 탭은 해당 run의 <b>기여분</b>(실현손익·그 run 포지션·거래)을 보여주고 총자산/현금은 계좌 컨텍스트로 표기.</div>
+
+      <!-- mini preview of other 2 tabs -->
+      <div class="row" style="margin-top:18px;">
+        <div class="card" style="flex:1; padding:0;">
+          <div class="nova" style="font-size:12px;font-weight:600;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--border);">탭2 · 거래 이력 (미리보기)</div>
+          <table style="font-size:12px;">
+            <tbody>
+              <tr><td><span class="badge b-paper" style="background:var(--up-bg);color:var(--up);">매수</span> 삼성전자</td><td class="mono" style="text-align:right;">73,100 × 40</td><td class="chev" style="text-align:right;">근거 ▾</td></tr>
+              <tr><td><span class="badge" style="background:var(--down-bg);color:var(--down);">매도</span> SK하이닉스</td><td class="mono" style="text-align:right;">179,500 × 5</td><td class="mono down" style="text-align:right;">−12,500</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="flex:1;">
+          <div class="nova" style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;">탭3 · 성과 리포트 (미리보기)</div>
+          <div class="equity"><svg viewBox="0 0 300 150" preserveAspectRatio="none"><polyline points="0,120 40,110 80,118 120,90 160,95 200,70 240,72 300,40" fill="none" stroke="#0ecb81" stroke-width="2"/></svg></div>
+          <div class="row" style="margin-top:10px;">
+            <div class="stat"><div class="lab">총수익률</div><div class="val up" style="font-size:16px;">+4.82%</div></div>
+            <div class="stat"><div class="lab">MDD</div><div class="val down" style="font-size:16px;">−3.1%</div></div>
+            <div class="stat"><div class="lab">승률</div><div class="val" style="font-size:16px;">62%</div></div>
+            <div class="stat"><div class="lab">Sharpe</div><div class="val" style="font-size:16px;">1.34</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN C : 전략 운영 + 상단 시장/스케줄러 ============ -->
+  <div class="seclabel">화면 C · 전략 운영 — 상단에 시장 상태 · 스케줄러 최근 실행 흡수 (동작 모니터링 삭제분)  ·  /trading/paper/rules</div>
+  <div class="frame">
+    <div class="sb">
+      <div class="brand"><b>graphify</b></div>
+      <div class="mode"><div style="display:flex;align-items:center;gap:7px;"><span class="dot" style="background:var(--yellow);"></span><span class="nova" style="font-size:13px;font-weight:600;">PAPER 모드</span></div></div>
+      <div class="grp">전략</div>
+      <div class="nav">
+        <div class="ni"><span class="ic">▦</span>전략 설정</div>
+        <div class="ni on"><span class="ic">▶</span>전략 운영</div>
+        <div class="ni"><span class="ic">◷</span>백테스트</div>
+      </div>
+      <div class="grp">운영 결과</div>
+      <div class="nav"><div class="ni"><span class="ic">▤</span>실행 이력</div></div>
+      <div class="grp">공통</div>
+      <div class="nav"><div class="ni"><span class="ic">✦</span>DDS Agent</div></div>
+    </div>
+    <div class="main">
+      <div class="h1">전략 운영</div>
+      <div class="sub">ACTIVE 전략의 실시간 모의 실행(start/stop) 관리.</div>
+
+      <!-- top: market + scheduler (moved from 동작 모니터링) -->
+      <div class="row" style="margin:16px 0;">
+        <div class="card stat" style="display:flex; align-items:center; gap:12px;">
+          <span class="dot" style="background:var(--up); width:10px; height:10px;"></span>
+          <div><div class="lab" style="margin:0;">시장 상태</div><div class="nova" style="font-size:16px;font-weight:700;color:var(--up);">개장 (OPEN)</div></div>
+          <div style="margin-left:auto; text-align:right;"><div class="lab" style="margin:0;">KST</div><div class="mono" style="font-size:13px;color:var(--muted2);">10:42:18</div></div>
+        </div>
+        <div class="card stat" style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:18px;color:var(--yellow);">◷</span>
+          <div><div class="lab" style="margin:0;">스케줄러 최근 실행</div><div class="mono" style="font-size:15px;font-weight:600;">10:40:00</div></div>
+          <div style="margin-left:auto;"><span class="badge b-run">정상</span></div>
+        </div>
+      </div>
+      <div class="qnote" style="margin-bottom:18px;">동작 모니터링 메뉴 삭제 → 시장 상태·스케줄러만 여기 상단으로. 최근 신호로그·오늘 거래는 제거.</div>
+
+      <!-- running strategies -->
+      <div class="card" style="padding:0;">
+        <div class="nova" style="font-size:13px;font-weight:600;padding:14px 16px;border-bottom:1px solid var(--border);">운영 가능 전략 (3)</div>
+        <table>
+          <thead><tr><th>전략명</th><th>상태</th><th>유니버스</th><th style="text-align:right;">작업</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><b>RSI 과매도 반등</b></td>
+              <td><span class="badge b-run"><span class="dot" style="background:var(--up);margin-right:5px;"></span>PAPER_LIVE</span></td>
+              <td style="color:var(--muted2);">거래량 상위 10</td>
+              <td style="text-align:right;"><span class="btn btn-g">중지</span></td>
+            </tr>
+            <tr>
+              <td><b>골든크로스 추세</b></td>
+              <td><span class="badge b-paper">ACTIVE</span></td>
+              <td style="color:var(--muted2);">삼성전자 외 4</td>
+              <td style="text-align:right;"><span class="btn btn-y">시작 ▶</span></td>
+            </tr>
+            <tr>
+              <td><b>볼린저 하단 터치</b></td>
+              <td><span class="badge b-paper">ACTIVE</span></td>
+              <td style="color:var(--muted2);">거래량 상위 10</td>
+              <td style="text-align:right;"><span class="btn btn-y">시작 ▶</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="qnote">시작(start) → "실행 이력"에 새 run 생성. 중지(stop) → 해당 run 종료. 운영 결과 화면과 직접 연결.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:46px; border:1px solid var(--border); border-radius:12px; padding:20px 24px; background:var(--bg);">
+    <div class="nova" style="font-size:15px;font-weight:700;color:var(--yellow);">확인 필요 — 가정 4가지 (planning 전 확정)</div>
+    <ol class="nova" style="font-size:13.5px; color:var(--muted2); line-height:1.8; margin:10px 0 0; padding-left:20px;">
+      <li>"run" 정의: start→stop 1회 = 1 run, 재실행 = 새 회차. (맞나?)</li>
+      <li>실행 이력 리스트 컬럼 구성. (추가/제외?)</li>
+      <li>기간 필터: "이 실행만 ↔ 전략 전체 통합" 2-mode. (충분한가?)</li>
+      <li>전략(run)별 가상 서브계좌 vs 단일 계좌 공유. (대시보드 equity/cash 정의)</li>
+      <li>통합 메뉴 명칭: "운영 결과 > 실행 이력". (확정?)</li>
+    </ol>
+  </div>
+
+</div>
+</body>
+</html>

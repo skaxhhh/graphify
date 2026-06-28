@@ -158,7 +158,10 @@ public class OpenAiSettingsService {
             if (uri.getScheme() == null || !uri.getScheme().equalsIgnoreCase("https")) {
                 return new StatusEvaluation("ERROR", "https 엔드포인트만 지원합니다.");
             }
-            if (host == null || (!host.contains("openai.azure.com") && !host.contains("cognitiveservices.azure.com"))) {
+            if (host == null
+                    || (!host.contains("openai.azure.com")
+                        && !host.contains("cognitiveservices.azure.com")
+                        && !host.contains("ai-talentlab.com"))) {
                 return new StatusEvaluation("ERROR", "Azure OpenAI 호스트 형식이 아닙니다.");
             }
             secretEncryptionService.decrypt(settings.getApiKeyEncrypted());

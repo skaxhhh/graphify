@@ -11,8 +11,10 @@ import type {
   ReportData,
   PaperPositionItem,
 } from "@/types/paper";
-import type { BacktestEquityPoint } from "@/types/trading";
+import type { BacktestEquityPoint, BacktestTrade } from "@/types/trading";
 import { EquityCurveChart } from "@/components/backtest/EquityCurveChart";
+import { CandleSection } from "@/components/backtest/CandleSection";
+import { toEpochSec } from "@/components/backtest/candleIndicators";
 import {
   TradeRationaleRow,
   parseRationale,
@@ -180,10 +182,18 @@ function HistoryTab({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  // 선택된 거래 → 상단 5분봉 캔들 차트 + 마커 (백테스트 화면과 동일 동작)
+  const [selected, setSelected] = useState<{
+    symbol: string;
+    date: string;
+    time: number;
+    side: "BUY" | "SELL";
+  } | null>(null);
 
   const load = () => {
     setLoading(true);
     setError(null);
+    setSelected(null);
     fetchRunHistory(
       runId,
       mode === "RULE_AGGREGATE" ? "RULE_AGGREGATE" : undefined,
@@ -219,8 +229,33 @@ function HistoryTab({
       <TradePageState variant="empty" title="거래 이력이 없어요" />
     );
 
+  const chartTrades: BacktestTrade[] = items.map((t) => ({
+    datetime: t.tradedAt,
+    symbol: t.symbol,
+    companyName: t.companyName,
+    side: t.side,
+    qty: t.qty,
+    price: t.price,
+    pnl: t.pnl,
+    rationaleJson: t.rationaleJson,
+  }));
+
   return (
-    <TradeTable>
+    <div className="space-y-4">
+      <TradeCard>
+        <CandleSection
+          symbol={selected?.symbol ?? null}
+          date={selected?.date ?? null}
+          trades={chartTrades}
+          indicators={[]}
+          highlightTime={selected?.time}
+          highlightSide={selected?.side}
+        />
+      </TradeCard>
+      <p className="text-xs text-trade-muted font-trade-sans">
+        행을 클릭하면 상단에 해당 거래의 5분봉 캔들 차트와 매매 시점 마커가 표시됩니다.
+      </p>
+      <TradeTable>
       <TradeTableHeader>
         <div className="grid grid-cols-[1.5fr_1fr_70px_80px_90px_90px] gap-2 text-xs text-trade-muted uppercase tracking-wide font-trade-sans">
           <span>종목</span>
@@ -237,9 +272,15 @@ function HistoryTab({
         return (
           <div key={t.id}>
             <TradeTableRow
-              onClick={() =>
-                setExpandedId(isExpanded ? null : t.id)
-              }
+              onClick={() => {
+                setSelected({
+                  symbol: t.symbol,
+                  date: t.tradedAt.slice(0, 10),
+                  time: toEpochSec(t.tradedAt),
+                  side: t.side,
+                });
+                setExpandedId(isExpanded ? null : t.id);
+              }}
             >
               <div className="grid grid-cols-[1.5fr_1fr_70px_80px_90px_90px] gap-2 items-center text-sm">
                 <div>
@@ -292,7 +333,8 @@ function HistoryTab({
           </div>
         );
       })}
-    </TradeTable>
+      </TradeTable>
+    </div>
   );
 }
 

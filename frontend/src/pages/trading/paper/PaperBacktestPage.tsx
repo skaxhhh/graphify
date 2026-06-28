@@ -120,7 +120,7 @@ export function PaperBacktestPage() {
               onChange={(e) =>
                 setRuleId(e.target.value === "" ? "" : Number(e.target.value))
               }
-              className="h-10 w-full rounded-md border border-trade-hairline bg-trade-bg px-3 text-sm text-trade-on-dark font-trade-sans focus:outline-none focus:ring-2 focus:ring-trade-info"
+              className="h-10 w-full rounded-md border border-trade-hairline bg-trade-surface px-3 text-trade-body font-trade-sans transition-colors focus:outline-none focus:ring-2 focus:ring-trade-info"
             >
               <option value="">룰 선택…</option>
               {(rules ?? []).map((r) => (
