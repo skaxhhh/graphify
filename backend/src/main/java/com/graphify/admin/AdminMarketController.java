@@ -2,13 +2,10 @@ package com.graphify.admin;
 
 import com.graphify.common.dto.ApiResponse;
 import com.graphify.market.Kospi200SeedService;
-import com.graphify.market.MarketIngestionJobRunner;
-import java.util.Map;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.graphify.market.MarketDataIngestionService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -20,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminMarketController {
 
     private final Kospi200SeedService kospi200SeedService;
-    private final MarketIngestionJobRunner ingestionJobRunner;
+    private final MarketDataIngestionService ingestionService;
 
     public AdminMarketController(
             Kospi200SeedService kospi200SeedService,
-            MarketIngestionJobRunner ingestionJobRunner) {
+            MarketDataIngestionService ingestionService) {
         this.kospi200SeedService = kospi200SeedService;
-        this.ingestionJobRunner = ingestionJobRunner;
+        this.ingestionService = ingestionService;
     }
 
     /** companies 마스터에 KOSPI200 종목을 ticker 기준 UPSERT. 멱등. */
@@ -36,25 +33,14 @@ public class AdminMarketController {
     }
 
     /**
-     * in_kospi200=true 종목 일봉 적재를 백그라운드로 시작한다(fire-and-forget).
-     * 99종목 직렬 외부호출은 수 분이 걸려 동기 응답 시 게이트웨이 타임아웃 → CORS 마스킹이 발생하므로,
-     * 즉시 202(STARTED)를 반환하고 진행은 상태 조회 엔드포인트로 확인한다.
-     * 이미 실행 중이면 409(ALREADY_RUNNING).
+     * KOSPI200 일봉을 청크 단위로 적재한다. 99종목 직렬 외부호출(수 분)을 한 요청에서 처리하면
+     * 게이트웨이 타임아웃 → CORS 마스킹이 발생하므로, 프론트가 size개씩 nextOffset으로 순회한다.
+     * 각 청크는 독립 HTTP 요청이라 Cloud Run 기본 CPU 정책에서도 안전하게 완주한다.
      */
-    @PostMapping("/ingest-kospi200")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> ingestKospi200() {
-        boolean started = ingestionJobRunner.tryStartKospi200DailyIngest();
-        if (!started) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(ApiResponse.ok(Map.of("status", "ALREADY_RUNNING")));
-        }
-        return ResponseEntity.accepted()
-                .body(ApiResponse.ok(Map.of("status", "STARTED")));
-    }
-
-    /** 최근(또는 진행 중) 일봉 적재 작업 상태. */
-    @GetMapping("/ingest-kospi200/status")
-    public ApiResponse<MarketIngestionJobRunner.JobStatus> ingestKospi200Status() {
-        return ApiResponse.ok(ingestionJobRunner.status());
+    @PostMapping("/ingest-kospi200/batch")
+    public ApiResponse<MarketDataIngestionService.BatchResult> ingestKospi200Batch(
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.ok(ingestionService.ingestDailyForKospi200Batch(offset, size));
     }
 }

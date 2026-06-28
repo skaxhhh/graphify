@@ -96,6 +96,47 @@ public class MarketDataIngestionService {
         return count;
     }
 
+    /** 청크 단위 적재 결과. nextOffset부터 이어서 호출, done=true면 종료. */
+    public record BatchResult(
+            int processed, int ingested, int failed, int total, int nextOffset, boolean done) {
+    }
+
+    /**
+     * KOSPI200 일봉을 청크(offset~offset+size)로 적재한다. Cloud Run 기본 CPU 정책에서도
+     * 각 청크가 독립 HTTP 요청이라 요청 처리 중 CPU를 받아 안전하게 완주한다(프론트가 nextOffset으로 순회).
+     * 종목 정렬은 id 오름차순으로 고정해 호출 간 슬라이스가 일관되게 한다.
+     */
+    public BatchResult ingestDailyForKospi200Batch(int offset, int size) {
+        int safeOffset = Math.max(0, offset);
+        int safeSize = Math.max(1, size);
+        java.util.List<Company> all = new java.util.ArrayList<>(companyRepository.findByInKospi200True());
+        all.sort(java.util.Comparator.comparing(Company::getId));
+        int total = all.size();
+        int end = Math.min(safeOffset + safeSize, total);
+
+        int processed = 0;
+        int ingested = 0;
+        int failed = 0;
+        for (int i = safeOffset; i < end; i++) {
+            Company company = all.get(i);
+            processed++;
+            if (company.getTicker() == null) {
+                continue;
+            }
+            try {
+                if (ingestDaily(company.getTicker()) > 0) {
+                    ingested++;
+                }
+            } catch (Exception e) {
+                failed++;
+                log.warn("KOSPI 200 ingest batch: ticker={} 처리 실패 — 건너뜀: {}",
+                        company.getTicker(), e.toString());
+            }
+        }
+        boolean done = end >= total;
+        return new BatchResult(processed, ingested, failed, total, end, done);
+    }
+
     /** 룰에 등장하는 전 종목 분봉 적재(interval/range). 적재된 종목 수 반환. */
     public int ingestIntradayForActiveSymbols(String interval, String range) {
         Set<String> symbols = activeSymbols();

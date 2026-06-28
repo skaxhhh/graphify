@@ -40,28 +40,20 @@ export async function seedKospi200() {
   );
 }
 
-// 일봉 적재는 99종목 직렬 외부호출이라 백그라운드(fire-and-forget)로 실행된다.
-// 트리거는 즉시 202(STARTED) / 409(ALREADY_RUNNING)를 반환하고, 진행은 status로 폴링한다.
-export type IngestTriggerResult = { status: "STARTED" | "ALREADY_RUNNING" };
-
-export type IngestJobState = "IDLE" | "RUNNING" | "DONE" | "FAILED";
-export type IngestJobStatus = {
-  state: IngestJobState;
-  symbols: number | null;
-  startedAt: string | null;
-  finishedAt: string | null;
-  error: string | null;
+// 일봉 적재는 99종목 직렬 외부호출이라 한 요청에 다 처리하면 게이트웨이 타임아웃 → CORS 마스킹이 발생한다.
+// 그래서 청크(size개씩)로 끊어 호출하고, 프론트가 nextOffset으로 done=true까지 순회한다.
+export type IngestBatchResult = {
+  processed: number;
+  ingested: number;
+  failed: number;
+  total: number;
+  nextOffset: number;
+  done: boolean;
 };
 
-export async function ingestKospi200() {
-  return apiPost<IngestTriggerResult, void>(
-    "/api/v1/admin/market/ingest-kospi200",
+export async function ingestKospi200Batch(offset: number, size: number) {
+  return apiPost<IngestBatchResult, void>(
+    `/api/v1/admin/market/ingest-kospi200/batch?offset=${offset}&size=${size}`,
     undefined
-  );
-}
-
-export async function fetchIngestKospi200Status() {
-  return apiGet<IngestJobStatus>(
-    "/api/v1/admin/market/ingest-kospi200/status"
   );
 }
