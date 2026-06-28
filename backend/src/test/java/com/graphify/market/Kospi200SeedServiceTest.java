@@ -34,7 +34,7 @@ class Kospi200SeedServiceTest {
     @BeforeEach
     void setUp() {
         store = new HashMap<>();
-        when(companyRepository.findByTicker(anyString()))
+        when(companyRepository.findFirstByTickerOrderByIdAsc(anyString()))
                 .thenAnswer(inv -> Optional.ofNullable(store.get(inv.getArgument(0))));
         when(companyRepository.save(any(Company.class)))
                 .thenAnswer(inv -> {

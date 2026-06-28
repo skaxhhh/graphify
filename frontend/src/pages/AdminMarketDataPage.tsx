@@ -12,6 +12,7 @@ const COUNT_LABELS: Record<string, string> = {
   count: "건수",
   symbols: "종목",
   total: "합계",
+  failed: "실패",
 };
 
 function formatCounts(counts: Kospi200Counts | null | undefined): string {

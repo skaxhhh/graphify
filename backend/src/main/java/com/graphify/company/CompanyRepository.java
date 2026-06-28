@@ -44,6 +44,9 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     Optional<Company> findByTicker(String ticker);
 
+    /** ticker 중복 행이 있어도 안전(LIMIT 1). 시드/부트스트랩처럼 무결성 미보장 데이터에서 사용. */
+    Optional<Company> findFirstByTickerOrderByIdAsc(String ticker);
+
     List<Company> findByInKospi200True();
 
     Optional<Company> findByExternalSourceAndExternalId(String externalSource, String externalId);
