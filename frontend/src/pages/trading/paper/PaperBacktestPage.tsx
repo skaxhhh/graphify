@@ -195,7 +195,22 @@ export function PaperBacktestPage() {
         ) : null}
       </div>
 
-      {result ? (
+      {mutation.isPending ? (
+        /* 실행 중 로딩 화면 — trade 토큰 + 기존 border-spinner 컨벤션 */
+        <div
+          className="mt-6 flex min-h-[280px] flex-col items-center justify-center rounded-lg border border-trade-hairline bg-trade-surface px-6 py-12 text-center"
+          role="status"
+          aria-live="polite"
+        >
+          <span className="inline-block h-10 w-10 animate-spin rounded-full border-[3px] border-trade-hairline border-t-trade-primary" />
+          <p className="mt-4 text-sm font-medium text-trade-on-dark font-trade-sans">
+            백테스트 실행 중…
+          </p>
+          <p className="mt-1 text-xs text-trade-muted font-trade-sans">
+            5분봉 데이터를 불러와 매매를 시뮬레이션하고 있습니다. 잠시만 기다려 주세요.
+          </p>
+        </div>
+      ) : result ? (
         <div className="mt-6 space-y-4">
           {/* Summary metrics — 5 cards */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
