@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "execute-phase 완료 — 06.9-02: PaperExecutor run_id stamping + PaperRunListService + PaperRunContributionService. Full suite green."
-stopped_at: Completed 06.9-02-PLAN.md — run_id stamping + aggregation services
-last_updated: "2026-06-28T02:29:40.443Z"
+status: "execute-phase 완료 — 06.9-03: GET /runs + GET /runs/{runId}/dashboard|history|report (2-mode). Full suite green."
+stopped_at: Completed 06.9-03-PLAN.md — PaperRunListController + PaperRunDetailController (dashboard/history/report 2-mode)
+last_updated: "2026-06-28T02:44:45.326Z"
 last_activity: "2026-06-28 — 06.8-04 execute: PaperBacktestPage fully reskinned (Binance dark). Build green, 0 token violations, D2 diff=0."
 progress:
   total_phases: 14
   completed_phases: 11
   total_plans: 44
-  completed_plans: 41
+  completed_plans: 42
   percent: 98
 ---
 
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 ## Current Position
 
-Phase: 6.8 (Trading 콘솔 UI 개편) — COMPLETE (모든 5개 플랜 완료: 01/02/03/04/05)
-Plan: 06.8-04 완료 (백테스트 페이지 Binance dark reskin). Phase 6.8 fully shipped.
-Status: execute-phase 완료 — 04 완료: PaperBacktestPage form + 5 metrics + equity + candle + trade table + TradingCompanyPickerModal.
+Phase: 6.9 (모의 운영 IA 재구조화 & 전략별 실행 이력) — Backend Wave 3 완료 (03/05)
+Plan: 06.9-03 완료 (Run-Scoped REST API). Wave 1(DB/Entity)+Wave 2(Executor tagging+Services)+Wave 3(REST API) shipped.
+Status: execute-phase 완료 — 06.9-03: GET /runs + GET /runs/{runId}/dashboard|history|report (2-mode). Full suite green.
 Last activity: 2026-06-28 — 06.8-04 execute: PaperBacktestPage fully reskinned (Binance dark). Build green, 0 token violations, D2 diff=0.
 
 Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLANNED)
@@ -79,6 +79,7 @@ Progress: [██████████] 98% (Phase 6.7 완료 / Phase 6.8 PLA
 | Phase 06.8 P04 | 2m | 2 tasks | 1 files |
 | Phase 06.9 P01 | 6m | 2 tasks | 8 files |
 | Phase 06.9 P02 | 11m | 2 tasks | 7 files |
+| Phase 06.9 P03 | 7m | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -207,6 +208,9 @@ Recent decisions affecting current work:
 - [Phase 06.9]: 8-arg PaperTrade delegates to 9-arg with runId=null — backward compat until Wave 2 PaperExecutor edit
 - [Phase 06.9]: resolveActiveRunId queries DB once per trade event; refactor to pass via OrderExecutorPort if N+1 causes perf issues
 - [Phase 06.9]: Open positions derived in-memory from BUY-without-SELL in paper_trades; no run_id on paper_positions (D5/Pitfall1)
+- [Phase 06.9]: RunSummaryDto mapped inline in controller from RunListItem; no reshape in service needed
+- [Phase 06.9]: RULE_AGGREGATE date params as YYYY-MM-DD strings parsed to Instant in controller — avoids Spring Instant binding complexity
+- [Phase 06.9]: PaperRunContributionService throws GraphifyException NOT_FOUND (ERR_PAPER_RUN_001) for proper HTTP 404 via GlobalExceptionHandler
 
 ### Pending Todos
 
@@ -220,6 +224,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-28T02:29:40.439Z
-Stopped at: Completed 06.9-02-PLAN.md — run_id stamping + aggregation services
+Last session: 2026-06-28T02:44:45.323Z
+Stopped at: Completed 06.9-03-PLAN.md — PaperRunListController + PaperRunDetailController (dashboard/history/report 2-mode)
 Resume file: None
