@@ -74,17 +74,25 @@ public class MarketDataIngestionService {
     public int ingestDailyForKospi200() {
         List<Company> kospi200 = companyRepository.findByInKospi200True();
         int count = 0;
+        int failed = 0;
         for (Company company : kospi200) {
             if (company.getTicker() == null) {
                 log.debug("Skip KOSPI 200 company without ticker: {}", company.getId());
                 continue;
             }
-            if (ingestDaily(company.getTicker()) > 0) {
-                count++;
+            // 종목 단위 격리: 한 종목의 외부호출/저장 실패가 전체 적재를 중단/500화하지 않게 한다.
+            try {
+                if (ingestDaily(company.getTicker()) > 0) {
+                    count++;
+                }
+            } catch (Exception e) {
+                failed++;
+                log.warn("KOSPI 200 ingest: ticker={} 처리 실패 — 건너뜀: {}",
+                        company.getTicker(), e.toString());
             }
         }
-        log.info("KOSPI 200 daily ingestion done: {} / {} symbols ingested",
-                count, kospi200.size());
+        log.info("KOSPI 200 daily ingestion done: {} / {} symbols ingested, {} failed",
+                count, kospi200.size(), failed);
         return count;
     }
 

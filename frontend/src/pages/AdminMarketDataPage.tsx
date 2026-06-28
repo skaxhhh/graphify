@@ -1,8 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { PrimaryButton } from "@/components/shared/PrimaryButton";
 import { ApiRequestError } from "@/lib/apiClient";
-import { ingestKospi200, seedKospi200, type Kospi200Counts } from "@/lib/adminApi";
+import {
+  fetchIngestKospi200Status,
+  ingestKospi200,
+  seedKospi200,
+  type IngestJobStatus,
+  type Kospi200Counts,
+} from "@/lib/adminApi";
 
 const COUNT_LABELS: Record<string, string> = {
   inserted: "추가",
@@ -47,11 +53,60 @@ export function AdminMarketDataPage() {
     },
   });
 
+  // 백그라운드 적재 작업 상태 폴링 (fire-and-forget 트리거 후 진행 추적)
+  const [ingestJob, setIngestJob] = useState<IngestJobStatus | null>(null);
+  const pollRef = useRef<number | null>(null);
+
+  const stopPolling = () => {
+    if (pollRef.current !== null) {
+      window.clearInterval(pollRef.current);
+      pollRef.current = null;
+    }
+  };
+
+  const startPolling = () => {
+    stopPolling();
+    const tick = async () => {
+      try {
+        const job = (await fetchIngestKospi200Status()).data;
+        setIngestJob(job ?? null);
+        if (job?.state === "DONE") {
+          stopPolling();
+          setError(null);
+          setToast(`KOSPI200 일봉 적재 완료 — 적재 ${job.symbols ?? 0}종목`);
+        } else if (job?.state === "FAILED") {
+          stopPolling();
+          setToast(null);
+          setError(`적재 실패: ${job.error ?? "알 수 없는 오류"}`);
+        }
+      } catch {
+        // 일시적 폴링 실패는 무시하고 다음 tick에서 재시도
+      }
+    };
+    void tick();
+    pollRef.current = window.setInterval(() => void tick(), 4000);
+  };
+
+  // 언마운트 시 폴링 정리
+  useEffect(() => stopPolling, []);
+
   const ingestMutation = useMutation({
     mutationFn: () => ingestKospi200(),
     onSuccess: (res) => {
       setError(null);
-      setToast(`KOSPI200 일봉 적재 완료 — ${formatCounts(res.data)}`);
+      if (res.data?.status === "ALREADY_RUNNING") {
+        setToast("이미 적재가 진행 중입니다. 완료될 때까지 기다려 주세요.");
+      } else {
+        setToast("KOSPI200 일봉 적재를 시작했습니다 — 백그라운드로 진행됩니다.");
+      }
+      setIngestJob({
+        state: "RUNNING",
+        symbols: null,
+        startedAt: null,
+        finishedAt: null,
+        error: null,
+      });
+      startPolling();
     },
     onError: (err) => {
       setToast(null);
@@ -61,7 +116,9 @@ export function AdminMarketDataPage() {
     },
   });
 
-  const anyPending = seedMutation.isPending || ingestMutation.isPending;
+  const ingestRunning =
+    ingestMutation.isPending || ingestJob?.state === "RUNNING";
+  const anyPending = seedMutation.isPending || ingestRunning;
 
   return (
     <div className="mx-auto w-full max-w-[800px] space-y-8 p-6 md:p-8">
@@ -116,12 +173,20 @@ export function AdminMarketDataPage() {
           <div>
             <h2 className="text-base font-medium text-charcoal">KOSPI200 일봉 적재</h2>
             <p className="mt-1 text-sm text-muted-gray">
-              KOSPI200 구성종목의 일봉 데이터를 적재합니다. 시드 후 실행하세요.
+              KOSPI200 구성종목의 일봉 데이터를 적재합니다. 시드 후 실행하세요. 수 분 걸리는
+              작업이라 백그라운드로 진행되며, 진행 상태가 아래에 표시됩니다.
             </p>
+            {ingestRunning ? (
+              <p className="mt-1 text-sm text-charcoal">적재 진행 중…</p>
+            ) : ingestJob?.state === "DONE" ? (
+              <p className="mt-1 text-sm text-muted-gray">
+                최근 적재 완료 — {ingestJob.symbols ?? 0}종목
+              </p>
+            ) : null}
           </div>
           <PrimaryButton
             className="w-auto px-6"
-            loading={ingestMutation.isPending}
+            loading={ingestRunning}
             disabled={anyPending}
             onClick={() => ingestMutation.mutate()}
           >

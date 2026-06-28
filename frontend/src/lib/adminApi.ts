@@ -40,9 +40,28 @@ export async function seedKospi200() {
   );
 }
 
+// 일봉 적재는 99종목 직렬 외부호출이라 백그라운드(fire-and-forget)로 실행된다.
+// 트리거는 즉시 202(STARTED) / 409(ALREADY_RUNNING)를 반환하고, 진행은 status로 폴링한다.
+export type IngestTriggerResult = { status: "STARTED" | "ALREADY_RUNNING" };
+
+export type IngestJobState = "IDLE" | "RUNNING" | "DONE" | "FAILED";
+export type IngestJobStatus = {
+  state: IngestJobState;
+  symbols: number | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  error: string | null;
+};
+
 export async function ingestKospi200() {
-  return apiPost<Kospi200Counts, void>(
+  return apiPost<IngestTriggerResult, void>(
     "/api/v1/admin/market/ingest-kospi200",
     undefined
+  );
+}
+
+export async function fetchIngestKospi200Status() {
+  return apiGet<IngestJobStatus>(
+    "/api/v1/admin/market/ingest-kospi200/status"
   );
 }
