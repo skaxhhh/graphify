@@ -3,6 +3,7 @@ package com.graphify.trading.paper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.graphify.market.KrxMarketCalendar;
 import com.graphify.trading.paper.dto.MonitorDto;
 import com.graphify.trading.paper.dto.SignalLogItem;
 import com.graphify.trading.paper.dto.TradeItem;
@@ -25,16 +26,19 @@ public class PaperMonitorService {
     private final PaperSignalLogRepository signalLogRepo;
     private final PaperTradeRepository tradeRepo;
     private final ObjectMapper objectMapper;
+    private final KrxMarketCalendar marketCalendar;
 
     public PaperMonitorService(
             PaperAccountRepository accountRepo,
             PaperSignalLogRepository signalLogRepo,
             PaperTradeRepository tradeRepo,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            KrxMarketCalendar marketCalendar) {
         this.accountRepo = accountRepo;
         this.signalLogRepo = signalLogRepo;
         this.tradeRepo = tradeRepo;
         this.objectMapper = objectMapper;
+        this.marketCalendar = marketCalendar;
     }
 
     public MonitorDto getMonitor(Long userId) {
@@ -74,18 +78,7 @@ public class PaperMonitorService {
     }
 
     private String resolveMarketStatus() {
-        ZonedDateTime now = ZonedDateTime.now(KST);
-        int dow = now.getDayOfWeek().getValue(); // 1=Mon, 7=Sun
-        if (dow >= 6) return "CLOSED"; // Saturday or Sunday
-
-        int hour = now.getHour();
-        int minute = now.getMinute();
-        int totalMinutes = hour * 60 + minute;
-        // 09:00 = 540, 15:30 = 930
-        if (totalMinutes >= 540 && totalMinutes < 930) {
-            return "OPEN";
-        }
-        return "CLOSED";
+        return marketCalendar.isOperatingWindowOpen(ZonedDateTime.now(KST)) ? "OPEN" : "CLOSED";
     }
 
     private SignalLogItem toSignalLogItem(PaperSignalLog log) {

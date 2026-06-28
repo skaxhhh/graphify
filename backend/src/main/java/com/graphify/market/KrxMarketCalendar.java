@@ -2,6 +2,8 @@ package com.graphify.market;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class KrxMarketCalendar {
+
+    private static final LocalTime OPERATING_OPEN  = LocalTime.of(9, 0);
+    private static final LocalTime OPERATING_CLOSE = LocalTime.of(18, 0);
 
     private final MarketHolidayRepository holidayRepository;
 
@@ -29,5 +34,15 @@ public class KrxMarketCalendar {
             return false;
         }
         return !holidayRepository.existsByHolidayDate(date);
+    }
+
+    /**
+     * 전략 운영 창 개장 여부 — 거래일(평일−공휴일) AND 09:00–18:00 KST.
+     * KRX 정규장(09:00–15:30)과 별개의 "운영" 시간대: 전략 시작 가능/자동 중지 기준.
+     */
+    public boolean isOperatingWindowOpen(ZonedDateTime now) {
+        if (!isTradingDay(now.toLocalDate())) return false;
+        LocalTime t = now.toLocalTime();
+        return !t.isBefore(OPERATING_OPEN) && t.isBefore(OPERATING_CLOSE);
     }
 }
